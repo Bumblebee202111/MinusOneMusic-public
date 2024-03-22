@@ -1,0 +1,15 @@
+package com.github.bumblebee202111.minusonecloudmusic.ui.recentplay
+
+import androidx.lifecycle.ViewModel
+import com.github.bumblebee202111.minusonecloudmusic.data.repository.UserRepository
+import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+
+@HiltViewModel
+class MyRecentPlayViewModel @Inject constructor(private val userRepository: UserRepository) : ViewModel() {
+    val recentPlaySongs=userRepository.getRecentPlayMusic().map { it.data }.flowOn(Dispatchers.IO).stateInUi()
+}
