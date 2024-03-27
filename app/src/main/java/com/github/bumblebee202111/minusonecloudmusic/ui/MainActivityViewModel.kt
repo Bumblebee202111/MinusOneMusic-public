@@ -53,14 +53,14 @@ class MainActivityViewModel @Inject constructor(
     fun registerAnonymousOrRefreshExisting() {
         viewModelScope.launch(SupervisorJob() + Dispatchers.IO) {
             if (hasLoggedInOrAnonymousUser()) {
-                loginRepository.registerAnonymous().collect()
-            }else{
                 loginRepository.refreshLoginToken()
+            }else{
+                loginRepository.registerAnonymous().collect()
             }
         }
     }
 
-    private suspend fun hasLoggedInOrAnonymousUser()=preferenceStorage.currentLoggedInUserId.first() == null && preferenceStorage.currentAnonymousUserId.first() == null
+    private suspend fun hasLoggedInOrAnonymousUser()=preferenceStorage.currentLoggedInUserId.first() != null || preferenceStorage.currentAnonymousUserId.first() != null
 
     val currentSongMediaItems = currentPlaylist.map {
 
