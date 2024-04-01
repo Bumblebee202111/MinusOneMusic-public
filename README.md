@@ -48,11 +48,10 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## Screenshot
 
-<img src="F:\AndroidStudioProjects\MinusOneMusic\docs\screenshots\Screenshot_main.png" style="zoom:25%;" /> <img src="F:\AndroidStudioProjects\MinusOneMusic\docs\screenshots\Screenshot_now_playing_main.png" style="zoom:25%;" /> <img src="F:\AndroidStudioProjects\MinusOneMusic\docs\screenshots\Screenshot_now_playing_lyrics.png" style="zoom:25%;" />
+<img src="docs\screenshots\Screenshot_main.png" style="zoom:25%;" /> <img src="docs\screenshots\Screenshot_now_playing_main.png" style="zoom:25%;" /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" style="zoom:25%;" />
 
 ## To-dos
 
-- Add screenshots, logo, release
 - \[Mini Player\] Swipe, Hide like `PlayControlView`
 - [Playlist] Everything about playlists
   - [Playlist] [Player\] Various playlist fragments/dialogs
