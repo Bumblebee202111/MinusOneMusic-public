@@ -7,7 +7,7 @@ import androidx.annotation.Dimension.Companion.DP
 
 object ViewUtils {
     fun dpToPx(context: Context, @Dimension(unit = DP) dp: Int): Float {
-        return dpToPx(context,dp)
+        return dpToPx(context,dp.toFloat())
     }
     fun dpToPx(context: Context, @Dimension(unit = DP) dp: Float): Float {
         val r = context.resources

@@ -40,12 +40,10 @@ class DiscoverFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mainNavController = mainNavController
         val categories = requireActivity().resources.getStringArray(R.array.wow_types).toList()
         val playListSquareAdapter = PlayListSquareAdapter(categories) { position ->
             when (position) {
                 0 -> {
-
                     mainNavController.navigate(R.id.nav_dailyrecommend)
                 }
 
@@ -58,7 +56,9 @@ class DiscoverFragment : Fragment() {
         }
         binding.wowDashboard.adapter = playListSquareAdapter
 
-        val songAdapter = SongAdapter(null)
+        val songAdapter = SongAdapter{song->
+            viewModel.onSongItemClick(song)
+        }
         binding.hotSongsChartList.adapter = songAdapter
 
         repeatWithViewLifecycle {

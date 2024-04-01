@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LoggedInUser
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.PlaylistApiModel
+import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.UserRepository
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -28,7 +30,8 @@ import javax.inject.Inject
 class MainActivityViewModel @Inject constructor(
     private val preferenceStorage: PreferenceStorage,
     private val userRepository: UserRepository,
-    private val loginRepository: LoginRepository
+    private val loginRepository: LoginRepository,
+    private val loggedInUserDataRepository: LoggedInUserDataRepository
 ) : ViewModel() {
 
     private val loggedInUserIdFlow = loginRepository.loggedInUserId
@@ -54,13 +57,17 @@ class MainActivityViewModel @Inject constructor(
         viewModelScope.launch(SupervisorJob() + Dispatchers.IO) {
             if (hasLoggedInOrAnonymousUser()) {
                 loginRepository.refreshLoginToken()
+                if(isLoggedIn()){
+                        loggedInUserDataRepository.refreshMyLikedSongs()
+                }
             }else{
                 loginRepository.registerAnonymous().collect()
             }
         }
     }
 
-    private suspend fun hasLoggedInOrAnonymousUser()=preferenceStorage.currentLoggedInUserId.first() != null || preferenceStorage.currentAnonymousUserId.first() != null
+    private suspend fun isLoggedIn()=preferenceStorage.currentLoggedInUserId.first() != null
+    private suspend fun hasLoggedInOrAnonymousUser()=isLoggedIn() || preferenceStorage.currentAnonymousUserId.first() != null
 
     val currentSongMediaItems = currentPlaylist.map {
 

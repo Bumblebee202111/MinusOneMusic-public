@@ -4,16 +4,18 @@ MinusOne Cloud Music (减一云音乐, also *MinusOne Music* as app name) is a t
 
 In developing this app, we (actually me alone) will explore how to develop a more complicated app. This project is not going to be very creative. Instead, we will focus on the technical details of how to implement core features of NCM with modern approaches. 
 
-Meanwhile, we are attempting to make it competent for the daily use of not only our team members but also loyal NCM fans.
+Meanwhile, we are attempting to make it as good as possible.
 
 Note this app is at a very early stage of development and we are very inexperienced. Current progress: 
 
-- 我的—音乐（界面与功能）
-- 迷你播放器（界面与功能）
-- 播放页—底部控制栏（仅功能）
-- 密码登录/退出登录（仅功能）
+> 一般不包括子界面、子菜单、子对话框等
 
-Other UI elements/pages or functionalities are nowhere near completed even if some drafts can be found now.
+- 好用：我的—音乐、迷你播放器、播放页
+- 够用：密码登录/退出登录
+
+Other UI elements/pages or functionalities are nowhere near completed even if some drafts can be found now. For example:
+
+- 能用：最近、云盘、我的播放列表、每日推荐
 
 ## Features
 
@@ -23,7 +25,6 @@ It will bring you 99% pure music experience with basic support of social feature
 - What are kept. Core functionalities and UI kept but only on best effort
 - (Non additive or subtractive) Modifications. Some limited number of convenient changes to the official UI/behaviors can be toggled in Settings.
 - No additions.
-- Stateful players with their stateless child views.
 - Music playback.
 - *Natural* (= without special adaptations) tablet/landscape support.
 - Direct up-to-date NCM service provided.
@@ -42,82 +43,61 @@ Below are some factors that may hinder you from using it, which can change over 
 - The app is almost fully **closed source**. (Maintaining an extra semi-open code base would lead to heavy burden!) So was the simple public repo born. If you don't trust me, simply reverse-engineer the app. If you are interested in some non-NCM-bound code, I can post it somewhere.
 
 ### Your do's and don'ts
-- Please use it only for proper learning/personal/non-commercial purposes. 
+- Please use it only for personal learning purposes. 
 - Please don't share it on other websites/apps without permission.
+
+## Screenshot
+
+<img src="docs\screenshots\Screenshot_main.png" style="zoom:25%;" /> <img src="docs\screenshots\Screenshot_now_playing_main.png" style="zoom:25%;" /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" style="zoom:25%;" />
 
 ## To-dos
 
-- Update AS
-
-- Update jadx-gui
-
-- Update and model on latest NCM app
-
-- > To avoid refreshing the UI too often in a short period of time, it's generally better to listen to just `onEvents` and trigger UI updates from there
-
-- [Insets] Better handle insets and stop using `fitsSystemWindows`
-
-- [BNV\] Fix overlapping of icon and title on some devices such as my AVD
-
-- [Now Playing] Volume control, lyrics
-
-- [Now Playing] Song actions
-
-- \[Mini Player\] Swipe
-
-- [Playlist] https://github.com/google/ExoPlayer/issues/8607
-
-- [Playlist] [Player\] Various playlist fragments/dialogs
-
-- [Player] Figure out with what param combination can a song be played, handle fetch error
-
-- [Mini Player\] Hide like `PlayControlView`
-
+- \[Mini Player\] Swipe, Hide like `PlayControlView`
+- [Playlist] Everything about playlists
+  - [Playlist] [Player\] Various playlist fragments/dialogs
+  - [Player] Playlist pagination
+  - [Player] Playlist resumption
 - \[Mini Player\] [Now Playing\] Transition
-
-- [Player] Download
-
+- [Player] Download & caching
 - [Player] Continue the work of moving Player to VM
-
 - [Player] Support various audio qualities
-
-- [Player] Playlist paging
-
+- [Insets] Fix insets
+  - Use fake status bars for top padding, deprecate CustomCoordinatorLayout
+- Statusbar lyrics
+- [New screens]
+  - Discover home
+  - Daily recommendations
+  - Personal FM
+  - Search
+  - Comments
+  - Billboards
+  - Friends
+- [Now Playing\] Follow
+- [BNV\] Fix overlapping of icon and title on some devices such as my AVD
+- [Player] Figure out with what param combination can a song be played
+- Use Channel to show Toasts
+- [Player] Handle fetch error
 - [Settings] Add 底部导航栏自定义
 
   - Delayed since: it's gone forever in our installed official app; it's not officially supported
-
+- [Now Playing] Prefer volume bar dialog to sytem volume Toast for systems where the built-in output switcher dialog is unavailable.
 - On-boarding
-
 - [Nav] Continue the work of optimizing navigation code
-
-- [Now Playing] UI
-
-- [Search] Add
-
 - [Network] More elegant
 
   - My own CookieJar implementation
   - Custom param annotation
-
+  - [Network] Add ApiResponse wrapper for more precise error tracking
 - [Arch] Clarify the dividing line between network layer and repo layer and consider removing the `NetworkDataSource` wrapper
-
 - [Login] SMS captcha login. Fully deprecate NCMA
-
 - [Arch] For data mapping, should probably use `from`-s instead of `to-`s instead
-
-- [Network] Add ApiResponse wrapper for more precise error tracking
-
-- [Quiz] Add quiz activity/app based on JetSurvey, meanwhile try out a lot of new/Kotlin libraries such as Compose
-
+- [Compose] Write non-NCM screens in Compose
+- [Qualification] Add quiz activity/app based on JetSurvey
 - [Mine] Add shadow for profile background
-
 - [Mine] Top crop profile background
-
 - [Mine] Fix top margin of user profile
-
+- [Full-screen Player] Maybe use Compose FlowRow and Arrangement.SpaceAround for control buttons
 - [Music Player Bar] Fix top shadow
-
 - [MinusTue] A minimum NCM app for exploring Vue3
 
 ## Libraries used
@@ -213,9 +193,7 @@ Below are some factors that may hinder you from using it, which can change over 
 <details>
     <summary>Misc.</summary>
     - Initially, I named it as 'NaCl'. Letters extracted from that of the official NCE app, it indicated that this third-party variant would be a lite alternative to the official one, due to technical limitations and omission of useless features. However, I found that Salt Music, another existing well-designed music app had a similar name. Now my app has been renamed to MinusOne Cloud Music, matching both of the '-1'
-  slogan and the name format of NCM.
-- Security and cryptography. We do use the very basic of NDK, which is apparently redundant in non-toy apps but worth for learning purposes.
+  slogan and the name format of NCM. - Security and cryptography. We do use the very basic of NDK, which is apparently redundant in non-toy apps but worth for learning purposes.
 </details>
-
 
 

@@ -13,6 +13,8 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.R
+import com.github.bumblebee202111.minusonecloudmusic.data.model.Song
+import com.github.bumblebee202111.minusonecloudmusic.data.model.asMediaItem
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentPlaylistBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
@@ -67,21 +69,7 @@ class PlaylistFragment : Fragment() {
                     val songs =
                         viewModel.playlistDetail.value?.songs ?: emptyList()
 
-                    val mediaItems = songs.map { song ->
-                        val songIdString = song.id.toString()
-                        val mediaMetadata =
-                            MediaMetadata.Builder()
-                                .setTitle(song.name)
-                                .setArtist(song.artists.joinToString("/"))
-                                .setArtworkUri(song.album?.let { Uri.parse(it.pictureUrl) })
-                                .setIsPlayable(song.available)
-                                .build()
-                        MediaItem.Builder().setMediaId(songIdString)
-                            .setUri(songIdString)
-                            .setMediaMetadata(mediaMetadata)
-                            .setCustomCacheKey(songIdString)
-                            .build()
-                    }
+                    val mediaItems = songs.map(Song::asMediaItem)
 
                     val startPositionMs =
                         if (currentMediaItem?.mediaId == song.id.toString()) currentPosition

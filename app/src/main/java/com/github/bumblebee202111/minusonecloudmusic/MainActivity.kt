@@ -87,7 +87,6 @@ class MainActivity : AppCompatActivity() {
         MediaController.releaseFuture(mediaControllerFuture)
     }
 
-
     private fun ensureOfficialNcmAppInstalled(): Boolean {
         val isOfficialNcmAppInstalled = packageManager.isPackageInstalled("com.netease.cloudmusic")
         if (!isOfficialNcmAppInstalled) {
@@ -102,9 +101,7 @@ class MainActivity : AppCompatActivity() {
         return isOfficialNcmAppInstalled
     }
 
-
     companion object {
-        
         init {
             System.loadLibrary("minusonecloudmusic")
         }

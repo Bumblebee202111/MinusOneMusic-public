@@ -1,6 +1,9 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import android.annotation.SuppressLint
+import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -8,6 +11,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.R
+import com.google.android.material.internal.ViewUtils.requestApplyInsetsWhenAttached
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 val Fragment.statusBarHeight:Int
@@ -40,3 +44,48 @@ inline fun Fragment.repeatWithViewLifecycle(
 fun Fragment.requireFragment(id: Int): Fragment {
     return childFragmentManager.findFragmentById(id) ?: throw IllegalArgumentException()
 }
+
+
+@SuppressLint("RestrictedApi")
+fun View.doOnApplyWindowInsets(f: (v:View, insets:WindowInsetsCompat, padding:ViewPaddingState) -> Unit) {
+    val paddingState = createStateForView(this)
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+        f(v, insets, paddingState)
+        insets
+    }
+    requestApplyInsetsWhenAttached()
+}
+
+
+
+fun View.requestApplyInsetsWhenAttached() {
+    if (isAttachedToWindow) {
+        requestApplyInsets()
+    } else {
+        addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                v.requestApplyInsets()
+            }
+
+            override fun onViewDetachedFromWindow(v: View) = Unit
+        })
+    }
+}
+
+private fun createStateForView(view: View) = ViewPaddingState(
+    view.paddingLeft,
+    view.paddingTop,
+    view.paddingRight,
+    view.paddingBottom,
+    view.paddingStart,
+    view.paddingEnd
+)
+
+data class ViewPaddingState(
+    val left: Int,
+    val top: Int,
+    val right: Int,
+    val bottom: Int,
+    val start: Int,
+    val end: Int
+)

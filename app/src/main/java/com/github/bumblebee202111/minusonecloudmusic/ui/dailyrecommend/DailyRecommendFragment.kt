@@ -38,7 +38,7 @@ class DailyRecommendFragment : Fragment() {
 
         val dailyRecommendList = binding.dailyRecommendList
         val adapter = DailyRecommendSongAdapter { dailyRecommendSong ->
-
+            viewModel.onSongItemClick(dailyRecommendSong)
         }
         dailyRecommendList.adapter = adapter
 
