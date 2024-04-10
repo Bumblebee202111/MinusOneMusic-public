@@ -14,7 +14,7 @@ This patch mainly contains various playlists-related development
 
 - Optimize: Introduce better ways of handling window insets
 - Optimize: Minor optimizations and code cleanups
-- TODO: Bug fixes
+- Fix: Fix action of notification next button, which is flipped by mistake
 
 ## Version 1.0.0-dev02 (baseline: NCM 9.0.40)
 

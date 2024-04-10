@@ -50,7 +50,6 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- Fix action of notification next button, which is flipped by mistake
 - Guest user tokens need no refresh
 - Release
 - [Persistence] Download, caching, local music & resumption
