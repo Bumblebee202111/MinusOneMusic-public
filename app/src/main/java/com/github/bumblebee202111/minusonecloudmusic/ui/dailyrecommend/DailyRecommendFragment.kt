@@ -1,54 +1,72 @@
+@file:OptIn(UnstableApi::class)
+
 package com.github.bumblebee202111.minusonecloudmusic.ui.dailyrecommend
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.annotation.OptIn
 import androidx.fragment.app.viewModels
+import androidx.media3.common.util.UnstableApi
+import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDailyRecommendBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractRemotePlaylistFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.setFitHeightNavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
-class DailyRecommendFragment : Fragment() {
+class DailyRecommendFragment : AbstractRemotePlaylistFragment() {
 
     companion object {
         fun newInstance() = DailyRecommendFragment()
     }
 
     private lateinit var binding: FragmentDailyRecommendBinding
-    private val viewModel: DailyRecommendViewModel by viewModels()
+    override val viewModel: DailyRecommendViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentDailyRecommendBinding.inflate(inflater, container, false).apply {
+            viewModel = this@DailyRecommendFragment.viewModel
             lifecycleOwner = viewLifecycleOwner
         }
-
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val dailyRecommendList = binding.dailyRecommendList
         val adapter = DailyRecommendSongAdapter { dailyRecommendSong ->
-            viewModel.onSongItemClick(dailyRecommendSong)
+            viewModel.onSongItemClick(dailyRecommendSong.id)
         }
         dailyRecommendList.adapter = adapter
 
+        val typeface = Typeface.createFromAsset(requireContext().assets, "bamboo.ttf")
+        binding.tvPendantDayRecommendDateInfo.typeface = typeface
+        binding.tvPendantMonthText.typeface = typeface
+
+
         repeatWithViewLifecycle {
             launch {
-                viewModel.dailyRecommendSongs.collect {
+                viewModel.songUiModels.collect {
                     adapter.submitList(it)
+                }
+            }
+            launch {
+                viewModel.player.collect {
+                    setPlayer(it)
                 }
             }
 
         }
     }
+
 }

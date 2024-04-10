@@ -1,19 +1,16 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.media.AudioManager
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.IotDevicesDialogContentBinding
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class IotDevicesDialogFragment : BottomSheetDialogFragment() {

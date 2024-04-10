@@ -3,7 +3,6 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
-import com.github.bumblebee202111.minusonecloudmusic.data.Result
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
@@ -11,7 +10,6 @@ import com.github.bumblebee202111.minusonecloudmusic.player.CountUtil
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -78,5 +76,4 @@ class NowPlayingViewModel @Inject constructor(
 
 }
 
-data class LikeState(val like: Boolean?, val likeCountDisplayText: String?) {
-}
+data class LikeState(val like: Boolean?, val likeCountDisplayText: String?)

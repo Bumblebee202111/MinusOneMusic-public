@@ -35,10 +35,10 @@ class UserRepository @Inject constructor(
         if (useCache) getOfflineFirstUserDetail(uid) else getApiUserDetail(uid)
 
 
-    private fun getApiUserDetail(uid: Long) = apiResultFlow(fetcher = {
+    private fun getApiUserDetail(uid: Long) = apiResultFlow(fetch = {
         networkDataSource.getUserDetail(uid)
     },
-        successMapper = { result -> UserDetail(result.listenSongs, result.profile.asExternalModel()) })
+        mapSuccess = { result -> UserDetail(result.listenSongs, result.profile.asExternalModel()) })
 
     private fun getOfflineFirstUserDetail(uid: Long) = offlineFirstApiResultFlow(
         loadFromDb = {
@@ -47,7 +47,7 @@ class UserRepository @Inject constructor(
         call = {
             networkDataSource.getUserDetail(uid)
         },
-        successSaver = { data ->
+        saveSuccess = { data ->
             userDao.insertUserProfile(data.profile.asEntity())
             userDao.insertUserDetail(UserDetailEntity(data.profile.userId, data.listenSongs))
         })
@@ -60,7 +60,7 @@ class UserRepository @Inject constructor(
                 .map { it.map { populatedUserPlaylist -> populatedUserPlaylist.playlist.asExternalModel() } }
         },
         call = { networkDataSource.getUserPlaylists(userId) },
-        successSaver = { ncmPlaylistsResult ->
+        saveSuccess = { ncmPlaylistsResult ->
             val userPlaylists =
                 ncmPlaylistsResult.playlist.mapIndexed { index, p ->
                     UserPlaylistEntity(
@@ -85,7 +85,7 @@ class UserRepository @Inject constructor(
                 .map { it.map(PopulatedMyRecentMusicData::asExternalModel) }
         },
         call = { networkDataSource.getMyRecentMusic() },
-        successSaver = { myRecentMusicWrapper ->
+        saveSuccess = { myRecentMusicWrapper ->
             recentPlayDao.deleteAndInsertRecentPlayMusic(
                 myRecentMusicWrapper.list.map(
                     MyRecentMusicDataApiModel::asEntity
@@ -97,14 +97,14 @@ class UserRepository @Inject constructor(
 
 
     fun getUserFollows(userId: Long, offset: Int=0, limit: Int=20) =
-        apiResultFlow(fetcher = { networkDataSource.getUserFollows(userId, offset, limit) },
-            successMapper = { result ->
+        apiResultFlow(fetch = { networkDataSource.getUserFollows(userId, offset, limit) },
+            mapSuccess = { result ->
                 return@apiResultFlow result.follow.map { it.asExternalModel() }
             })
 
     fun getUserFans(userId: Long, offset: Int=0, limit: Int=20) =
-        apiResultFlow(fetcher = { networkDataSource.getUserFolloweds(userId, offset, limit) },
-            successMapper = { result ->
+        apiResultFlow(fetch = { networkDataSource.getUserFolloweds(userId, offset, limit) },
+            mapSuccess = { result ->
                 return@apiResultFlow result.followeds.map { it.asExternalModel() }
             })
 

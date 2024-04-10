@@ -20,14 +20,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
-        android:theme="@style/Theme.MinusOneCloudMusic"
+        android:theme="@style/Theme.App"
         android:usesCleartextTraffic="true"
         tools:targetApi="33"
         >
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.MinusOneCloudMusic.NoActionBar">
+            android:theme="@style/Theme.App.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

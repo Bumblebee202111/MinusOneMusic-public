@@ -6,16 +6,14 @@ In developing this app, we (actually me alone) will explore how to develop a mor
 
 Meanwhile, we are attempting to make it as good as possible.
 
-Note this app is at a very early stage of development and we are very inexperienced. Current progress: 
+Note we are very inexperience and this app is at a very early stage of development. Current progress: 
 
-> 一般不包括子界面、子菜单、子对话框等
+- 好用[^*]：我的—音乐、迷你播放器、播放页、我的播放列表、每日推荐
+- 够用：密码登录/退出登录、最近播放—歌曲、云盘
 
-- 好用：我的—音乐、迷你播放器、播放页
-- 够用：密码登录/退出登录
+[^*]: 一般不包括子界面、子菜单、子对话框等
 
-Other UI elements/pages or functionalities are nowhere near completed even if some drafts can be found now. For example:
-
-- 能用：最近、云盘、我的播放列表、每日推荐
+Other UI elements/pages or functionalities are nowhere near completed even if some drafts can be found now. 
 
 ## Features
 
@@ -48,48 +46,50 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## Screenshot
 
-<img src="docs\screenshots\Screenshot_main.png" style="zoom:25%;" /> <img src="docs\screenshots\Screenshot_now_playing_main.png" style="zoom:25%;" /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" style="zoom:25%;" />
+<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=192/> <img src="F:\AndroidStudioProjects\MinusOneMusic\docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=192 /><img src="F:\AndroidStudioProjects\MinusOneMusic\docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=192 />
 
 ## To-dos
 
-- \[Mini Player\] Swipe, Hide like `PlayControlView`
-- [Playlist] Everything about playlists
-  - [Playlist] [Player\] Various playlist fragments/dialogs
-  - [Player] Playlist pagination
-  - [Player] Playlist resumption
-- \[Mini Player\] [Now Playing\] Transition
-- [Player] Download & caching
-- [Player] Continue the work of moving Player to VM
-- [Player] Support various audio qualities
-- [Insets] Fix insets
-  - Use fake status bars for top padding, deprecate CustomCoordinatorLayout
-- Statusbar lyrics
-- [New screens]
-  - Discover home
-  - Daily recommendations
-  - Personal FM
+- Fix action of notification next button, which is flipped by mistake
+- Guest user tokens need no refresh
+- Release
+- [Persistence] Download, caching, local music & resumption
+- Playlist dialog may not auto jump to current song on entrance on rare occations, and we'll keep tracking on this
+- New screens / major features
+  - Discover & feed
+    - Personal FMs
+    - Billboards
   - Search
   - Comments
-  - Billboards
+  - My Chart (听歌排行)
   - Friends
+  - MVs
+- Statusbar lyrics
+- \[Mini Player\] Swipe, Hide like `PlayControlView`
+- [Mini Player\] [Now Playing\] Transition
+- [Player] Continue the work of moving Player to VM
+- [Now Playing\] Use light status bar text
 - [Now Playing\] Follow
 - [BNV\] Fix overlapping of icon and title on some devices such as my AVD
-- [Player] Figure out with what param combination can a song be played
+- [Playlist] Items
+  - Actions
+  - Cloud/favorite/试听(trial)/unavailable UI state
 - Use Channel to show Toasts
 - [Player] Handle fetch error
-- [Settings] Add 底部导航栏自定义
-
-  - Delayed since: it's gone forever in our installed official app; it's not officially supported
-- [Now Playing] Prefer volume bar dialog to sytem volume Toast for systems where the built-in output switcher dialog is unavailable.
-- On-boarding
-- [Nav] Continue the work of optimizing navigation code
+- [Now Playing] Provide bottom volume bar dialog (iknstead of showing sytem volume toast) for systems where the built-in output switcher dialog is unavailable.
 - [Network] More elegant
 
   - My own CookieJar implementation
   - Custom param annotation
   - [Network] Add ApiResponse wrapper for more precise error tracking
+- On-boarding
+- [Nav] Continue the work of optimizing navigation code
+- [Settings] Add 底部导航栏自定义
+  - Delayed since: it's gone forever in our installed official app; it's not officially supported
+- [Player] Support various audio qualities
 - [Arch] Clarify the dividing line between network layer and repo layer and consider removing the `NetworkDataSource` wrapper
-- [Login] SMS captcha login. Fully deprecate NCMA
+- [NCMB] Fully deprecate it 
+- [Login] SMS captcha login
 - [Arch] For data mapping, should probably use `from`-s instead of `to-`s instead
 - [Compose] Write non-NCM screens in Compose
 - [Qualification] Add quiz activity/app based on JetSurvey

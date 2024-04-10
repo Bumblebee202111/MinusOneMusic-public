@@ -4,18 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMyRecentPlayMusicBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractRemotePlaylistFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractRemotePlaylistViewModel
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import kotlinx.coroutines.launch
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-class MyRecentPlayMusicFragment : Fragment() {
+class MyRecentPlayMusicFragment : AbstractRemotePlaylistFragment() {
 
     private val myRecentPlayViewModel:MyRecentPlayViewModel by viewModels( { requireParentFragment() })
+    override val viewModel: AbstractRemotePlaylistViewModel<*>
+        get() = myRecentPlayViewModel
     private lateinit var binding: FragmentMyRecentPlayMusicBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,14 +37,19 @@ class MyRecentPlayMusicFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val adapter=RecentPlaySongAdapter {
-
+            viewModel.onSongItemClick(it)
         }
         binding.list.adapter=adapter
 
         repeatWithViewLifecycle {
             launch {
-                myRecentPlayViewModel.recentPlaySongs.collect{
+                myRecentPlayViewModel.recentPlaySongUiList.collect{
                     adapter.submitList(it)
+                }
+            }
+            launch {
+                myRecentPlayViewModel.player.collect{
+                    binding.miniPlayerBar.player=it
                 }
             }
         }

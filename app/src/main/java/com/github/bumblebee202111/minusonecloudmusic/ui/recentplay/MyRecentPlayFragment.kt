@@ -51,7 +51,7 @@ class MyRecentPlayFragment : Fragment() {
 
         repeatWithViewLifecycle {
             launch {
-                viewModel.recentPlaySongs.collect {
+                viewModel.recentPlaySongUiList.collect {
                     badge.number = it?.size ?: 0
                 }
 

@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide
 import com.github.bumblebee202111.minusonecloudmusic.R
 
 
+
 @UnstableApi
 class MiniPlayerBarView @JvmOverloads constructor(
     context: Context,
@@ -48,6 +49,7 @@ class MiniPlayerBarView @JvmOverloads constructor(
     private var playPauseButton: MiniPlayPauseButton? = null
     private var artworkView: ImageView? = null
     private var titleAndArtistView: MiniBarTextView? = null
+    private var playlistButton:ImageView?=null
 
     private val period: Timeline.Period
     private val window: Timeline.Window
@@ -158,8 +160,10 @@ class MiniPlayerBarView @JvmOverloads constructor(
         playPauseButton?.setOnClickListener {
             Util.handlePlayPauseButtonAction(player, showPlayButtonIfSuppressed)
         }
+
         artworkView=findViewById(R.id.cover)
         titleAndArtistView=findViewById(R.id.tv_music)
+        playlistButton=findViewById(R.id.playlist_button)
     }
 
     private fun updateAll() {
@@ -245,9 +249,15 @@ class MiniPlayerBarView @JvmOverloads constructor(
             postDelayed(updateProgressAction, MAX_UPDATE_INTERVAL_MS.toLong())
         }
     }
-
     fun isVisible(): Boolean {
         return visibility == VISIBLE
+    }
+
+    fun setPlaylistButtonListener(onClickListener: OnClickListener?) {
+            playlistButton?.apply {
+                setOnClickListener(onClickListener)
+                updateButton(onClickListener != null, this)
+            }
     }
 
     private fun updateButton(enabled: Boolean, view: View?) {

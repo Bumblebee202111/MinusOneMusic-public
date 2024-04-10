@@ -20,11 +20,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
+import androidx.core.view.setPadding
 import androidx.fragment.app.viewModels
 import androidx.media3.common.C
 import androidx.media3.common.Player
@@ -46,9 +47,12 @@ import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentNowPlayingBinding
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleModeUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleToggleMode
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractMiniPlayerBarFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlayerFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.LyricsView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.getNavButtonView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
@@ -57,11 +61,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Formatter
 import java.util.Locale
+import kotlin.math.roundToInt
 
 
 @AndroidEntryPoint
 @UnstableApi
-class NowPlayingFragment : Fragment() {
+class NowPlayingFragment : AbstractPlayerFragment() {
 
     lateinit var binding: FragmentNowPlayingBinding
     private val nowPlayingViewModel: NowPlayingViewModel by viewModels()
@@ -69,7 +74,7 @@ class NowPlayingFragment : Fragment() {
     private lateinit var resources: Resources
     private lateinit var playerListener: PlayerListener
     private lateinit var artworkView: ImageView
-    private lateinit var toolbar: androidx.appcompat.widget.Toolbar
+    private lateinit var toolbar: Toolbar
     private lateinit var songActionsTitleView: TextView
     private lateinit var songActionsArtistView: TextView
     private lateinit var previousButton: View
@@ -83,6 +88,7 @@ class NowPlayingFragment : Fragment() {
     private lateinit var timeBar: DefaultTimeBar
 
     
+    private lateinit var playlistButton: ImageView
     private lateinit var deviceButton: ImageView
     private lateinit var likeButton: ImageButton
     private lateinit var commentButton: ImageButton
@@ -221,7 +227,10 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        audioManager = requireContext().applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        binding.openPlaylist.setOnClickListener { openPlayerPlaylistDialog() }
+
+        audioManager =
+            requireContext().applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioManager.registerAudioDeviceCallback(object : AudioDeviceCallback() {
             var audioDevices: List<AudioDeviceInfo> = emptyList()
             override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>?) {
@@ -241,8 +250,9 @@ class NowPlayingFragment : Fragment() {
             }
 
             fun updateIcon() {
-                val isA2dpPlaying=audioDevices.firstOrNull { it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP } != null
-                binding.deviceBtnStyle1.setImageResource(if(isA2dpPlaying)  R.drawable.f5j else R.drawable.f5i)
+                val isA2dpPlaying =
+                    audioDevices.find { it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP } != null
+                binding.deviceBtnStyle1.setImageResource(if (isA2dpPlaying) R.drawable.f5j else R.drawable.f5i)
             }
         }, handler)
 
@@ -353,6 +363,7 @@ class NowPlayingFragment : Fragment() {
         }
 
         toolbar = binding.toolbar.apply {
+            getNavButtonView()?.setPadding(ViewUtils.dpToPx(context, 10).roundToInt())
             setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
@@ -728,7 +739,7 @@ class NowPlayingFragment : Fragment() {
     private fun createBadgeDrawable(context: Context): BadgeDrawable =
         BadgeDrawable.create(context).apply {
             isVisible = true
-            setTextAppearance(R.style.TextAppearance_MinusOneCloudMusic_Player_Badge)
+            setTextAppearance(R.style.TextAppearance_App_Player_Badge)
             horizontalOffset = ViewUtils.dpToPx(requireContext(), 12).toInt()
             verticalOffset = ViewUtils.dpToPx(requireContext(), 11).toInt()
             backgroundColor = Color.TRANSPARENT

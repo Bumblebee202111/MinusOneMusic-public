@@ -41,8 +41,8 @@ class LoginRepository @Inject constructor(
             deviceInfoProvider.deviceId
         val username = createUsername(deviceId)
         return apiResultFlow(
-            fetcher = { networkDataSource.registerAnonimous(username) },
-            successMapper = {
+            fetch = { networkDataSource.registerAnonimous(username) },
+            mapSuccess = {
                 preferenceStorage.setAnonymousUserId(it.userId)
                 preferenceStorage.setLoggedInUserId(null)
             }
@@ -132,7 +132,7 @@ class LoginRepository @Inject constructor(
             }
         },
         call = { networkDataSource.getLoginStatus() },
-        successSaver = {
+        saveSuccess = {
             if (it.account.status == 0) {
                 appDatabase.userDao().insertUserProfile(it.profile!!.asEntity())
                 setLoggedInUserId(it.account.id)
@@ -152,36 +152,36 @@ class LoginRepository @Inject constructor(
     }
 
     fun sendCaptcha(phoneNumber: String) = apiResultFlow(
-        fetcher = { networkDataSource.sendSMSCaptcha(phoneNumber) }
+        fetch = { networkDataSource.sendSMSCaptcha(phoneNumber) }
     ) { _ ->
     }
 
     fun verifyPhoneLoginCaptcha(phoneNumber: String, captcha: String) = apiResultFlow(
-        fetcher = { networkDataSource.verifyCaptcha(phoneNumber, captcha) }
+        fetch = { networkDataSource.verifyCaptcha(phoneNumber, captcha) }
     ) { _ -> }
 
 
     fun loginWithCaptcha(phoneNumber: String, captcha: String) =
-        apiResultFlow(fetcher = {
+        apiResultFlow(fetch = {
             networkDataSource.cellphoneLogin(
                 cellphone = phoneNumber,
                 captcha = captcha
             )
         },
-            successMapper = { result ->
+            mapSuccess = { result ->
                 setLoggedInUserId(result.account.id)
                 setAnonymousUserId(null)
                 result
             })
 
     fun loginWithPassword(phoneNumber: String, password: String) =
-        apiResultFlow(fetcher = {
+        apiResultFlow(fetch = {
             networkDataSource.cellphoneLogin(
                 cellphone = phoneNumber,
                 password = password.toByteArray().md5().toHexString()
             )
         },
-            successMapper = { result ->
+            mapSuccess = { result ->
                 setLoggedInUserId(result.account.id)
                 setAnonymousUserId(null)
                 appDatabase.withTransaction {

@@ -1,32 +1,36 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.playlist
 
-import android.net.Uri
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.viewModels
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.media3.common.util.UnstableApi
-import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.data.model.Song
-import com.github.bumblebee202111.minusonecloudmusic.data.model.asMediaItem
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentPlaylistBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarView
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractRemotePlaylistFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.extractDominantColor
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.setBackgroundColorAndTopCorner
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.setFitHeightNavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlin.math.abs
+import kotlin.math.min
 
 @AndroidEntryPoint
-class PlaylistFragment : Fragment() {
+class PlaylistFragment : AbstractRemotePlaylistFragment() {
 
-    private val viewModel: PlaylistViewModel by viewModels()
+    override val viewModel: PlaylistViewModel by viewModels()
     private lateinit var binding: FragmentPlaylistBinding
-    private lateinit var playerView: MiniPlayerBarView
+
     companion object {
         fun newInstance() = PlaylistFragment()
     }
@@ -40,7 +44,6 @@ class PlaylistFragment : Fragment() {
             lifecycleOwner = viewLifecycleOwner
             viewModel = this@PlaylistFragment.viewModel
         }
-        playerView = binding.playerView
         return binding.root
     }
 
@@ -48,61 +51,55 @@ class PlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-        playerView.setOnClickListener {
-            findNavController().navigate(R.id.nav_now_playing)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.appBarLayout) { _, insets ->
+            (binding.toolbar.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
+                insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
+            WindowInsetsCompat.CONSUMED
         }
 
-        repeatWithViewLifecycle {
-            launch {
-                viewModel.player.collect{
-                    binding.playerView.player = it
-                }
-            }
+        binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val totalScrollRange = appBarLayout.totalScrollRange
+            val fraction = min(abs(verticalOffset).toFloat() / totalScrollRange, 0.3F)
+
+            val timeInterpolator = FastOutSlowInInterpolator()
+            val interpolation = timeInterpolator.getInterpolation(fraction)
+            val alpha = 0.0F + interpolation * (0.3F - 0.0F)
+            binding.toolbarBackground.alpha=alpha
 
         }
 
-        val songAdapter = SongAdapter { song ->
-            if (song.available) {
-                val player = viewModel.player.value ?: return@SongAdapter
-                with(player) {
-                    val songs =
-                        viewModel.playlistDetail.value?.songs ?: emptyList()
+       playlistActions.setBackgroundColorAndTopCorner(R.color.colorBackgroundAndroid,12F)
 
-                    val mediaItems = songs.map(Song::asMediaItem)
-
-                    val startPositionMs =
-                        if (currentMediaItem?.mediaId == song.id.toString()) currentPosition
-                        else C.TIME_UNSET
-                    setMediaItems(
-                        mediaItems,
-                        songs.indexOfFirst { it.id == song.id },
-                        startPositionMs
-                    )
-                    prepare()
-                    play()
-
-                }
-
-            }
-
+        val songAdapter = PagedSongAdapter { song ->
+            viewModel.onSongItemClick(song.id)
         }
+
         binding.songList.adapter = songAdapter
         repeatWithViewLifecycle {
             launch {
+                viewModel.player.collect(::setPlayer)
+            }
+            launch {
                 viewModel.playlistDetail.collect {
-                    songAdapter.submitList(it?.songs)
+                    val playlistCover = it?.coverImgUrl?:return@collect
+                    Log.d("fuvk", playlistCover)
+                    Glide.with(binding.playlistCover).load(playlistCover)
+                        .placeholder(R.drawable.h_1)
+                        .extractDominantColor(binding.gradientBg, Color.BLACK,0.45F,0.75F)
+                        .optionalCenterCrop().into(binding.playlistCover)
+
                 }
 
+
+            }
+            launch {
+                viewModel.playlistSongs.collectLatest {
+                    songAdapter.submitData(it)
+
+                }
             }
         }
-    }
 
-
-    @UnstableApi
-    override fun onStop() {
-        super.onStop()
-        playerView.player = null
     }
 
 

@@ -2,9 +2,12 @@ package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
 import com.github.bumblebee202111.minusonecloudmusic.data.Result
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LyricsEntry
-import com.github.bumblebee202111.minusonecloudmusic.data.model.VersionedSongTrackId
+import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.data.model.SongIdAndVersion
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NetworkDataSource
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.MusicInfoApiModel
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongDetailsApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongLyricsApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongPrivilegeApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.asExternalModel
@@ -22,52 +25,66 @@ class SongRepository @Inject constructor(
 ) {
 
     @Suppress("unused")
-    fun getSongDetails(versionedSongTrackIds: List<VersionedSongTrackId>) = apiResultFlow(
-        fetcher = {
-            versionedSongTrackIds.size.takeIf { it >= 1000 }?.let { size ->
+    fun observeSongDetails(songIdAndVersions: List<SongIdAndVersion>) = apiResultFlow(
+        fetch = {
+            songIdAndVersions.size.takeIf { it >= 1000 }?.let { size ->
                 throw IllegalArgumentException("Size $size exceeds API limit 1000")
             }
-            val c = versionedSongTrackIds.map {
+            val c = songIdAndVersions.map {
                 CParamSongInfo(
                     id = it.songId,
                     version = it.version
                 )
             }
 
-            val cJsonString = moshiAdapter.toJson(c)
-            networkDataSource.getSongDetails(cJsonString)
+            val cJson = moshiAdapter.toJson(c)
+            networkDataSource.getSongDetails(cJson)
         },
-        successMapper = { result ->
+        mapSuccess = { result ->
             result.songs.zip(result.privileges)
                 .map(Pair<MusicInfoApiModel, SongPrivilegeApiModel>::asExternalModel)
         }
     )
 
+    suspend fun getSongDetails(songIds: List<Long>): List<RemoteSong> {
+        val songs = mutableListOf<Pair<MusicInfoApiModel, SongPrivilegeApiModel>>()
+        for (chunk in songIds.chunked(1000)) {
+            val cParam = moshiAdapter.toJson(chunk.map { CParamSongInfo(it, 0) })
+            val result = networkDataSource.getSongDetails(cParam)
+            if (result is ApiResult.ApiSuccessResult) {
+                songs += result.data.songs.zip(result.data.privileges)
+            } else {
+                break
+            }
+        }
+        return songs.map(Pair<MusicInfoApiModel, SongPrivilegeApiModel>::asExternalModel)
+    }
+
     fun getSongUrls(vararg songIds: Long): Flow<Result<List<SongUrlInfo>?>> {
         val songIdsJson = moshiAdapter.toJson(songIds)
         return apiResultFlow(
-            fetcher = { networkDataSource.getSongUrlsV1(songIdsJson) }
+            fetch = { networkDataSource.getSongUrlsV1(songIdsJson) }
         ) { data ->
             data
         }
     }
 
     fun getLyrics(songId: Long) =
-        apiResultFlow<SongLyricsApiModel, List<LyricsEntry>>(fetcher = {
+        apiResultFlow<SongLyricsApiModel, List<LyricsEntry>>(fetch = {
             networkDataSource.getSongLyrics(
                 songId
             )
-        }, successMapper = SongLyricsApiModel::asExternalModel)
+        }, mapSuccess = SongLyricsApiModel::asExternalModel)
 
     fun getSongLikeCountText(songId: Long) = apiResultFlow(
-        fetcher = { networkDataSource.getSongLikeCount(songId) },
-        successMapper = { it.countDesc }
+        fetch = { networkDataSource.getSongLikeCount(songId) },
+        mapSuccess = { it.countDesc }
     )
 
 
     fun getCommentCount(songId: Long) = apiResultFlow(
-        fetcher = { networkDataSource.getCommentInfoResourceList(moshiAdapter.toJson(listOf(songId))) },
-        successMapper = { it[0].commentCount }
+        fetch = { networkDataSource.getCommentInfoResourceList(moshiAdapter.toJson(listOf(songId))) },
+        mapSuccess = { it[0].commentCount }
     )
 
 }

@@ -3,7 +3,7 @@ package com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.github.bumblebee202111.minusonecloudmusic.data.model.Album
-import com.github.bumblebee202111.minusonecloudmusic.data.model.Song
+import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 
 @Entity
 data class MusicInfoEntity(
@@ -16,7 +16,7 @@ data class MusicInfoEntity(
     val version: Int
 )
 
-fun MusicInfoEntity.asExternalModel(): Song = Song(
+fun MusicInfoEntity.asExternalModel(): RemoteSong = RemoteSong(
     name = name,
     id = id,
     album = album,

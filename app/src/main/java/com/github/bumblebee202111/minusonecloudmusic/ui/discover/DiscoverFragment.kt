@@ -11,7 +11,7 @@ import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDiscove
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.mainNavController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.main.MainFragment
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SongAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistSongAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 @AndroidEntryPoint
@@ -40,6 +40,7 @@ class DiscoverFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val categories = requireActivity().resources.getStringArray(R.array.wow_types).toList()
         val playListSquareAdapter = PlayListSquareAdapter(categories) { position ->
             when (position) {
@@ -56,15 +57,15 @@ class DiscoverFragment : Fragment() {
         }
         binding.wowDashboard.adapter = playListSquareAdapter
 
-        val songAdapter = SongAdapter{song->
-            viewModel.onSongItemClick(song)
+        val playlistSongAdapter = PlaylistSongAdapter{ song->
+            viewModel.onSongItemClick(song.id)
         }
-        binding.hotSongsChartList.adapter = songAdapter
+        binding.hotSongsChartList.adapter = playlistSongAdapter
 
         repeatWithViewLifecycle {
             launch {
-                viewModel.songs.collect {
-                    songAdapter.submitList(it)
+                viewModel.songUiList.collect {
+                    playlistSongAdapter.submitList(it)
                 }
             }
         }

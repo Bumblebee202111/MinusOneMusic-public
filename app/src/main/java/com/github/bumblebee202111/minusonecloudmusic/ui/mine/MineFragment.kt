@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -65,6 +67,12 @@ class MineFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.appBarLayout) { _, insets ->
+            (binding.topAppBar.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
+                insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
+            WindowInsetsCompat.CONSUMED
+        }
 
         val displayName = binding.displayName
         val smallNameTv = binding.smallNameTv
@@ -152,7 +160,7 @@ class MineFragment : Fragment() {
         val themeColor = resources.getColor(R.color.themeColor, null)
         val selectedTabIndicatorColor = ColorUtils.setAlphaComponent(
             themeColor,
-            (Color.alpha(themeColor) * 1).toInt()
+            (Color.alpha(themeColor) * 1)
         )
         tabLayout.setSelectedTabIndicatorColor(selectedTabIndicatorColor)
 
@@ -166,7 +174,6 @@ class MineFragment : Fragment() {
             } else {
             }
         }
-
 
         displayName.setOnClickListener(profileOnClickListener)
         smallNameTv.setOnClickListener(profileOnClickListener)
