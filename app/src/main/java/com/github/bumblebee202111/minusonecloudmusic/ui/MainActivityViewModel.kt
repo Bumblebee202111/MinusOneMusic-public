@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -39,11 +38,10 @@ class MainActivityViewModel @Inject constructor(
 
     val loggedInUserId = loginRepository.loggedInUserId.flowOn(Dispatchers.IO).stateInUi()
 
-    val loggedInUserProfile = loggedInUserIdFlow.flatMapLatest { loggedInUserId->
-        if(loggedInUserId!=null){
+    val loggedInUserProfile = loggedInUserIdFlow.flatMapLatest { loggedInUserId ->
+        if (loggedInUserId != null) {
             userRepository.getCachedUserProfile(loggedInUserId)
-        }
-        else
+        } else
             flowOf(null)
 
     }.stateInUi()
@@ -55,19 +53,23 @@ class MainActivityViewModel @Inject constructor(
 
     fun registerAnonymousOrRefreshExisting() {
         viewModelScope.launch(SupervisorJob() + Dispatchers.IO) {
-            if (hasLoggedInOrAnonymousUser()) {
+            if (isLoggedIn()) {
                 loginRepository.refreshLoginToken()
-                if(isLoggedIn()){
-                        loggedInUserDataRepository.refreshMyLikedSongs()
-                }
-            }else{
+                refreshDataForLogin()
+            } else if (!isLoggedInGuest()) {
                 loginRepository.registerAnonymous().collect()
             }
         }
     }
 
-    private suspend fun isLoggedIn()=preferenceStorage.currentLoggedInUserId.first() != null
-    private suspend fun hasLoggedInOrAnonymousUser()=isLoggedIn() || preferenceStorage.currentAnonymousUserId.first() != null
+    private suspend fun refreshDataForLogin() {
+        loggedInUserDataRepository.refreshMyLikedSongs()
+        loginRepository.registerAnonymous().collect()
+    }
+
+    private suspend fun isLoggedIn() = preferenceStorage.currentLoggedInUserId.first() != null
+
+    private suspend fun isLoggedInGuest() = preferenceStorage.currentAnonymousUserId.first() != null
 
     val currentSongMediaItems = currentPlaylist.map {
 

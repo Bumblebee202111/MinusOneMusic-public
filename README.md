@@ -50,10 +50,7 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- Guest user tokens need no refresh
-- Release
-- [Persistence] Download, caching, local music & resumption
-- Playlist dialog may not auto jump to current song on entrance on rare occations, and we'll keep tracking on this
+- [Data persistence] Download, caching, local music & resumption
 - New screens / major features
   - Discover & feed
     - Personal FMs
@@ -64,6 +61,7 @@ Below are some factors that may hinder you from using it, which can change over 
   - Friends
   - MVs
 - Statusbar lyrics
+- Playlist dialog may not auto jump to current song on entrance on rare occations, and we'll keep tracking on this
 - \[Mini Player\] Swipe, Hide like `PlayControlView`
 - [Mini Player\] [Now Playing\] Transition
 - [Player] Continue the work of moving Player to VM
