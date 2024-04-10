@@ -1,6 +1,22 @@
 Change Log
 ==========
 
+## Version 1.0.0-dev03 (baseline: NCM 9.0.40)
+
+This patch mainly contains various playlists-related development
+
+- New: Updates on playlist fragments
+  - Playing playlist dialog, my playlists, daily recommendation, cloud disk and recent play music
+  - NCM-styled UI
+  - Play all action
+  - Minibar
+  - Pagination with Paging 3
+
+- Optimize: Introduce better ways of handling window insets
+- Optimize: Minor optimizations and code cleanups
+- Optimize: Guest user tokens need no refresh
+- Fix: Fix action of notification next button, which is flipped by mistake
+
 ## Version 1.0.0-dev02 (baseline: NCM 9.0.40)
 
 - New: Player screen: Lyrics with scroll animations
