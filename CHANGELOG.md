@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+## Version 1.0.0-dev03 (baseline: NCM 9.0.6x)
+
+This patch mainly contains various storage-related development
+
+
+
 ## Version 1.0.0-dev03 (baseline: NCM 9.0.40)
 
 This patch mainly contains various playlists-related development

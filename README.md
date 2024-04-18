@@ -46,7 +46,7 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## Screenshot
 
-<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=192/> <img src="F:\AndroidStudioProjects\MinusOneMusic\docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=192 /><img src="F:\AndroidStudioProjects\MinusOneMusic\docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=192 />
+<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=192/> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=192 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=192 />
 
 ## To-dos
 
@@ -81,7 +81,7 @@ Below are some factors that may hinder you from using it, which can change over 
   - [Network] Add ApiResponse wrapper for more precise error tracking
 - On-boarding
 - [Nav] Continue the work of optimizing navigation code
-- [Settings] Add 底部导航栏自定义
+- [Settings] Add 底部导航自定义
   - Delayed since: it's gone forever in our installed official app; it's not officially supported
 - [Player] Support various audio qualities
 - [Arch] Clarify the dividing line between network layer and repo layer and consider removing the `NetworkDataSource` wrapper
