@@ -5,18 +5,20 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.MusicInfoDao
+import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.SongDao
 import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.PlayerDao
 import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.PlaylistDao
 import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.RecentPlayDao
 import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.UserDao
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.MusicInfoEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.LocalSongEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.RemoteSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.MyRecentMusicDataEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlaylistEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserDetailEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserPlaylistEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserProfileEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.GenericSongView
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 
@@ -25,12 +27,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
         UserProfileEntity::class,
         UserDetailEntity::class,
         PlaylistEntity::class,
-        MusicInfoEntity::class,
+        RemoteSongEntity::class,
+        LocalSongEntity::class,
         UserPlaylistEntity::class,
         MyRecentMusicDataEntity::class,
         PlayerPlaylistSongEntity::class
     ],
-    version = 13,
+    views = [GenericSongView::class],
+    version = 17,
     exportSchema = false
 )
 @TypeConverters(com.github.bumblebee202111.minusonecloudmusic.data.database.TypeConverters::class)
@@ -38,7 +42,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun playlistDao(): PlaylistDao
     abstract fun recentPlayDao(): RecentPlayDao
-    abstract fun musicInfoDao(): MusicInfoDao
+    abstract fun songDao(): SongDao
 
     abstract fun playerDao(): PlayerDao
 

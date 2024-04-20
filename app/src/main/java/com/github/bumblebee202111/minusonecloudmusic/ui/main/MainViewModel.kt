@@ -21,5 +21,5 @@ class MainViewModel @Inject constructor(private val musicServiceConnection: Musi
         }
     }
 
-    val player=musicServiceConnection.player.stateInUi()
+    val player = musicServiceConnection.player
 }

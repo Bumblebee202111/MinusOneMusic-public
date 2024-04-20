@@ -6,7 +6,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.MusicInfoEntity
+import androidx.room.Transaction
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.GenericSongView
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.RemoteSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
 
 @Dao
@@ -17,13 +19,19 @@ interface PlayerDao {
     @Query("DELETE FROM player_playlist_songs")
     suspend fun deleteAllPlaylistSongs()
 
+    @Transaction
     @RewriteQueriesToDropUnusedColumns
-    @Query("SELECT * FROM player_playlist_songs LEFT OUTER JOIN MusicInfoEntity WHERE player_playlist_songs.id = MusicInfoEntity.id ORDER BY position")
-    fun populatedPlaylistSongs(): PagingSource<Int, MusicInfoEntity>
+    @Query(
+        """SELECT * FROM player_playlist_songs
+LEFT OUTER JOIN
+generic_songs
+ON player_playlist_songs.id = generic_songs.id AND player_playlist_songs.is_local = generic_songs.is_local ORDER BY position"""
+    )
+    fun populatedPlaylistSongs(): PagingSource<Int, GenericSongView>
 
     @Query("SELECT COUNT(1) FROM player_playlist_songs")
     suspend fun getPlaylistSize():Int
 
-    @Query("SELECT position FROM player_playlist_songs WHERE id=:songId")
-    suspend fun getPlaylistSongPosition(songId: Long): Int
+    @Query("SELECT position FROM player_playlist_songs WHERE media_id=:mediaId")
+    suspend fun getPlaylistSongPosition(mediaId: String): Int
 }

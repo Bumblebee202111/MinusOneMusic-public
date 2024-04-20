@@ -14,11 +14,10 @@ import androidx.media3.common.util.UnstableApi
 import com.bumptech.glide.Glide
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentPlaylistBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractRemotePlaylistFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.extractDominantColor
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.setBackgroundColorAndTopCorner
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.setFitHeightNavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -26,7 +25,7 @@ import kotlin.math.abs
 import kotlin.math.min
 
 @AndroidEntryPoint
-class PlaylistFragment : AbstractRemotePlaylistFragment() {
+class PlaylistFragment : AbstractPlaylistFragment() {
 
     override val viewModel: PlaylistViewModel by viewModels()
     private lateinit var binding: FragmentPlaylistBinding
@@ -70,9 +69,7 @@ class PlaylistFragment : AbstractRemotePlaylistFragment() {
 
        playlistActions.setBackgroundColorAndTopCorner(R.color.colorBackgroundAndroid,12F)
 
-        val songAdapter = PagedSongAdapter { song ->
-            viewModel.onSongItemClick(song.id)
-        }
+        val songAdapter = PagedPlaylistSongWithPositionAdapter(viewModel::onSongItemClick)
 
         binding.songList.adapter = songAdapter
         repeatWithViewLifecycle {

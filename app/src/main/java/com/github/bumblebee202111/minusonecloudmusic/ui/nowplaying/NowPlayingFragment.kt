@@ -47,7 +47,6 @@ import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentNowPlayingBinding
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleModeUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleToggleMode
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractMiniPlayerBarFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlayerFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.LyricsView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
@@ -476,7 +475,9 @@ class NowPlayingFragment : AbstractPlayerFragment() {
         songActionsTitleView.text = mediaMetadata.title
         songActionsArtistView.text = mediaMetadata.artist
 
-        Glide.with(artworkView.context).load(mediaMetadata.artworkUri).placeholder(defaultArtwork)
+
+        Glide.with(artworkView.context).load(mediaMetadata.artworkUri ?: mediaMetadata.artworkData)
+            .placeholder(defaultArtwork)
             .optionalCircleCrop()
             .into(object : CustomTarget<Drawable>() {
                 override fun onResourceReady(

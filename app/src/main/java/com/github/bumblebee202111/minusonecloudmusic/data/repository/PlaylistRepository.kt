@@ -1,5 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
+import androidx.core.net.toUri
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -8,20 +9,29 @@ import androidx.room.withTransaction
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.Result
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.LocalSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.RemoteSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.GenericSongView
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.asExternalModel
 import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractRemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractSong
+import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.MainPageBillboardRowGroup
 import com.github.bumblebee202111.minusonecloudmusic.data.model.PlaylistDetail
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.SongIdAndVersion
 import com.github.bumblebee202111.minusonecloudmusic.data.model.asEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.model.toAudioId
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.NetworkBillboardGroup
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongDetailsApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.asExternalModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.requestparam.CParamSongInfo
+import com.github.bumblebee202111.minusonecloudmusic.player.isLocalSongUri
+import com.github.bumblebee202111.minusonecloudmusic.player.mediaIdToIsLocalAndSongId
 import com.squareup.moshi.JsonAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +46,7 @@ class PlaylistRepository @Inject constructor(
     private val moshiAdapter: JsonAdapter<Any>,
     @ApplicationScope private val coroutineScope: CoroutineScope
 ) {
-    private val musicInfoDao = appDatabase.musicInfoDao()
+    private val songDao = appDatabase.songDao()
     private val playerDao = appDatabase.playerDao()
 
 
@@ -101,9 +111,7 @@ class PlaylistRepository @Inject constructor(
         }))
     }
 
-
     fun getHotTracks() = NotImplementedError()
-
 
     fun getTopLists(): Flow<Result<List<MainPageBillboardRowGroup>?>> = apiResultFlow(
         fetch = { networkDataSource.getToplistDetail() }
@@ -111,35 +119,50 @@ class PlaylistRepository @Inject constructor(
         data.map(transform = NetworkBillboardGroup::asExternalModel)
     }
 
-
     suspend fun clearPlayerPlaylist() {
         appDatabase.withTransaction {
             playerDao.deleteAllPlaylistSongs()
         }
     }
 
-    
-    suspend fun addSongsToPlayerPlaylist(songs: List<AbstractRemoteSong>) {
+    suspend fun addSongsToPlayerPlaylist(songs: List<AbstractSong>) {
         appDatabase.withTransaction {
             val playlistSize = playerDao.getPlaylistSize()
+            val localSongs = mutableListOf<LocalSong>()
+            val remoteSongs = mutableListOf<AbstractRemoteSong>()
             playerDao.insertPlaylistSongs(songs.mapIndexed { index, song ->
-                PlayerPlaylistSongEntity(index + playlistSize, song.id)
+                when (song) {
+                    is LocalSong -> localSongs += song
+                    is AbstractRemoteSong -> remoteSongs += song
+                }
+                val mediaId = song.mediaId
+                val (isLocal, songId) = mediaId.mediaIdToIsLocalAndSongId()
+                PlayerPlaylistSongEntity(
+                    position = index + playlistSize,
+                    mediaId = mediaId,
+                    isLocal = isLocal, id = songId
+                )
             })
-            musicInfoDao.insertMusicInfos(songs.map(AbstractRemoteSong::asEntity))
+
+            songDao.run {
+                insertLocalSongs(localSongs.map(LocalSong::asEntity))
+                insertRemoteSongs(remoteSongs.map(AbstractRemoteSong::asEntity))
+            }
         }
     }
 
-    fun getPlayerPlaylistPagingData(): Flow<PagingData<RemoteSong>> {
+    fun getPlayerPlaylistPagingData(): Flow<PagingData<AbstractSong>> {
         val pagingConfig = PagingConfig(100)
         return Pager(config = pagingConfig) {
             playerDao.populatedPlaylistSongs()
-        }.flow.map { populatedList -> populatedList.map { it.asExternalModel() } }
+        }.flow.map { populatedList ->
+            populatedList.map(GenericSongView::asExternalModel)
+        }
     }
 
-    suspend fun getPlayerPlaylistSongPosition(songId: Long): Int {
-        return playerDao.getPlaylistSongPosition(songId)
+    suspend fun getPlayerPlaylistSongPosition(mediaId: String): Int {
+        return playerDao.getPlaylistSongPosition(mediaId)
     }
-
 
     companion object {
         const val TOP_LIST_ID: Long = 3778678

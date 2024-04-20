@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.PlaylistDetail
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
@@ -15,10 +14,9 @@ import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRep
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.GetPagedPlaylistSongItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractRemotePlaylistViewModel
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistViewModel
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -34,18 +32,17 @@ class PlaylistViewModel @Inject constructor(
     private val playlistRepository: PlaylistRepository,
     private val songRepository: SongRepository,
     musicServiceConnection: MusicServiceConnection,
-    @ApplicationScope private val coroutineScope: CoroutineScope,
     private val playPlaylistUseCase: PlayPlaylistUseCase,
     private val getPlaylistSongItemsUseCase: GetPagedPlaylistSongItemsUseCase
 ) :
-    AbstractRemotePlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
+    AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
 
 
     private val args = PlaylistFragmentArgs.fromSavedStateHandle(savedStateHandle)
     private val playlistId = args.playlistId
     private val creatorId = args.playlistCreatorId
 
-    val player = musicServiceConnection.player.stateInUi()
+    val player = musicServiceConnection.player
 
     private val _playlistDetail = MutableStateFlow<PlaylistDetail?>(null)
     val playlistDetail get() = _playlistDetail.stateInUi()

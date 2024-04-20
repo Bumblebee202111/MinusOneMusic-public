@@ -29,7 +29,7 @@ class UserRepository @Inject constructor(
     private val userDao = appDatabase.userDao()
     private val playlistDao = appDatabase.playlistDao()
     private val recentPlayDao = appDatabase.recentPlayDao()
-    private val musicInfoDao = appDatabase.musicInfoDao()
+    private val musicInfoDao = appDatabase.songDao()
 
     fun getUserDetail(uid: Long, useCache: Boolean) =
         if (useCache) getOfflineFirstUserDetail(uid) else getApiUserDetail(uid)
@@ -91,7 +91,7 @@ class UserRepository @Inject constructor(
                     MyRecentMusicDataApiModel::asEntity
                 )
             )
-            musicInfoDao.insertMusicInfos(myRecentMusicWrapper.list.map { it.musicInfo.asEntity() })
+            musicInfoDao.insertRemoteSongs(myRecentMusicWrapper.list.map { it.musicInfo.asEntity() })
         }
     )
 

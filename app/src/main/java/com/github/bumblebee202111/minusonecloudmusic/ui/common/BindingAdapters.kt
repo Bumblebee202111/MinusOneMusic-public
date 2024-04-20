@@ -3,6 +3,7 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.common
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
@@ -11,7 +12,6 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -20,7 +20,6 @@ import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.data.model.Billboard
@@ -61,18 +60,8 @@ fun ImageView.imageUrl(
         }
         into(this@imageUrl)
     }
-
 }
 
-
-@BindingAdapter("android:text")
-fun setText(view: TextView, @StringRes resId: Int) {
-    if (resId == 0) {
-        view.text = null
-    } else {
-        view.setText(resId)
-    }
-}
 @BindingAdapter(
     value = ["imageUrl", "circleCrop", "placeholder", "crossFadeDuration"],
     requireAll = false
@@ -90,6 +79,63 @@ fun ImageView.imageUrl(
         crossFadeDuration
     )
 }
+
+@BindingAdapter(
+    value = ["image", "circleCrop", "placeholder", "crossFadeDuration"],
+    requireAll = false
+)
+fun ImageView.image(
+    imageUri: Any?,
+    circleCrop: Boolean? = false,
+    placeholder: Drawable? = null,
+    crossFadeDuration: Int? = null
+) {
+    if (imageUri == null && placeholder == null) return
+
+    var rb = Glide.with(context).load(imageUri ?: placeholder)
+    with(rb) {
+        if (imageUri != null && placeholder != null) {
+            rb = placeholder(placeholder)
+        }
+        if (circleCrop == true) {
+            rb = optionalCircleCrop()
+        }
+        if (crossFadeDuration != null) {
+            rb = transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
+        }
+        into(this@image)
+    }
+}
+
+@BindingAdapter(
+    value = ["image", "circleCrop", "placeholder", "crossFadeDuration"],
+    requireAll = false
+)
+fun ImageView.image(
+    imageUri: Uri?,
+    circleCrop: Boolean? = false,
+    placeholder: String? = null,
+    crossFadeDuration: Int? = null
+) {
+    image(
+        imageUri,
+        circleCrop,
+        placeholder?.let { ColorDrawable(Color.parseColor(it)) },
+        crossFadeDuration
+    )
+}
+
+
+
+@BindingAdapter("android:text")
+fun setText(view: TextView, @StringRes resId: Int) {
+    if (resId == 0) {
+        view.text = null
+    } else {
+        view.setText(resId)
+    }
+}
+
 
 
 @BindingAdapter("billboards")

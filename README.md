@@ -9,7 +9,7 @@ Meanwhile, we are attempting to make it as good as possible.
 Note we are very inexperience and this app is at a very early stage of development. Current progress: 
 
 - 好用[^*]：我的—音乐、迷你播放器、播放页、我的播放列表、每日推荐
-- 够用：密码登录/退出登录、最近播放—歌曲、云盘
+- 够用：密码登录/退出登录、最近播放—歌曲、云盘、本地音乐
 
 [^*]: 一般不包括子界面、子菜单、子对话框等
 
@@ -50,7 +50,7 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- [Data persistence] Download, caching, local music & resumption
+- More data persistence: Download, caching & resumption
 - New screens / major features
   - Discover & feed
     - Personal FMs
@@ -74,15 +74,15 @@ Below are some factors that may hinder you from using it, which can change over 
 - Use Channel to show Toasts
 - [Player] Handle fetch error
 - [Now Playing] Provide bottom volume bar dialog (iknstead of showing sytem volume toast) for systems where the built-in output switcher dialog is unavailable.
+- [Settings] Add 底部导航自定义
+  - ~~Delayed since: it's gone forever in our installed official app; it's not officially supported~~ Seems it can be found with some tricks
 - [Network] More elegant
-
   - My own CookieJar implementation
   - Custom param annotation
   - [Network] Add ApiResponse wrapper for more precise error tracking
 - On-boarding
+- Local music: Lyrics and cover matching
 - [Nav] Continue the work of optimizing navigation code
-- [Settings] Add 底部导航自定义
-  - Delayed since: it's gone forever in our installed official app; it's not officially supported
 - [Player] Support various audio qualities
 - [Arch] Clarify the dividing line between network layer and repo layer and consider removing the `NetworkDataSource` wrapper
 - [NCMB] Fully deprecate it 

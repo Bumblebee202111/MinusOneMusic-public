@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractRemoteSong
 import javax.annotation.OverridingMethodsMustInvokeSuper
 
-abstract class AbstractRemotePlaylistFragment: AbstractMiniPlayerBarFragment() {
+abstract class AbstractPlaylistFragment : AbstractMiniPlayerBarFragment() {
 
-    abstract val viewModel:AbstractRemotePlaylistViewModel<*>
+    abstract val viewModel: AbstractPlaylistViewModel<*>
     protected lateinit var playlistActions:View
     @OverridingMethodsMustInvokeSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

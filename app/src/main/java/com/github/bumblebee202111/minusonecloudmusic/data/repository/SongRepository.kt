@@ -1,13 +1,14 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
 import com.github.bumblebee202111.minusonecloudmusic.data.Result
+import com.github.bumblebee202111.minusonecloudmusic.data.mediastore.MediaStoreDataSource
+import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LyricsEntry
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.SongIdAndVersion
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.MusicInfoApiModel
-import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongDetailsApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongLyricsApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongPrivilegeApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.asExternalModel
@@ -21,7 +22,8 @@ import javax.inject.Singleton
 @Singleton
 class SongRepository @Inject constructor(
     private val networkDataSource: NetworkDataSource,
-    private val moshiAdapter: JsonAdapter<Any>
+    private val moshiAdapter: JsonAdapter<Any>,
+    private val mediaStoreDataSource: MediaStoreDataSource
 ) {
 
     @Suppress("unused")
@@ -86,5 +88,9 @@ class SongRepository @Inject constructor(
         fetch = { networkDataSource.getCommentInfoResourceList(moshiAdapter.toJson(listOf(songId))) },
         mapSuccess = { it[0].commentCount }
     )
+
+    fun getLocalSongs(): List<LocalSong> {
+        return mediaStoreDataSource.getMusicResources()
+    }
 
 }

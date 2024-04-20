@@ -10,17 +10,16 @@ import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.fragment.app.viewModels
 import androidx.media3.common.util.UnstableApi
-import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDailyRecommendBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractRemotePlaylistFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.setFitHeightNavigationIcon
+import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistSongWithAlbumAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
-class DailyRecommendFragment : AbstractRemotePlaylistFragment() {
+class DailyRecommendFragment : AbstractPlaylistFragment() {
 
     companion object {
         fun newInstance() = DailyRecommendFragment()
@@ -44,9 +43,7 @@ class DailyRecommendFragment : AbstractRemotePlaylistFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val dailyRecommendList = binding.dailyRecommendList
-        val adapter = DailyRecommendSongAdapter { dailyRecommendSong ->
-            viewModel.onSongItemClick(dailyRecommendSong.id)
-        }
+        val adapter = PlaylistSongWithAlbumAdapter(viewModel::onSongItemClick)
         dailyRecommendList.adapter = adapter
 
         val typeface = Typeface.createFromAsset(requireContext().assets, "bamboo.ttf")
@@ -56,7 +53,7 @@ class DailyRecommendFragment : AbstractRemotePlaylistFragment() {
 
         repeatWithViewLifecycle {
             launch {
-                viewModel.songUiModels.collect {
+                viewModel.songItems.collect {
                     adapter.submitList(it)
                 }
             }

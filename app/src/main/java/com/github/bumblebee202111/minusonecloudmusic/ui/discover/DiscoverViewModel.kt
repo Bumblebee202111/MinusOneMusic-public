@@ -11,7 +11,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRep
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository.Companion.TOP_LIST_ID
 import com.github.bumblebee202111.minusonecloudmusic.domain.GetPlaylistSongItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractRemotePlaylistViewModel
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistViewModel
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +27,7 @@ class DiscoverViewModel @Inject constructor(
     private val playPlaylistUseCase: PlayPlaylistUseCase,
     @ApplicationScope private val coroutineScope: CoroutineScope,
     private val getPlaylistSongItemsUseCase: GetPlaylistSongItemsUseCase
-) : AbstractRemotePlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
+) : AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
     override val loadedSongs: List<RemoteSong>
         get() = playlist.value?.expandedSongs ?: emptyList()
 
@@ -36,7 +36,7 @@ class DiscoverViewModel @Inject constructor(
         playlistRepository.getPlaylistDetail(TOP_LIST_ID).map { it.data }.flowOn(Dispatchers.IO)
             .stateInUi()
 
-    val songUiList =
+    val songItems =
         getPlaylistSongItemsUseCase(playlist.map { it?.expandedSongs?.take(3) }).stateInUi()
 
 }

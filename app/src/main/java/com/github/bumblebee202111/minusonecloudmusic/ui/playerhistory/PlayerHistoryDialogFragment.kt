@@ -64,7 +64,7 @@ class PlayerHistoryDialogFragment : BottomSheetDialogFragment() {
 
 
         val adapter = PagedPlayerSongAdapter(onItemClick = { playlistSongItemUiModel, i ->
-            playerHistoryViewModel.onItemClick(playlistSongItemUiModel.id, i)
+            playerHistoryViewModel.onItemClick(playlistSongItemUiModel.mediaId, i)
         }
         )
         binding.playlistSongs.adapter = adapter
@@ -72,7 +72,7 @@ class PlayerHistoryDialogFragment : BottomSheetDialogFragment() {
 
         repeatWithViewLifecycle {
             launch {
-                playerHistoryViewModel.pagingData.collectLatest {
+                playerHistoryViewModel.songItemsPagingData.collectLatest {
                     adapter.submitData(it)
 
                 }

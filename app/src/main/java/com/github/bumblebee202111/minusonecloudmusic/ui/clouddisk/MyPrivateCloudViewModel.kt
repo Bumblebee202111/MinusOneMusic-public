@@ -8,7 +8,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.GetPagedPlaylistSongItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractRemotePlaylistViewModel
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistViewModel
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
@@ -17,13 +17,12 @@ import javax.inject.Inject
 @HiltViewModel
 class MyPrivateCloudViewModel @Inject constructor(
     private val loggedInUserDataRepository: LoggedInUserDataRepository,
-    private val getPlaylistSongItemsUseCase: GetPagedPlaylistSongItemsUseCase,
+    private val getPagedPlaylistSongItemsUseCase: GetPagedPlaylistSongItemsUseCase,
     private val musicServiceConnection: MusicServiceConnection,
     playPlaylistUseCase: PlayPlaylistUseCase
-) : AbstractRemotePlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
+) : AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
 
-    val player = musicServiceConnection.player.stateInUi()
-
+    val player = musicServiceConnection.player
 
     private val cloudSongsCountAndPagingData = loggedInUserDataRepository.getCloudSongsPagingData1()
 
@@ -31,8 +30,8 @@ class MyPrivateCloudViewModel @Inject constructor(
 
     override val loadedSongs: MutableList<RemoteSong> = mutableListOf()
 
-    val cloudSongsPagingData =
-        getPlaylistSongItemsUseCase(cloudSongsCountAndPagingData.second.map {
+    val songUiItemsPagingData =
+        getPagedPlaylistSongItemsUseCase(cloudSongsCountAndPagingData.second.map {
             it.map { song ->
                 loadedSongs += song
                 song

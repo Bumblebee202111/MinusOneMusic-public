@@ -20,24 +20,25 @@ import javax.inject.Inject
 @HiltViewModel
 class PlayerHistoryViewModel @Inject constructor(
     private val musicServiceConnection: MusicServiceConnection,
-    private val getPlaylistSongItemsUseCase: GetPagedPlaylistSongItemsUseCase,
+    private val getPagedPlaylistSongItemsUseCase: GetPagedPlaylistSongItemsUseCase,
     private val playlistRepository: PlaylistRepository,
     @Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     suspend fun getCurrentSongPosition() = withContext(ioDispatcher) {
-        musicServiceConnection.currentSongId.first()?.let {
+        musicServiceConnection.currentMediaId.first()?.let {
             playlistRepository.getPlayerPlaylistSongPosition(it)
         }
     }
 
-    val pagingData =
-        getPlaylistSongItemsUseCase(
+    val songItemsPagingData =
+        getPagedPlaylistSongItemsUseCase(
             playlistRepository.getPlayerPlaylistPagingData().cachedIn(viewModelScope),
         ).cachedIn(viewModelScope)
-    fun onItemClick(songId: Long, songItemPosition: Int) {
+
+    fun onItemClick(mediaId: String, songItemPosition: Int) {
         val player = musicServiceConnection.player.value ?: return
-        val currentSong = musicServiceConnection.currentSongId.value
-        if (songId != currentSong) {
+        val currentMediaId = musicServiceConnection.currentMediaId.value
+        if (mediaId != currentMediaId) {
             viewModelScope.launch {
                 with(player) {
                     if (isCommandAvailable(Player.COMMAND_SET_MEDIA_ITEM))

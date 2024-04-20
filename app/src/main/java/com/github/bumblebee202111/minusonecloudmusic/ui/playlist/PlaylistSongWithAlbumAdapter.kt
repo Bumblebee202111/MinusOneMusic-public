@@ -1,20 +1,16 @@
-package com.github.bumblebee202111.minusonecloudmusic.ui.dailyrecommend
+package com.github.bumblebee202111.minusonecloudmusic.ui.playlist
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemDailyRecommendBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistSongItemUiModel
+import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemPlaylistSongWithAlbumBinding
 
-class DailyRecommendSongAdapter(private val onItemClick: (PlaylistSongItemUiModel) -> Unit) :
-    ListAdapter<PlaylistSongItemUiModel, DailyRecommendSongAdapter.ViewHolder>(
-        PlaylistSongItemUiModel.DIFF_CALLBACK
-    ) {
+class PlaylistSongWithAlbumAdapter(override val onItemClick: (position: Int) -> Unit) :
+    BasePlaylistSongAdapter<PlaylistSongWithAlbumAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ListItemDailyRecommendBinding.inflate(
+            ListItemPlaylistSongWithAlbumBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -23,11 +19,11 @@ class DailyRecommendSongAdapter(private val onItemClick: (PlaylistSongItemUiMode
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val playlist = getItem(position)
-        holder.bind(playlist) { onItemClick(playlist) }
+        val song = getItem(position)
+        holder.bind(song) { onItemClick(position) }
     }
 
-    class ViewHolder(private val binding: ListItemDailyRecommendBinding) :
+    class ViewHolder(private val binding: ListItemPlaylistSongWithAlbumBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(
             song: PlaylistSongItemUiModel,

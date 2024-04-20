@@ -49,7 +49,7 @@ class MiniPlayerBarView @JvmOverloads constructor(
     private var playPauseButton: MiniPlayPauseButton? = null
     private var artworkView: ImageView? = null
     private var titleAndArtistView: MiniBarTextView? = null
-    private var playlistButton:ImageView?=null
+    private var playlistButton: ImageView? = null
 
     private val period: Timeline.Period
     private val window: Timeline.Window
@@ -147,8 +147,8 @@ class MiniPlayerBarView @JvmOverloads constructor(
         }
 
         LayoutInflater.from(context).inflate(layoutId,  this)
-        orientation= VERTICAL
-        val v=findViewById<View>(R.id.v3ShadowView).apply {
+        orientation = VERTICAL
+        val v = findViewById<View>(R.id.v3ShadowView).apply {
         }
 
         playerListener = PlayerListener()
@@ -161,9 +161,9 @@ class MiniPlayerBarView @JvmOverloads constructor(
             Util.handlePlayPauseButtonAction(player, showPlayButtonIfSuppressed)
         }
 
-        artworkView=findViewById(R.id.cover)
-        titleAndArtistView=findViewById(R.id.tv_music)
-        playlistButton=findViewById(R.id.playlist_button)
+        artworkView = findViewById(R.id.cover)
+        titleAndArtistView = findViewById(R.id.tv_music)
+        playlistButton = findViewById(R.id.playlist_button)
     }
 
     private fun updateAll() {
@@ -172,7 +172,7 @@ class MiniPlayerBarView @JvmOverloads constructor(
     }
 
     fun updateForCurrentTrackSelections(isNewPlayer: Boolean) {
-        val player=player?:return
+        val player = player ?: return
         if (!player.isCommandAvailable(Player.COMMAND_GET_TRACKS) || player.currentTracks.isEmpty
         ) {
             return
@@ -180,13 +180,15 @@ class MiniPlayerBarView @JvmOverloads constructor(
 
         val mediaMetadata = player.mediaMetadata
 
-        artworkView?.let {artworkView->
-            mediaMetadata.artworkUri?.let { artworkUri->
-                Glide.with(artworkView.context).load(artworkUri).into(artworkView)
-            }
+        artworkView?.let { artworkView ->
+            Glide.with(artworkView.context)
+                .load(mediaMetadata.artworkUri ?: mediaMetadata.artworkData).into(artworkView)
         }
 
-        titleAndArtistView?.setTitleAndArtist(mediaMetadata.title.toString(),mediaMetadata.artist.toString())
+        titleAndArtistView?.setTitleAndArtist(
+            mediaMetadata.title.toString(),
+            mediaMetadata.artist.toString()
+        )
     }
 
 
@@ -249,15 +251,16 @@ class MiniPlayerBarView @JvmOverloads constructor(
             postDelayed(updateProgressAction, MAX_UPDATE_INTERVAL_MS.toLong())
         }
     }
+
     fun isVisible(): Boolean {
         return visibility == VISIBLE
     }
 
     fun setPlaylistButtonListener(onClickListener: OnClickListener?) {
-            playlistButton?.apply {
-                setOnClickListener(onClickListener)
-                updateButton(onClickListener != null, this)
-            }
+        playlistButton?.apply {
+            setOnClickListener(onClickListener)
+            updateButton(onClickListener != null, this)
+        }
     }
 
     private fun updateButton(enabled: Boolean, view: View?) {
