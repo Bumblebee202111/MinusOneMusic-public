@@ -7,9 +7,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.GenericSongView
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.RemoteSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.GenericSongView
 
 @Dao
 interface PlayerDao {
@@ -33,5 +32,5 @@ ON player_playlist_songs.id = generic_songs.id AND player_playlist_songs.is_loca
     suspend fun getPlaylistSize():Int
 
     @Query("SELECT position FROM player_playlist_songs WHERE media_id=:mediaId")
-    suspend fun getPlaylistSongPosition(mediaId: String): Int
+    suspend fun getPlaylistSongPosition(mediaId: String): Int?
 }

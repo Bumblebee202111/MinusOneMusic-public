@@ -9,8 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.get
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.paging.awaitNotLoading
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDialogPlayerHistoryBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -67,10 +70,11 @@ class PlayerHistoryDialogFragment : BottomSheetDialogFragment() {
             playerHistoryViewModel.onItemClick(playlistSongItemUiModel.mediaId, i)
         }
         )
-        binding.playlistSongs.adapter = adapter
+        val songList = binding.playlistSongs
+        songList.adapter = adapter
+        val linearLayoutManager = songList.layoutManager as LinearLayoutManager
 
-
-        repeatWithViewLifecycle {
+        repeatWithViewLifecycle(Lifecycle.State.RESUMED) {
             launch {
                 playerHistoryViewModel.songItemsPagingData.collectLatest {
                     adapter.submitData(it)
@@ -82,7 +86,8 @@ class PlayerHistoryDialogFragment : BottomSheetDialogFragment() {
                 adapter.loadStateFlow.awaitNotLoading()
                 playerHistoryViewModel.getCurrentSongPosition()
                     ?.let {
-                        binding.playlistSongs.scrollToPosition((it+7).coerceAtMost(adapter.itemCount-1))
+                        val centerOfScreen = songList.height / 2 - songList[0].height / 2
+                        linearLayoutManager.scrollToPositionWithOffset(it, centerOfScreen)
                     }
             }
 

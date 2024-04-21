@@ -3,7 +3,7 @@ Change Log
 
 ## Version 1.0.0-dev04 (baseline: NCM 9.0.6x)
 
-- New: Support playing local music
+- New: Support playing local music under NCM directories
 - Optimize: Reduce boilerplate related to song models and adapters
 
 ## Version 1.0.0-dev03 (baseline: NCM 9.0.40)
