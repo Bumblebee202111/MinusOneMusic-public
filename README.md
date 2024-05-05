@@ -51,6 +51,7 @@ Below are some factors that may hinder you from using it, which can change over 
 ## To-dos
 
 - More data persistence: Download, caching & resumption
+- Fix app crash when the guest user tries to open cloud disk
 - New screens / major features
   - Discover & feed
     - Personal FMs
