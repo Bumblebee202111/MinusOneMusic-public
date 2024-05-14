@@ -67,9 +67,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        super.onStop()
         musicServiceConnection.close()
         releaseController()
+        super.onStop()
     }
 
     private fun initializeController() {
