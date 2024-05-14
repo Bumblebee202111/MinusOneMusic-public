@@ -6,7 +6,7 @@ In developing this app, we (actually me alone) will explore how to develop a mor
 
 Meanwhile, we are attempting to make it as good as possible.
 
-Note we are very inexperience and this app is at a very early stage of development. Current progress: 
+Note we are very inexperienced and this app is at a very early stage of development. Current progress: 
 
 - 好用[^*]：我的—音乐、迷你播放器、播放页、我的播放列表、每日推荐
 - 够用：密码登录/退出登录、最近播放—歌曲、云盘、本地音乐
@@ -51,7 +51,6 @@ Below are some factors that may hinder you from using it, which can change over 
 ## To-dos
 
 - More data persistence: Download, caching & resumption
-- Fix app crash when the guest user tries to open cloud disk
 - New screens / major features
   - Discover & feed
     - Personal FMs
