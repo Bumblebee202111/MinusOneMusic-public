@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.C
 import androidx.media3.common.Player
+import androidx.media3.common.util.Util
 import androidx.paging.cachedIn
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.AppDispatchers
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.Dispatcher
@@ -43,6 +44,7 @@ class PlayerHistoryViewModel @Inject constructor(
                 with(player) {
                     if (isCommandAvailable(Player.COMMAND_SET_MEDIA_ITEM))
                         seekTo(songItemPosition, C.TIME_UNSET)
+                    Util.handlePlayButtonAction(this)
                 }
 
             }
