@@ -4,12 +4,12 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.get
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.paging.awaitNotLoading
@@ -86,12 +86,17 @@ class PlayerHistoryDialogFragment : BottomSheetDialogFragment() {
                 adapter.loadStateFlow.awaitNotLoading()
                 playerHistoryViewModel.getCurrentSongPosition()
                     ?.let {
-                        val centerOfScreen = songList.height / 2 - songList[0].height / 2
+                        val centerOfScreen = songList.height / 2 - getItemHeight() / 2
                         linearLayoutManager.scrollToPositionWithOffset(it, centerOfScreen)
                     }
             }
 
         }
+    }
+
+    private fun getItemHeight(): Int {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48F, resources.displayMetrics)
+            .roundToInt()
     }
 
     companion object {

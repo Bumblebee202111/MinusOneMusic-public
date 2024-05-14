@@ -51,7 +51,6 @@ Below are some factors that may hinder you from using it, which can change over 
 ## To-dos
 
 - More data persistence: Download, caching
-- Fix playlist dialog crash by changing how item height is retrieved
 - New screens / major features
   - Discover & feed
     - Personal FMs
