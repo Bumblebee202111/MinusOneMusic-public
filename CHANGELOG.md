@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+## Version 1.0.0-dev05 (baseline: NCM 9.0.6x)
+
+- Fix crashes when you are trying to play playlists
+- Fix size of navigationIcons Bumblebee202111
+- Fix app crash when the guest user is trying to open cloud disk
+- Fix logged-in user getting altered by guest on refresh
+- Update dependencies
+
 ## Version 1.0.0-dev04 (baseline: NCM 9.0.6x)
 
 - New: Support playing local music under NCM directories
