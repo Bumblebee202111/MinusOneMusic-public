@@ -28,8 +28,8 @@ class NowPlayingViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val currentMediaId = musicServiceConnection.currentMediaId
-    private val currentRemoteSongId = currentMediaId.map {
-        it?.mediaIdToIsLocalAndSongId()?.second
+    private val currentRemoteSongId = currentMediaId.map { currentMediaId ->
+        currentMediaId?.mediaIdToIsLocalAndSongId()?.takeUnless(Pair<Boolean, Long>::first)?.second
     }.stateInUi()
 
     val lyrics = currentRemoteSongId.flatMapLatest { songId ->
@@ -62,11 +62,7 @@ class NowPlayingViewModel @Inject constructor(
         if (songId != null) {
             songRepository.getCommentCount(songId)
                 .map { commentCount ->
-                    commentCount.data?.let {
-                        CountUtil.getAbbreviatedCommentCount(
-                            it
-                        )
-                    }
+                    commentCount.data?.let(CountUtil::getAbbreviatedCommentCount)
                 }
 
         } else {

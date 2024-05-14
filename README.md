@@ -51,6 +51,7 @@ Below are some factors that may hinder you from using it, which can change over 
 ## To-dos
 
 - More data persistence: Download, caching
+- Increase player bottom margin for current NCM version
 - New screens / major features
   - Discover & feed
     - Personal FMs
