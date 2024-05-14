@@ -11,6 +11,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.GenericSongView
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
 import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
@@ -37,6 +38,7 @@ import javax.inject.Singleton
 class PlaylistRepository @Inject constructor(
     private val networkDataSource: NetworkDataSource,
     private val appDatabase: AppDatabase,
+    private val preferenceStorage: PreferenceStorage,
     private val moshiAdapter: JsonAdapter<Any>,
     @ApplicationScope private val coroutineScope: CoroutineScope
 ) {
@@ -148,14 +150,25 @@ class PlaylistRepository @Inject constructor(
     fun getPlayerPlaylistPagingData(): Flow<PagingData<AbstractSong>> {
         val pagingConfig = PagingConfig(100)
         return Pager(config = pagingConfig) {
-            playerDao.populatedPlaylistSongs()
+            playerDao.populatedPlaylistSongsPagingSource()
         }.flow.map { populatedList ->
             populatedList.map(GenericSongView::asExternalModel)
         }
     }
 
+    suspend fun playerPlaylistSongs() =
+        playerDao.populatedPlaylistSongs().map(GenericSongView::asExternalModel)
+
     suspend fun getPlayerPlaylistSongPosition(mediaId: String): Int? {
         return playerDao.getPlaylistSongPosition(mediaId)
+    }
+
+    fun playerPlaylistCurrentSongPosition() =
+        preferenceStorage.currentSongPosition
+
+
+    suspend fun savePlayerPlaylistCurrentSongPosition(position: Int) {
+        preferenceStorage.setCurrentSongPosition(position)
     }
 
     companion object {

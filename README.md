@@ -50,9 +50,8 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- Update NCM, jadx
-- More data persistence: Download, caching & resumption
-- Fix playlist dialog R8
+- More data persistence: Download, caching
+- Fix playlist dialog crash by changing how item height is retrieved
 - New screens / major features
   - Discover & feed
     - Personal FMs

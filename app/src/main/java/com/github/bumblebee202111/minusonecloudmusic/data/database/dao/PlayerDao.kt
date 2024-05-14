@@ -21,16 +21,27 @@ interface PlayerDao {
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query(
-        """SELECT * FROM player_playlist_songs
-LEFT OUTER JOIN
-generic_songs
-ON player_playlist_songs.id = generic_songs.id AND player_playlist_songs.is_local = generic_songs.is_local ORDER BY position"""
+        QUERY_PLAYER_PLAYLIST_SONGS
     )
-    fun populatedPlaylistSongs(): PagingSource<Int, GenericSongView>
+    fun populatedPlaylistSongsPagingSource(): PagingSource<Int, GenericSongView>
+
+    @Transaction
+    @RewriteQueriesToDropUnusedColumns
+    @Query(
+        QUERY_PLAYER_PLAYLIST_SONGS
+    )
+    suspend fun populatedPlaylistSongs(): List<GenericSongView>
 
     @Query("SELECT COUNT(1) FROM player_playlist_songs")
     suspend fun getPlaylistSize():Int
 
     @Query("SELECT position FROM player_playlist_songs WHERE media_id=:mediaId")
     suspend fun getPlaylistSongPosition(mediaId: String): Int?
+
+    private companion object {
+        const val QUERY_PLAYER_PLAYLIST_SONGS = """SELECT * FROM player_playlist_songs
+LEFT OUTER JOIN
+generic_songs
+ON player_playlist_songs.id = generic_songs.id AND player_playlist_songs.is_local = generic_songs.is_local ORDER BY position"""
+    }
 }

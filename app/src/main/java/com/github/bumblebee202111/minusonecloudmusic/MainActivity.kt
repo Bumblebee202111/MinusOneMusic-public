@@ -13,6 +13,7 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
+import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ActivityMainBinding
 import com.github.bumblebee202111.minusonecloudmusic.service.PlaybackService
 import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
@@ -37,6 +38,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var loginRepository: LoginRepository
+
+    @Inject
+    lateinit var playlistRepository: PlaylistRepository
     private lateinit var mediaControllerFuture: ListenableFuture<MediaController>
     private val mediaController: MediaController?
         get() = if (mediaControllerFuture.isDone) mediaControllerFuture.get() else null
@@ -79,7 +83,9 @@ class MainActivity : AppCompatActivity() {
             .buildAsync()
         mediaControllerFuture.addListener({
             val mediaController = this.mediaController ?: return@addListener
-            musicServiceConnection.connect(mediaController, mediaController::release)
+            musicServiceConnection.connect(mediaController) {
+                mediaController.release()
+            }
         }, MoreExecutors.directExecutor())
     }
 

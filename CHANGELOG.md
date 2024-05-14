@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+## Version 1.0.0-dev06 (baseline: NCM 9.0.80)
+
+- Last played playlist and song can be resumed when app is restarted
+
 ## Version 1.0.0-dev05 (baseline: NCM 9.0.6x)
 
 - Fix crashes when you are trying to play playlists
