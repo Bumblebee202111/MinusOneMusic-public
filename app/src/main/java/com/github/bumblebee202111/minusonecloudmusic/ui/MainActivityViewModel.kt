@@ -64,7 +64,6 @@ class MainActivityViewModel @Inject constructor(
 
     private suspend fun refreshDataForLogin() {
         loggedInUserDataRepository.refreshMyLikedSongs()
-        loginRepository.registerAnonymous().collect()
     }
 
     private suspend fun isLoggedIn() = preferenceStorage.currentLoggedInUserId.first() != null
