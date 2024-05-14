@@ -25,7 +25,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.core.view.setPadding
 import androidx.fragment.app.viewModels
 import androidx.media3.common.C
 import androidx.media3.common.Player
@@ -51,7 +50,6 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlayerFra
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.LyricsView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.getNavButtonView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
@@ -60,7 +58,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Formatter
 import java.util.Locale
-import kotlin.math.roundToInt
 
 
 @AndroidEntryPoint
@@ -362,7 +359,6 @@ class NowPlayingFragment : AbstractPlayerFragment() {
         }
 
         toolbar = binding.toolbar.apply {
-            getNavButtonView()?.setPadding(ViewUtils.dpToPx(context, 10).roundToInt())
             setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
