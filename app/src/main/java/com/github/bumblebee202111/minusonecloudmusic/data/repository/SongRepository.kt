@@ -2,6 +2,7 @@ package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.Result
+import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.datasource.MediaStoreDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.datasource.SongDownloadDataSource
@@ -14,6 +15,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.Mu
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongLyricsApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongPrivilegeApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.SongUrlInfo
 import com.github.bumblebee202111.minusonecloudmusic.data.network.requestparam.CParamSongInfo
 import com.squareup.moshi.JsonAdapter
@@ -29,8 +31,11 @@ class SongRepository @Inject constructor(
     private val networkDataSource: NetworkDataSource,
     private val moshiAdapter: JsonAdapter<Any>,
     private val mediaStoreDataSource: MediaStoreDataSource,
-    private val mediaDownloadDataSource: SongDownloadDataSource
+    private val mediaDownloadDataSource: SongDownloadDataSource,
+    private val appDatabase: AppDatabase
 ) {
+    private val songDao = appDatabase.songDao()
+
 
     @Suppress("unused")
     fun observeSongDetails(songIdAndVersions: List<SongIdAndVersion>) = apiResultFlow(
@@ -75,6 +80,22 @@ class SongRepository @Inject constructor(
         ) { data ->
             data
         }
+    }
+
+    suspend fun refreshUserRemoteSongs(songIds: List<Long>): kotlin.Result<Unit> {
+        for (chunk in songIds.chunked(1000)) {
+            val songIdsString = moshiAdapter.toJson(chunk)
+            when (val result = networkDataSource.getSongEnhancePrivilege(songIdsString)) {
+                is ApiResult.ApiSuccessResult -> {
+                    songDao.upsertPrivileges(result.data.map(SongPrivilegeApiModel::toEntity))
+                }
+
+                is ApiResult.ApiErrorResult -> {
+                    return kotlin.Result.failure(Exception(result.message))
+                }
+            }
+        }
+        return kotlin.Result.success(Unit)
     }
 
     fun getLyrics(songId: Long) =

@@ -145,6 +145,10 @@ class LoggedInUserDataRepository @Inject constructor(
         }
     }
 
+    suspend fun clearMyLikedSongs() {
+        myLikedSongs.value = emptySet()
+    }
+
     fun observeSongLiked(songId: Long) = myLikedSongs.map { it?.contains(songId) ?: false }
     private fun updateSongLiked(songId: Long, like: Boolean) {
         val oldMyLikedSongs = myLikedSongs.value ?: return

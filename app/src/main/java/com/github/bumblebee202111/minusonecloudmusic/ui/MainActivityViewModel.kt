@@ -4,14 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LoggedInUser
+import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.PlaylistApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
+import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
+import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.UserRepository
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +25,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,20 +35,25 @@ class MainActivityViewModel @Inject constructor(
     private val preferenceStorage: PreferenceStorage,
     private val userRepository: UserRepository,
     private val loginRepository: LoginRepository,
+    private val playlistRepository: PlaylistRepository,
+    private val songRepository: SongRepository,
     private val loggedInUserDataRepository: LoggedInUserDataRepository
 ) : ViewModel() {
 
-    private val loggedInUserIdFlow = loginRepository.loggedInUserId
+    val loggedInUserId = loginRepository.loggedInUserId.onEach {
+        refreshDataForLoginJob?.cancel()
+        refreshDataForLoginJob = viewModelScope.launch {
+            refreshDataForLogin(it)
+        }
+    }.flowOn(Dispatchers.IO).stateInUi()
 
+    private var refreshDataForLoginJob: Job? = null
 
-    val loggedInUserId = loginRepository.loggedInUserId.flowOn(Dispatchers.IO).stateInUi()
-
-    val loggedInUserProfile = loggedInUserIdFlow.flatMapLatest { loggedInUserId ->
+    val loggedInUserProfile = this.loggedInUserId.flatMapLatest { loggedInUserId ->
         if (loggedInUserId != null) {
             userRepository.getCachedUserProfile(loggedInUserId)
         } else
             flowOf(null)
-
     }.stateInUi()
 
 
@@ -53,22 +63,24 @@ class MainActivityViewModel @Inject constructor(
 
     fun registerAnonymousOrRefreshExisting() {
         viewModelScope.launch(SupervisorJob() + Dispatchers.IO) {
-            if (isLoggedIn()) {
+            if (loginRepository.isLoggedIn.first()) {
                 loginRepository.refreshLoginToken()
-                refreshDataForLogin()
-            } else if (!isLoggedInGuest()) {
+            } else if (!loginRepository.isLoggedInAsGuest.first()) {
                 loginRepository.registerAnonymous().collect()
             }
         }
     }
 
-    private suspend fun refreshDataForLogin() {
-        loggedInUserDataRepository.refreshMyLikedSongs()
+    private suspend fun refreshDataForLogin(userId: Long?) {
+        if (userId != null) {
+            loggedInUserDataRepository.refreshMyLikedSongs()
+        } else {
+            loggedInUserDataRepository.clearMyLikedSongs()
+        }
+        val playerPlaylistRemoteSongs =
+            playlistRepository.playerPlaylistSongs().filterIsInstance<RemoteSong>()
+        songRepository.refreshUserRemoteSongs(playerPlaylistRemoteSongs.map(RemoteSong::id))
     }
-
-    private suspend fun isLoggedIn() = preferenceStorage.currentLoggedInUserId.first() != null
-
-    private suspend fun isLoggedInGuest() = preferenceStorage.currentAnonymousUserId.first() != null
 
     val currentSongMediaItems = currentPlaylist.map {
 

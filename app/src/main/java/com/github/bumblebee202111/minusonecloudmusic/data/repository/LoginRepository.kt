@@ -15,7 +15,6 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.util.md5
 import com.github.bumblebee202111.minusonecloudmusic.utils.DeviceInfoProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -119,7 +118,9 @@ class LoginRepository @Inject constructor(
         }
     }
 
-    val loggedInUserId = preferenceStorage.currentLoggedInUserId.distinctUntilChanged()
+    val loggedInUserId = preferenceStorage.currentLoggedInUserId
+
+    val guestUserId = preferenceStorage.currentAnonymousUserId
 
     @ScheduledForRemoval
     @Deprecated("Won't work alone")
@@ -145,6 +146,8 @@ class LoginRepository @Inject constructor(
     suspend fun refreshLoginToken() = networkDataSource.refreshLoginToken()
 
     val isLoggedIn = loggedInUserId.map { it != null }
+
+    val isLoggedInAsGuest = guestUserId.map { it != null }
 
     suspend fun logout() {
         networkDataSource.logout()

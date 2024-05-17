@@ -49,10 +49,6 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- Refresh user data on login status change and app start
-  - Song likes
-  - Playlist privileges
-
 - 64-bit only
 - Deprecate GenericSongView
   - Keep type and id only and get populated by mapping

@@ -189,6 +189,10 @@ class PlaylistRepository @Inject constructor(
         preferenceStorage.setCurrentSongPosition(position)
     }
 
+    suspend fun updatePlayerPlaylistSongPrivileges(privileges: List<Boolean>) {
+
+    }
+
     companion object {
         const val TOP_LIST_ID: Long = 3778678
         const val PLAYLIST_PAGE_SIZE: Int = 1000
