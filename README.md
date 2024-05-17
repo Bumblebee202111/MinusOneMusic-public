@@ -21,7 +21,7 @@ It will bring you 99% pure music experience with basic support of social feature
 
 - **-1 (jiǎn yī)!** No ads. No podcast. No square. Fewer VIP UI elements. Tailored UI content. Incredibly small APK size.
 - What are kept. Core functionalities and UI kept but only on best effort
-- (Non additive or subtractive) Modifications. Some limited number of convenient changes to the official UI/behaviors can be toggled in Settings.
+- (Non additive or subtractive) Modifications. Some limited number of convenient changes to the official UI/behaviors can be toggled in Settings. (planned)
 - No additions.
 - Music playback.
 - *Natural* (= without special adaptations) tablet/landscape support.
@@ -35,7 +35,6 @@ It will bring you 99% pure music experience with basic support of social feature
 
 To strongly encourage the use of official NCM app, we decided that you must be "authorized" to use it. But you can easily gain access to it anyway.
 Below are some factors that may hinder you from using it, which can change over time.
-
 - The official app must be installed and co-exist with it.
 - The docs are written in broken English.
 - The app is almost fully **closed source**. (Maintaining an extra semi-open code base would lead to heavy burden!) So was the simple public repo born. If you don't trust me, simply reverse-engineer the app. If you are interested in some non-NCM-bound code, I can post it somewhere.
@@ -50,8 +49,13 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- More data persistence: Download, caching
-- Increase player bottom margin for current NCM version
+- Refresh user data on login status change and app start
+  - Song likes
+  - Playlist privileges
+
+- 64-bit only
+- Deprecate GenericSongView
+  - Keep type and id only and get populated by mapping
 - New screens / major features
   - Discover & feed
     - Personal FMs
@@ -73,6 +77,8 @@ Below are some factors that may hinder you from using it, which can change over 
   - Cloud/favorite/试听(trial)/unavailable UI state
 - Use Channel to show Toasts
 - [Player] Handle fetch error
+- More caching when RemoteMediator becomes non-experimental
+  - Playlist, lyrics ...
 - [Now Playing] Provide bottom volume bar dialog (instead of showing sytem volume toast) for systems where the built-in output switcher dialog is unavailable.
 - [Settings] Add 底部导航自定义
   - ~~Delayed since: it's gone forever in our installed official app; it's not officially supported~~ Seems it can be found with some tricks
@@ -81,7 +87,9 @@ Below are some factors that may hinder you from using it, which can change over 
   - Custom param annotation
   - [Network] Add ApiResponse wrapper for more precise error tracking
 - On-boarding
-- Local music: Lyrics and cover matching
+- Link local/downloaded songs with remote ones
+  - Lyrics and cover matching
+  - Advanced download
 - [Nav] Continue the work of optimizing navigation code
 - [Player] Support various audio qualities
 - [Arch] Clarify the dividing line between network layer and repo layer and consider removing the `NetworkDataSource` wrapper

@@ -38,10 +38,18 @@ interface PlayerDao {
     @Query("SELECT position FROM player_playlist_songs WHERE media_id=:mediaId")
     suspend fun getPlaylistSongPosition(mediaId: String): Int?
 
+    @Query(
+        """SELECT * FROM player_playlist_songs
+LEFT OUTER JOIN 
+generic_songs 
+ON player_playlist_songs.id = generic_songs.id AND player_playlist_songs.is_local = generic_songs.is_local WHERE media_id = :mediaId"""
+    )
+    suspend fun getPlaylistSong(mediaId: String): GenericSongView
+
     private companion object {
         const val QUERY_PLAYER_PLAYLIST_SONGS = """SELECT * FROM player_playlist_songs
-LEFT OUTER JOIN
-generic_songs
+LEFT OUTER JOIN 
+generic_songs 
 ON player_playlist_songs.id = generic_songs.id AND player_playlist_songs.is_local = generic_songs.is_local ORDER BY position"""
     }
 }

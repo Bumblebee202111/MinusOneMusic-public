@@ -1,12 +1,14 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
+import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.Result
-import com.github.bumblebee202111.minusonecloudmusic.data.mediastore.MediaStoreDataSource
+import com.github.bumblebee202111.minusonecloudmusic.data.datasource.MediaStoreDataSource
+import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
+import com.github.bumblebee202111.minusonecloudmusic.data.datasource.SongDownloadDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LyricsEntry
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.SongIdAndVersion
-import com.github.bumblebee202111.minusonecloudmusic.data.network.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.MusicInfoApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongLyricsApiModel
@@ -15,15 +17,19 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.as
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.SongUrlInfo
 import com.github.bumblebee202111.minusonecloudmusic.data.network.requestparam.CParamSongInfo
 import com.squareup.moshi.JsonAdapter
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SongRepository @Inject constructor(
+    @ApplicationScope private val coroutineScope: CoroutineScope,
     private val networkDataSource: NetworkDataSource,
     private val moshiAdapter: JsonAdapter<Any>,
-    private val mediaStoreDataSource: MediaStoreDataSource
+    private val mediaStoreDataSource: MediaStoreDataSource,
+    private val mediaDownloadDataSource: SongDownloadDataSource
 ) {
 
     @Suppress("unused")
@@ -91,6 +97,16 @@ class SongRepository @Inject constructor(
 
     fun getLocalSongs(): List<LocalSong> {
         return mediaStoreDataSource.getMusicResources()
+    }
+
+    fun download(song: RemoteSong) {
+        coroutineScope.launch {
+            val apiResult = networkDataSource.songDownloadUrl(song.id)
+            if (apiResult is ApiResult.ApiSuccessResult) {
+                val url = apiResult.data.asExternalModel()
+                mediaDownloadDataSource.download(song, url)
+            }
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteAlbum
@@ -13,6 +14,8 @@ data class RemoteSongEntity(
     val album: RemoteAlbum?,
     val artists: List<String?>,
     val available: Boolean,
+    @ColumnInfo("is_downloadable")
+    val isDownloadable: Boolean,
     val version: Int
 )
 
@@ -23,6 +26,7 @@ fun RemoteSongEntity.asExternalModel() =
         album = album,
         artists = artists,
         available = available,
+        isDownloadable = isDownloadable,
         version = version
     )
 

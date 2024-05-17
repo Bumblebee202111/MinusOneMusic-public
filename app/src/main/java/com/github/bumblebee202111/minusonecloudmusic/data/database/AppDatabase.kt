@@ -5,16 +5,16 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.SongDao
 import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.PlayerDao
 import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.PlaylistDao
 import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.RecentPlayDao
+import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.SongDao
 import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.UserDao
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.LocalSongEntity
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.RemoteSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.MyRecentMusicDataEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlaylistEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.RemoteSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserDetailEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserPlaylistEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserProfileEntity
@@ -34,7 +34,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
         PlayerPlaylistSongEntity::class
     ],
     views = [GenericSongView::class],
-    version = 17,
+    version = 18,
     exportSchema = false
 )
 @TypeConverters(com.github.bumblebee202111.minusonecloudmusic.data.database.TypeConverters::class)

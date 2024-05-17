@@ -1,5 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying
 
+import android.Manifest
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
@@ -8,6 +9,7 @@ import android.graphics.drawable.Drawable
 import android.media.AudioDeviceCallback
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,9 +20,12 @@ import android.view.ViewTreeObserver
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
 import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsCompat
@@ -43,6 +48,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.github.bumblebee202111.minusonecloudmusic.R
+import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentNowPlayingBinding
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleModeUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleToggleMode
@@ -51,6 +57,8 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.LyricsView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.utils.launchRequestPermission
+import com.github.bumblebee202111.minusonecloudmusic.utils.requestPermissionLauncher
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.badge.ExperimentalBadgeUtils
@@ -85,7 +93,10 @@ class NowPlayingFragment : AbstractPlayerFragment() {
 
     
     private lateinit var playlistButton: ImageView
+    private lateinit var playBottomContainer: ConstraintLayout
     private lateinit var deviceButton: ImageView
+    private lateinit var downloadButton: ImageView
+    private lateinit var moreButton: ImageView
     private lateinit var likeButton: ImageButton
     private lateinit var commentButton: ImageButton
     private lateinit var lyricsView: LyricsView
@@ -148,11 +159,17 @@ class NowPlayingFragment : AbstractPlayerFragment() {
 
     private lateinit var defaultArtwork: Drawable
     private var defaultArtworkId = 0
+    private var requestPermissionLauncher: ActivityResultLauncher<String>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentNowPlayingBinding.inflate(inflater, container, false)
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            requestPermissionLauncher = requestPermissionLauncher(::onDownloadClick)
+        }
+
         return binding.root
     }
 
@@ -252,24 +269,31 @@ class NowPlayingFragment : AbstractPlayerFragment() {
             }
         }, handler)
 
+        playBottomContainer = binding.playBottomContainer
+
         deviceButton = binding.deviceBtnStyle1.apply {
             setOnClickListener {
                 if (!SystemOutputSwitcherDialogController.showDialog(context)) {
-
-
                     audioManager.adjustStreamVolume(
                         AudioManager.STREAM_MUSIC,
                         AudioManager.ADJUST_SAME,
                         AudioManager.FLAG_SHOW_UI
                     )
                 }
-
             }
-
         }
 
-        binding.downloadButton
+        downloadButton = binding.downloadButton.apply {
+            setOnClickListener {
+                requestPermissionLauncher?.apply {
+                    launchRequestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+                        onDownloadClick()
+                    }
+                } ?: onDownloadClick()
+            }
+        }
 
+        moreButton = binding.moreButton
 
         val likeClickListener = View.OnClickListener { nowPlayingViewModel.onLikeClicked() }
 
@@ -387,8 +411,26 @@ class NowPlayingFragment : AbstractPlayerFragment() {
 
         repeatWithViewLifecycle {
             launch {
-                nowPlayingViewModel.lyrics.collect(lyricsView::setLyrics)
+                nowPlayingViewModel.currentSong.collect {
+                    val downloadable = (it as? RemoteSong?)?.isDownloadable == true
+                    downloadButton.isVisible = downloadable
+                    ConstraintSet().apply {
+                        clone(playBottomContainer)
+                        if (downloadable) {
+                            setHorizontalBias(R.id.deviceBtnStyle1, 1 / 6f)
+                            setHorizontalBias(R.id.more_button, 5 / 6f)
+                        } else {
+                            setHorizontalBias(R.id.deviceBtnStyle1, 1 / 4f)
+                            setHorizontalBias(R.id.more_button, 3 / 4f)
+                        }
+                        applyTo(playBottomContainer)
+                    }
+                    deviceButton
+                }
+            }
 
+            launch {
+                nowPlayingViewModel.lyrics.collect(lyricsView::setLyrics)
             }
 
             launch {
@@ -742,6 +784,7 @@ class NowPlayingFragment : AbstractPlayerFragment() {
             backgroundColor = Color.TRANSPARENT
         }
 
+
     private fun ImageView.addBadge(badgeDrawable: BadgeDrawable) {
         viewTreeObserver.addOnGlobalLayoutListener(
             object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -751,6 +794,10 @@ class NowPlayingFragment : AbstractPlayerFragment() {
                     viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
             })
+    }
+
+    private fun onDownloadClick() {
+        nowPlayingViewModel.onDownloadClick()
     }
 
     companion object {

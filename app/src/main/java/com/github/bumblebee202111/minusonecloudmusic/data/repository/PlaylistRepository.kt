@@ -11,6 +11,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.GenericSongView
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
 import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractSong
@@ -20,8 +21,8 @@ import com.github.bumblebee202111.minusonecloudmusic.data.model.PlaylistDetail
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.SongIdAndVersion
 import com.github.bumblebee202111.minusonecloudmusic.data.model.asEntity
-import com.github.bumblebee202111.minusonecloudmusic.data.network.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.combine
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.NetworkBillboardGroup
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongDetailsApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.asExternalModel
@@ -47,9 +48,13 @@ class PlaylistRepository @Inject constructor(
 
 
     fun getPlaylistDetail(id: Long): Flow<Result<PlaylistDetail?>> = apiResultFlow(
-        fetch = { networkDataSource.getPlaylistV4Detail(id) },
+        fetch = {
+            networkDataSource.getPlaylistV4Detail(id).combine {
+                networkDataSource.getPlaylistPrivilege(id)
+            }
+        },
         mapSuccess = {
-            it.playlist.asExternalModel()
+            Pair(it.first.playlist, it.second).asExternalModel()
         }
     )
 
@@ -65,18 +70,24 @@ class PlaylistRepository @Inject constructor(
     fun getPlaylistDetailAndPagingData(playlistId: Long): Pair<Flow<Result<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
         return apiDetailFlowWithPagingDataFlow(
             coroutineScope = coroutineScope,
-            getTotalCount = { playlist.trackCount + playlist.cloudTrackCount },
-            initialFetch = { networkDataSource.getPlaylistV4Detail(playlistId) },
+            getTotalCount = { first.playlist.trackCount + first.playlist.cloudTrackCount },
+            initialFetch = {
+                networkDataSource.getPlaylistV4Detail(playlistId).combine {
+                    networkDataSource.getPlaylistPrivilege(playlistId)
+
+                }
+            },
             nonInitialFetch = { limit, offset, precondition ->
-                val songIdsAndVersions = precondition.playlist.trackIds.drop(offset).take(limit)
-                    .map { SongIdAndVersion(it.id, 0) }
+                val songIdsAndVersions =
+                    precondition.first.playlist.trackIds.drop(offset).take(limit)
+                        .map { SongIdAndVersion(it.id, 0) }
                 fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
             },
-            mapInitialFetchToResult = { playlist.asExternalModel() },
+            mapInitialFetchToResult = { Pair(first.playlist, second).asExternalModel() },
             limit = PLAYLIST_PAGE_SIZE,
-            getPageDataFromInitialFetch = { playlist.tracks },
-            getPageDataFromNonInitialFetch = { songs },
-            mapPagingValueToResult = { Pair(this, null).asExternalModel() }
+            getPageDataFromInitialFetch = { first.playlist.tracks.zip(second) },
+            getPageDataFromNonInitialFetch = { songs.zip(privileges) },
+            mapPagingValueToResult = { asExternalModel() }
         )
     }
 
@@ -90,11 +101,15 @@ class PlaylistRepository @Inject constructor(
                     .map { SongIdAndVersion(it.id, 0) }
                 fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
             },
-            mapInitialFetchToResult = { playlist.asExternalModel() },
+            mapInitialFetchToResult = { asExternalModel() },
             limit = PLAYLIST_PAGE_SIZE,
-            getPageDataFromInitialFetch = { playlist.tracks },
-            getPageDataFromNonInitialFetch = { songs },
-            mapPagingValueToResult = { Pair(this, null).asExternalModel() },
+            getPageDataFromInitialFetch = {
+                with(playlist) {
+                    tracks.zip(privileges)
+                }
+            },
+            getPageDataFromNonInitialFetch = { songs.zip(privileges) },
+            mapPagingValueToResult = { asExternalModel() },
         )
     }
 
@@ -158,6 +173,9 @@ class PlaylistRepository @Inject constructor(
 
     suspend fun playerPlaylistSongs() =
         playerDao.populatedPlaylistSongs().map(GenericSongView::asExternalModel)
+
+    suspend fun playerPlaylistSong(mediaId: String) =
+        playerDao.getPlaylistSong(mediaId).asExternalModel()
 
     suspend fun getPlayerPlaylistSongPosition(mediaId: String): Int? {
         return playerDao.getPlaylistSongPosition(mediaId)

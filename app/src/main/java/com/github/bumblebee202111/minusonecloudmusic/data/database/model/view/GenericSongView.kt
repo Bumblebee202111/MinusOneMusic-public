@@ -1,10 +1,7 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.database.model.view
 
-import android.net.Uri
 import androidx.room.ColumnInfo
 import androidx.room.DatabaseView
-import androidx.room.PrimaryKey
-import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalAlbum
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteAlbum
@@ -12,9 +9,9 @@ import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 
 @DatabaseView(
     value = """
-SELECT 0 AS is_local, id, name, album, artists, available, version FROM RemoteSongEntity
+SELECT 0 AS is_local, id, name, album, artists, available, is_downloadable, version FROM RemoteSongEntity
 UNION ALL
-SELECT 1 AS is_local, id, name, album, artists, available, NULL AS version FROM LocalSongEntity
+SELECT 1 AS is_local, id, name, album, artists, available, NULL AS is_downloadable, NULL AS version FROM LocalSongEntity
 """,
     viewName = "generic_songs"
 )
@@ -26,6 +23,8 @@ data class GenericSongView(
     val album: Album?,
     val artists: List<String?>,
     val available: Boolean,
+    @ColumnInfo("is_downloadable")
+    val isDownloadable: Boolean,
     val version: Int?,
 ) {
     data class Album(
@@ -76,5 +75,6 @@ else
         album = album?.let { RemoteAlbum(it.id!!, it.name, it.pictureUrl!!) },
         artists = artists,
         available = available,
+        isDownloadable = isDownloadable,
         version = version!!
     )

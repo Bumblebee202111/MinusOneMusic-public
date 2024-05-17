@@ -4,17 +4,18 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.github.bumblebee202111.minusonecloudmusic.coroutines.AppDispatchers.*
+import com.github.bumblebee202111.minusonecloudmusic.coroutines.AppDispatchers.IO
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.Dispatcher
 import com.github.bumblebee202111.minusonecloudmusic.data.Result
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
+import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.model.DailyRecommendSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.Video
-import com.github.bumblebee202111.minusonecloudmusic.data.network.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.CloudSongsApiPage
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.DailyPageApiData
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.SearchViewInfo
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.asExternalModel
 import com.github.bumblebee202111.minusonecloudmusic.data.pagingsource.CloudSongsPagingSource
@@ -41,16 +42,16 @@ class LoggedInUserDataRepository @Inject constructor(
 
     suspend fun getAllCloudSongs(start: Int): List<RemoteSong> {
         val songs = mutableListOf<CloudSongsApiPage.CloudSongData>()
-        var offset=start
+        var offset = start
         while (true) {
             val response = networkDataSource.getCloudSongs(500, offset)
             if (response is ApiResult.ApiSuccessResult) {
-                songs +=response.data.data
-                offset+=500
-                if(!response.data.hasMore){
+                songs += response.data.data
+                offset += 500
+                if (!response.data.hasMore) {
                     break
                 }
-            } else{
+            } else {
                 break
             }
         }
@@ -101,11 +102,11 @@ class LoggedInUserDataRepository @Inject constructor(
             }
         )
 
-    fun getDailyRecommendSongs(): Flow<Result<List<DailyRecommendSong>>> = apiResultFlow(
-        fetch = { networkDataSource.getRecommendSongs() }
-    ) { data ->
-        data.asExternalModel()
-    }
+    fun getDailyRecommendSongs(): Flow<Result<List<DailyRecommendSong>>> =
+        apiResultFlow<DailyPageApiData, List<DailyRecommendSong>>(
+            fetch = { networkDataSource.getRecommendSongs() },
+            mapSuccess = DailyPageApiData::asExternalModel
+        )
 
     fun getDailyRecommendBanner() = apiResultFlow(
         fetch = {
