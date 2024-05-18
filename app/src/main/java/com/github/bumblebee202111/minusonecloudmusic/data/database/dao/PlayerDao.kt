@@ -8,7 +8,6 @@ import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.GenericSongView
 
 @Dao
 interface PlayerDao {
@@ -23,14 +22,14 @@ interface PlayerDao {
     @Query(
         QUERY_PLAYER_PLAYLIST_SONGS
     )
-    fun populatedPlaylistSongsPagingSource(): PagingSource<Int, GenericSongView>
+    fun populatedPlaylistSongsPagingSource(): PagingSource<Int, PlayerPlaylistSongEntity>
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query(
         QUERY_PLAYER_PLAYLIST_SONGS
     )
-    suspend fun populatedPlaylistSongs(): List<GenericSongView>
+    suspend fun populatedPlaylistSongs(): List<PlayerPlaylistSongEntity>
 
     @Query("SELECT COUNT(1) FROM player_playlist_songs")
     suspend fun getPlaylistSize():Int
@@ -39,17 +38,12 @@ interface PlayerDao {
     suspend fun getPlaylistSongPosition(mediaId: String): Int?
 
     @Query(
-        """SELECT * FROM player_playlist_songs
-LEFT OUTER JOIN 
-generic_songs 
-ON player_playlist_songs.id = generic_songs.id AND player_playlist_songs.is_local = generic_songs.is_local WHERE media_id = :mediaId"""
+        """SELECT * FROM player_playlist_songs WHERE media_id = :mediaId"""
     )
-    suspend fun getPlaylistSong(mediaId: String): GenericSongView
+    suspend fun getPlaylistSong(mediaId: String): PlayerPlaylistSongEntity
 
     private companion object {
-        const val QUERY_PLAYER_PLAYLIST_SONGS = """SELECT * FROM player_playlist_songs
-LEFT OUTER JOIN 
-generic_songs 
-ON player_playlist_songs.id = generic_songs.id AND player_playlist_songs.is_local = generic_songs.is_local ORDER BY position"""
+        const val QUERY_PLAYER_PLAYLIST_SONGS =
+            "SELECT * FROM player_playlist_songs ORDER BY position"
     }
 }

@@ -1,7 +1,5 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity
 
-import android.net.Uri
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalAlbum
@@ -15,7 +13,7 @@ data class LocalSongEntity(
     val album: LocalAlbum?,
     val artists: List<String?>,
     val available: Boolean,
-)
+) : AbstractSongEntity
 
 fun LocalSongEntity.asExternalModel() = LocalSong(
     name = name,

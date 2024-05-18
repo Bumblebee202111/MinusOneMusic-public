@@ -8,9 +8,10 @@ import androidx.room.withTransaction
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.Result
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.AbstractSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.GenericSongView
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.populate
 import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
 import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractRemoteSong
@@ -166,16 +167,24 @@ class PlaylistRepository @Inject constructor(
         val pagingConfig = PagingConfig(100)
         return Pager(config = pagingConfig) {
             playerDao.populatedPlaylistSongsPagingSource()
-        }.flow.map { populatedList ->
-            populatedList.map(GenericSongView::asExternalModel)
+        }.flow.map { pagingData ->
+            pagingData.map {
+                songDao.run {
+                    it.populate().asExternalModel()
+                }
+            }
         }
     }
 
-    suspend fun playerPlaylistSongs() =
-        playerDao.populatedPlaylistSongs().map(GenericSongView::asExternalModel)
+    suspend fun playerPlaylistSongs() = songDao.run {
+        playerDao.populatedPlaylistSongs().populate().map(AbstractSongEntity::asExternalModel)
+    }
 
-    suspend fun playerPlaylistSong(mediaId: String) =
-        playerDao.getPlaylistSong(mediaId).asExternalModel()
+
+    suspend fun playerPlaylistSong(mediaId: String) = songDao.run {
+        playerDao.getPlaylistSong(mediaId).populate().asExternalModel()
+    }
+
 
     suspend fun getPlayerPlaylistSongPosition(mediaId: String): Int? {
         return playerDao.getPlaylistSongPosition(mediaId)

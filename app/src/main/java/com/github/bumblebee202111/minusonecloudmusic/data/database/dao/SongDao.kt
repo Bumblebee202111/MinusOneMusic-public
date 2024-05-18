@@ -8,7 +8,6 @@ import androidx.room.Update
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.LocalSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.RemoteSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.SongPrivilegePartialEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SongDao {
@@ -19,8 +18,17 @@ interface SongDao {
     @Insert(entity = LocalSongEntity::class, onConflict = OnConflictStrategy.REPLACE)
     fun insertLocalSongs(songs: List<LocalSongEntity>)
 
-    @Query("SELECT * FROM RemoteSongEntity WHERE id IN (:ids)")
-    fun observeRemoteSongs(ids: List<Long>): Flow<List<RemoteSongEntity>>
+    @Query("SELECT * FROM LocalSongEntity WHERE id = :id")
+    suspend fun localSong(id: Long): LocalSongEntity
+
+    @Query("SELECT * FROM LocalSongEntity WHERE id IN( :ids)")
+    suspend fun localSongs(ids: List<Long>): List<LocalSongEntity>
+
+    @Query("SELECT * FROM RemoteSongEntity WHERE id IN (:id)")
+    suspend fun remoteSong(id: Long): RemoteSongEntity
+
+    @Query("SELECT * FROM RemoteSongEntity WHERE id IN( :ids)")
+    suspend fun remoteSongs(ids: List<Long>): List<RemoteSongEntity>
 
     @Update(entity = RemoteSongEntity::class)
     suspend fun upsertPrivileges(userSongs: List<SongPrivilegePartialEntity>)

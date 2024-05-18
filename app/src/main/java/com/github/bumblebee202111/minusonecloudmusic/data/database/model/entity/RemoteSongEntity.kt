@@ -17,7 +17,7 @@ data class RemoteSongEntity(
     @ColumnInfo("is_downloadable")
     val isDownloadable: Boolean,
     val version: Int
-)
+) : AbstractSongEntity
 
 fun RemoteSongEntity.asExternalModel() =
     RemoteSong(

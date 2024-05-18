@@ -49,9 +49,6 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- 64-bit only
-- Deprecate GenericSongView
-  - Keep type and id only and get populated by mapping
 - New screens / major features
   - Discover & feed
     - Personal FMs

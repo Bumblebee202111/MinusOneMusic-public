@@ -3,7 +3,6 @@ package com.github.bumblebee202111.minusonecloudmusic.data.database
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.room.TypeConverter
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.GenericSongView
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalAlbum
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteAlbum
 import com.squareup.moshi.JsonAdapter
@@ -19,8 +18,6 @@ object TypeConverters {
     private val remoteAlbumAdapter: JsonAdapter<RemoteAlbum> =
         moshi.adapter(RemoteAlbum::class.java)
     private val localAlbumAdapter: JsonAdapter<LocalAlbum> = moshi.adapter(LocalAlbum::class.java)
-    private val genericAlbumAdapter: JsonAdapter<GenericSongView.Album> =
-        moshi.adapter(GenericSongView.Album::class.java)
     private val stringListAdapter:JsonAdapter<List<String?>> =moshi.adapter(stringListType)
     @TypeConverter
     fun remoteAlbumToString(album: RemoteAlbum): String {
@@ -39,11 +36,6 @@ object TypeConverters {
     @TypeConverter
     fun stringToLocalAlbum(string: String): LocalAlbum? {
         return localAlbumAdapter.fromJson(string)
-    }
-
-    @TypeConverter
-    fun stringToGenericAlbum(string: String): GenericSongView.Album? {
-        return genericAlbumAdapter.fromJson(string)
     }
 
     @TypeConverter

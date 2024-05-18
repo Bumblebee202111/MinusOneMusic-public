@@ -18,7 +18,6 @@ import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserDetailEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserPlaylistEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserProfileEntity
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.view.GenericSongView
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 
@@ -33,8 +32,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
         MyRecentMusicDataEntity::class,
         PlayerPlaylistSongEntity::class
     ],
-    views = [GenericSongView::class],
-    version = 19,
+    version = 20,
     exportSchema = false
 )
 @TypeConverters(com.github.bumblebee202111.minusonecloudmusic.data.database.TypeConverters::class)
