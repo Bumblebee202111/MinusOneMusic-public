@@ -32,7 +32,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
         MyRecentMusicDataEntity::class,
         PlayerPlaylistSongEntity::class
     ],
-    version = 20,
+    version = 21,
     exportSchema = false
 )
 @TypeConverters(com.github.bumblebee202111.minusonecloudmusic.data.database.TypeConverters::class)

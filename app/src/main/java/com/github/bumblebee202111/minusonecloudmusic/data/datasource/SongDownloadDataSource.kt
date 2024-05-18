@@ -6,8 +6,9 @@ import android.content.Context
 import android.os.Environment
 import androidx.core.net.toUri
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.displayArtists
-import com.github.bumblebee202111.minusonecloudmusic.data.model.displayName
+import com.github.bumblebee202111.minusonecloudmusic.data.model.SongDownloadInfo
+import com.github.bumblebee202111.minusonecloudmusic.data.model.artistsAsPartOfFilename
+import com.github.bumblebee202111.minusonecloudmusic.data.model.nameAsPartOfFilename
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,10 +20,11 @@ class SongDownloadDataSource @Inject constructor(@ApplicationContext private val
     private val downloadManager: DownloadManager =
         context.getSystemService(DownloadManager::class.java)
 
-    fun download(song: RemoteSong, url: String): Long {
-        val filename = "${song.displayArtists} - ${song.displayName}.${url.substringAfterLast('.')}"
-        val request = DownloadManager.Request(url.toUri())
-            .setTitle(song.displayName)
+    fun download(song: RemoteSong, songDownloadInfo: SongDownloadInfo): Long {
+        val filename =
+            "${song.artistsAsPartOfFilename} - ${song.nameAsPartOfFilename}.${songDownloadInfo.extension}"
+        val request = DownloadManager.Request(songDownloadInfo.url.toUri())
+            .setTitle(song.nameAsPartOfFilename)
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalPublicDir(
                 Environment.DIRECTORY_DOWNLOADS,
