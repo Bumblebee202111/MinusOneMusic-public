@@ -8,6 +8,11 @@ Change Log
   - Notifications
   - Dynamic button visibility
   - Downloaded songs are currently barely treated as normal local songs without any connection to remote songs
+- Support 64-bit devices only
+- Ensure that service is stopped after app is killed
+- Fix playlist dialog crash by properly retrieving item height
+- Fix playlist dialog songs don't play automatically when tapped
+- Code optimizations
 
 ## Version 1.0.0-dev05 (baseline: NCM 9.0.6x)
 
