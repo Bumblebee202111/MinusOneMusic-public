@@ -88,7 +88,7 @@ Below are some factors that may hinder you from using it, which can change over 
 - [Arch] Clarify the dividing line between network layer and repo layer and consider removing the `NetworkDataSource` wrapper
 - [NCMB] Fully deprecate it 
 - [Login] SMS captcha login
-- [Arch] For data mapping, should probably use `from`-s instead of `to-`s instead
+- [Arch] More elegant data mapping
 - [Compose] Write non-NCM screens in Compose
 - [Qualification] Add quiz activity/app based on JetSurvey
 - [Mine] Add shadow for profile background

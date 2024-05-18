@@ -5,6 +5,15 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.github.bumblebee202111.minusonecloudmusic.data.database.dao.SongDao
+import kotlin.collections.List
+import kotlin.collections.chunked
+import kotlin.collections.flatMap
+import kotlin.collections.forEach
+import kotlin.collections.groupBy
+import kotlin.collections.map
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
+import kotlin.collections.sortedBy
 
 @Entity(tableName = "player_playlist_songs", indices = [Index(value = ["position"], unique = true)])
 data class PlayerPlaylistSongEntity(
@@ -29,20 +38,31 @@ suspend fun PlayerPlaylistSongEntity.populate(): AbstractSongEntity {
 
 context (SongDao)
 suspend fun List<PlayerPlaylistSongEntity>.populate(): List<AbstractSongEntity> {
-    return asSequence()
-        .groupBy(keySelector = PlayerPlaylistSongEntity::isLocal)
-        .map {
-            val positions = it.value.map(PlayerPlaylistSongEntity::position)
-            val ids = it.value.map(PlayerPlaylistSongEntity::id)
-            positions.zip(
-                when (it.key) {
+
+    val idPositions = mutableMapOf<Pair<Boolean, Long>, Int>()
+    forEach {
+        with(it) {
+            idPositions[Pair(isLocal, id)] = position
+        }
+    }
+    return groupBy(keySelector = PlayerPlaylistSongEntity::isLocal)
+        .flatMap { entry ->
+            entry.value.chunked(999).flatMap { chunked ->
+                val ids = chunked.map(PlayerPlaylistSongEntity::id)
+                when (entry.key) {
                     true -> localSongs(ids)
                     false -> remoteSongs(ids)
                 }
-            )
+            }
         }
-        .flatten()
-        .sortedBy(Pair<Int, AbstractSongEntity>::first)
-        .map(Pair<Int, AbstractSongEntity>::second)
-        .toList()
+        .sortedBy {
+            with(it) {
+                idPositions[
+                    when (this) {
+                        is LocalSongEntity -> Pair(true, id)
+                        is RemoteSongEntity -> Pair(false, id)
+                    }
+                ]
+            }
+        }
 }
