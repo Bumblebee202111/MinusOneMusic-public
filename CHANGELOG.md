@@ -1,10 +1,23 @@
 Change Log
 ==========
 
+## Version 1.0.0-dev06 (baseline: NCM 9.0.80)
+
+- Last played playlist and song are restored when app is restarted
+- Basic support for downloading ex-high music
+  - Notifications
+  - Dynamic button visibility
+  - Downloaded songs are currently barely treated as normal local songs without any connection to remote songs
+- Support 64-bit devices only
+- Ensure that service is stopped after app is killed
+- Fix playlist dialog crash by properly retrieving item height
+- Fix playlist dialog songs don't play automatically when tapped
+- Code optimizations
+
 ## Version 1.0.0-dev05 (baseline: NCM 9.0.6x)
 
-- Fix crashes when you are trying to play playlists
-- Fix size of navigationIcons Bumblebee202111
+- Fix crashes when you are trying to open player playlist dialog
+- Fix size of navigationIcons
 - Fix app crash when the guest user is trying to open cloud disk
 - Fix logged-in user getting altered by guest on refresh
 - Update dependencies
