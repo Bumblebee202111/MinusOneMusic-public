@@ -1,6 +1,8 @@
 Change Log
 ==========
 
+## Version 1.0.0-dev07 (baseline: NCM 9.0.)
+
 ## Version 1.0.0-dev06 (baseline: NCM 9.0.80)
 
 - Last played playlist and song are restored when app is restarted
