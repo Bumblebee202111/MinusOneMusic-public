@@ -8,8 +8,8 @@ Meanwhile, we are attempting to make it as good as possible.
 
 Note we are very inexperienced and this app is at a very early stage of development. Current progress: 
 
-- 好用[^*]：我的—音乐、迷你播放器、播放页、我的播放列表、每日推荐
-- 够用：密码登录/退出登录、最近播放—歌曲、云盘、本地音乐
+- 高完成度[^*]：我的—音乐、迷你播放器、播放页、我的播放列表、每日推荐
+- 低完成度：发现首页（顶部入口、私人雷达、排行榜）、密码登录/退出登录、最近播放—歌曲、云盘、本地音乐
 
 [^*]: 一般不包括子界面、子菜单、子对话框等
 
@@ -45,57 +45,91 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## Screenshot
 
-<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=192/> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=192 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=192 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="local music and player playlist dialog" width=192 />
+<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=192 /> <img src="docs\screenshots\Screenshot_discover.png" alt="Discover" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=192/> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=192 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=192 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="local music and player playlist dialog" width=192 />
 
 ## To-dos
 
-- New screens / major features
-  - Discover & feed
-    - Personal FMs
-    - Billboards
+- Basic screens / major features
+  - Billboards
+
   - Search
   - Comments
   - My Chart (听歌排行)
+
+- Extended screens / major features
+
+  - Personal FMs
   - Friends
   - MVs
+  - Drawer
+
 - Statusbar lyrics
+
 - \[Mini Player\] Swipe, Hide like `PlayControlView`
+
 - [Mini Player\] [Now Playing\] Transition
+
 - [Player] Continue the work of moving Player to VM
+
 - [Now Playing\] Use light status bar text
+
 - [Now Playing\] Follow
+
 - [BNV\] Fix overlapping of icon and title on some devices such as my AVD
+
 - [Playlist] Items
   - Actions
   - Cloud/favorite/试听(trial)/unavailable UI state
+
 - Use Channel to show Toasts
+
 - [Player] Handle fetch error
+
 - More caching when RemoteMediator becomes non-experimental
   - Playlist, lyrics ...
+
 - [Now Playing] Provide bottom volume bar dialog (instead of showing sytem volume toast) for systems where the built-in output switcher dialog is unavailable.
+
 - [Settings] Add 底部导航自定义
   - ~~Delayed since: it's gone forever in our installed official app; it's not officially supported~~ Seems it can be found with some tricks
+
 - [Network] More elegant
   - My own CookieJar implementation
   - Custom param annotation
   - [Network] Add ApiResponse wrapper for more precise error tracking
+
 - On-boarding
+
 - Link local/downloaded songs with remote ones
   - Lyrics and cover matching
   - Advanced download
+
 - [Nav] Continue the work of optimizing navigation code
+
 - [Player] Support various audio qualities
+
 - [Arch] Clarify the dividing line between network layer and repo layer and consider removing the `NetworkDataSource` wrapper
+
 - [NCMB] Fully deprecate it 
+
 - [Login] SMS captcha login
+
 - [Arch] More elegant data mapping
+
 - [Compose] Write non-NCM screens in Compose
+
 - [Qualification] Add quiz activity/app based on JetSurvey
+
 - [Mine] Add shadow for profile background
+
 - [Mine] Top crop profile background
+
 - [Mine] Fix top margin of user profile
+
 - [Full-screen Player] Maybe use Compose FlowRow and Arrangement.SpaceAround for control buttons
+
 - [Music Player Bar] Fix top shadow
+
 - [MinusTue] A minimum NCM app for exploring Vue3
 
 ## Libraries used

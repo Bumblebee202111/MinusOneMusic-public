@@ -6,12 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.NavHostFragment
+import androidx.recyclerview.widget.DividerItemDecoration
+import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
 import com.github.bumblebee202111.minusonecloudmusic.R
+import com.github.bumblebee202111.minusonecloudmusic.data.model.DiscoverBlock
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDiscoverBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.mainNavController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.main.MainFragment
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistSongWithPositionAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 @AndroidEntryPoint
@@ -38,35 +41,65 @@ class DiscoverFragment : Fragment() {
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val categories = requireActivity().resources.getStringArray(R.array.wow_types).toList()
-        val playListSquareAdapter = PlayListSquareAdapter(categories) { position ->
-            when (position) {
-                0 -> {
-                    mainNavController.navigate(R.id.nav_dailyrecommend)
-                }
-
-                3 -> {
-                    mainNavController.navigate(R.id.nav_toplist)
-                }
-
-                else -> throw IndexOutOfBoundsException()
-            }
+        mainFragment =
+            ((requireParentFragment() as NavHostFragment).requireParentFragment() as MainFragment)
+        binding.topAppBar.setNavigationOnClickListener {
+            mainFragment.openDrawerLayout()
         }
-        binding.wowDashboard.adapter = playListSquareAdapter
 
-        val playlistSongWithPositionAdapter =
-            PlaylistSongWithPositionAdapter(viewModel::onSongItemClick)
-        binding.hotSongsChartList.adapter = playlistSongWithPositionAdapter
+        val discoverBlockAdapter = DiscoverBlockAdapter(
+            onDragonBallClick = { type ->
+                val navController = mainNavController
+                when (type) {
+                    DiscoverBlock.DragonBalls.DragonBall.Type.SONG_RCMD -> {
+                        navController.navigate(R.id.nav_dailyrecommend)
+                    }
+
+                    DiscoverBlock.DragonBalls.DragonBall.Type.RANK_LIST -> {
+                        navController.navigate(R.id.nav_top_lists)
+                }
+
+                    DiscoverBlock.DragonBalls.DragonBall.Type.PRIVATE_FM -> {
+
+                }
+
+                    DiscoverBlock.DragonBalls.DragonBall.Type.PLAYLIST_COLLECTION -> {
+
+                    }
+                }
+
+            },
+            onPlaylistClick = ::navigateToPlaylist
+        )
+        binding.blockList.apply {
+            adapter = discoverBlockAdapter
+            addItemDecoration(
+                DiscoverDividerItemDecoration(
+                    requireContext(),
+                    DividerItemDecoration.VERTICAL
+                )
+            )
+        }
 
         repeatWithViewLifecycle {
             launch {
-                viewModel.songItems.collect {
-                    playlistSongWithPositionAdapter.submitList(it)
+                viewModel.blocks.collect {
+                    discoverBlockAdapter.submitList(it)
                 }
             }
         }
+    }
+
+    private fun navigateToPlaylist(playlistId: Long, playlistCreatorId: Long, isMyPL: Boolean) {
+        mainNavController.navigate(
+            MobileNavigationDirections.actionGlobalNavPlaylist(
+                playlistId = playlistId,
+                playlistCreatorId = playlistCreatorId,
+                isMyPL = isMyPL
+            )
+        )
     }
 }

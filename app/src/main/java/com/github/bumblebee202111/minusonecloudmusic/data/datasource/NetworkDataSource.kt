@@ -54,6 +54,9 @@ class NetworkDataSource @Inject constructor(
 
     suspend fun logout() = this.eapiService.logout()
 
+    suspend fun getHomeDiscoveryPage(cursor: String) =
+        eapiService.getHomepageBlockPage(cursor = cursor)
+
     suspend fun getUserPlaylists(uid: Long) = this.eapiService.getUserPlaylists(uid)
     suspend fun getStarMusicIds(): ApiResult<LikedSongApiResult> =
         this.eapiService.getStarMusicIds()

@@ -41,6 +41,7 @@ class PlaylistViewModel @Inject constructor(
     private val args = PlaylistFragmentArgs.fromSavedStateHandle(savedStateHandle)
     private val playlistId = args.playlistId
     private val creatorId = args.playlistCreatorId
+    private val isMyPL = args.isMyPL
 
     val player = musicServiceConnection.player
 
@@ -56,7 +57,7 @@ class PlaylistViewModel @Inject constructor(
         viewModelScope.launch {
             loginRepository.loggedInUserId.collect { loggedInUserId ->
                 val (playlistDetailResultFlow, pagingDataFlow) =
-                    if (loggedInUserId == creatorId)
+                    if (isMyPL || loggedInUserId == creatorId)
                         playlistRepository.getMyPlaylistDetailAndPagingData(playlistId)
                     else
                         playlistRepository.getPlaylistDetailAndPagingData(playlistId)

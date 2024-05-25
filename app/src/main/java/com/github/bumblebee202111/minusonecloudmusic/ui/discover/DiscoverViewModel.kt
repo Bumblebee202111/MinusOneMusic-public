@@ -7,6 +7,7 @@ import androidx.media3.common.util.UnstableApi
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.data.repository.DiscoverRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository.Companion.TOP_LIST_ID
 import com.github.bumblebee202111.minusonecloudmusic.domain.GetPlaylistSongItemsUseCase
@@ -23,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DiscoverViewModel @Inject constructor(
     private val playlistRepository: PlaylistRepository,
+    private val discoverRepository: DiscoverRepository,
     private val musicServiceConnection: MusicServiceConnection,
     private val playPlaylistUseCase: PlayPlaylistUseCase,
     @ApplicationScope private val coroutineScope: CoroutineScope,
@@ -36,7 +38,5 @@ class DiscoverViewModel @Inject constructor(
         playlistRepository.getPlaylistDetail(TOP_LIST_ID).map { it.data }.flowOn(Dispatchers.IO)
             .stateInUi()
 
-    val songItems =
-        getPlaylistSongItemsUseCase(playlist.map { it?.expandedSongs?.take(3) }).stateInUi()
-
+    val blocks = discoverRepository.getDiscoverBlocks().map { it.data }.stateInUi()
 }
