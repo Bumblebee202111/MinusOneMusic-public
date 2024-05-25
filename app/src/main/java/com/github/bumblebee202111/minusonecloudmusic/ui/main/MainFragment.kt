@@ -4,22 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.forEach
-import androidx.fragment.app.activityViewModels
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.session.MediaController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMainBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractMiniPlayerBarFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -72,6 +71,16 @@ class MainFragment : AbstractMiniPlayerBarFragment() {
             menuItem.isChecked = true
             drawerLayout.close()
             true
+        }
+
+        binding.root.doOnApplyWindowInsets { _, insets, _ ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            bottomNavView.run {
+                layoutParams.height =
+                    resources.getDimensionPixelSize(R.dimen.bottom_nav_view_height) + systemBars.bottom
+                isVisible = true
+                requestLayout()
+            }
         }
 
         repeatWithViewLifecycle {

@@ -4,6 +4,7 @@ Change Log
 ## Version 1.0.0-dev07 (baseline: NCM 9.0.80)
 
 - Update DiscoverFragment from draft to basic one
+- Fix bottom inset not being handled to correctly display BNV
 
 ## Version 1.0.0-dev06 (baseline: NCM 9.0.80)
 
