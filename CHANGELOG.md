@@ -1,6 +1,8 @@
 Change Log
 ==========
 
+## Version 1.0.0-dev08 (baseline: NCM 9.0.80)
+
 ## Version 1.0.0-dev07 (baseline: NCM 9.0.80)
 
 - Update DiscoverFragment from draft to basic one

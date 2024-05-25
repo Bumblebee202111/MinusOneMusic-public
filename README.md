@@ -55,6 +55,9 @@ Below are some factors that may hinder you from using it, which can change over 
   - Search
   - Comments
   - My Chart (听歌排行)
+- MinusTue: A minimum NCM app for exploring Vue3 from scratch (not part of this project but related)
+  - The development of this project will then be slowed down but any user request that is not too challeging will be prioritized.
+
 - Extended screens / major features
 
   - Personal FMs
@@ -62,43 +65,41 @@ Below are some factors that may hinder you from using it, which can change over 
   - MVs
   - Drawer
 - Statusbar lyrics
-- \[Mini Player\] Swipe, Hide like `PlayControlView`
-- [Mini Player\] [Now Playing\] Transition
-- [Player] Continue the work of moving Player to VM
-- [Now Playing\] Use light status bar text
-- [Now Playing\] Follow
-- [Playlist] Items
+- Mini Player: Swipe, Hide like `PlayControlView`
+- Mini Player & Now Playing: Transition
+- Player: Continue the work of moving Player to VM
+- Now Playing: Use light status bar text
+- Now Playing: Follow
+- Playlist: Items
   - Actions
   - Cloud/favorite/试听(trial)/unavailable UI state
-- Use Channel to show Toasts
-- [Player] Handle fetch error
+- Use Channel to manage Toast-s
+- Player: Handle fetch error
 - More caching when RemoteMediator becomes non-experimental
   - Playlist, lyrics ...
-- [Now Playing] Provide bottom volume bar dialog (instead of showing sytem volume toast) for systems where the built-in output switcher dialog is unavailable.
-- [Settings] Add 底部导航自定义
+- Now Playing: Provide bottom volume bar dialog (instead of showing sytem volume toast) for systems where the built-in output switcher dialog is unavailable.
+- Settings: Add 底部导航自定义
   - ~~Delayed since: it's gone forever in our installed official app; it's not officially supported~~ Seems it can be found with some tricks
-- [Network] More elegant
+- Network: More elegant
   - My own CookieJar implementation
   - Custom param annotation
-  - [Network] Add ApiResponse wrapper for more precise error tracking
 - On-boarding
 - Link local/downloaded songs with remote ones
   - Lyrics and cover matching
   - Advanced download
-- [Nav] Continue the work of optimizing navigation code
-- [Player] Support various audio qualities
-- [Arch] Clarify the dividing line between network layer and repo layer and consider removing the `NetworkDataSource` wrapper
-- [NCMB] Fully deprecate it 
-- [Login] SMS captcha login
-- [Arch] More elegant data mapping
-- [Compose] Write non-NCM screens in Compose
-- [Qualification] Add quiz activity/app based on JetSurvey
-- [Mine] Add shadow for profile background
-- [Mine] Top crop profile background
-- [Mine] Fix top margin of user profile
-- [Full-screen Player] Maybe use Compose FlowRow and Arrangement.SpaceAround for control buttons
-- [Music Player Bar] Fix top shadow
-- [MinusTue] A minimum NCM app for exploring Vue3
+- Nav: Continue the work of optimizing navigation code
+- Player: Support various audio qualities
+- Arch: Clarify the dividing line between network layer and repo layer and consider removing the `NetworkDataSource` wrapper
+- NCMB: Fully deprecate it 
+- Login: SMS captcha login
+- Arch: More elegant data mapping
+- Compose: Write non-NCM screens in Compose
+- Qualification: Add quiz activity/app based on JetSurvey
+- Mine: Add shadow for profile background
+- Mine: Top crop profile background
+- Mine: Fix top margin of user profile
+- Full-screen Player: Use LinearLayout with "weight" things for control buttons
+- Music Player Bar: Fix top shadow
 
 ## Libraries used
 
