@@ -45,11 +45,11 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## Screenshot
 
-<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=192 /> <img src="docs\screenshots\Screenshot_discover.png" alt="Discover" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=192/> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=192 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=192 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="local music and player playlist dialog" width=192 />  <img src="docs\screenshots\Screenshot_top_lists.png" alt="top lists" width=192 />
+<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=192 /> <img src="docs\screenshots\Screenshot_discover.png" alt="Discover" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=192/> <img src="docs\screenshots\Screenshot_playlist.png" alt="Playlist" width=192 /> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=192 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=192 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="Local music and player playlist dialog" width=192 />  <img src="docs\screenshots\Screenshot_top_lists.png" alt="Top lists" width=192 />
 
 ## To-dos
 
-- Fix playlist info overlapping with toolbar
+- Add missing navigation icon click listeners
 - *Basic* screens / major features
   - Search
   - Comments

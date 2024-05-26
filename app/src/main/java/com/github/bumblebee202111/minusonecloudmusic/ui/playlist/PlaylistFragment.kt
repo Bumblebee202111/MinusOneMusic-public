@@ -53,8 +53,11 @@ class PlaylistFragment : AbstractPlaylistFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.appBarLayout) { _, insets ->
+            val topMargin = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
             (binding.toolbar.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
-                insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
+                topMargin
+            (binding.playlistDetail.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
+                topMargin + resources.getDimensionPixelSize(R.dimen.toolbar_size)
             WindowInsetsCompat.CONSUMED
         }
 
