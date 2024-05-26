@@ -129,45 +129,37 @@ class DiscoverBlockAdapter(
     ) : RecyclerView.ViewHolder(itemView) {
 
         class DragonBallsHolder(
-            private val itemView: View,
+            itemView: View,
             private val onDragonBallClick: (DiscoverBlock.DragonBalls.DragonBall.Type) -> Unit
         ) : ViewHolder(itemView) {
-            fun bind(
-                dragonBallBlock: DiscoverBlock.DragonBalls,
-
-                ) {
-
+            fun bind(dragonBallBlock: DiscoverBlock.DragonBalls) {
                 val dragonBalls = dragonBallBlock.dragonBalls
                 (itemView as LinearLayout).apply {
+                    removeAllViews()
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     )
                     weightSum = dragonBalls.size.toFloat()
-                    removeAllViews()
                     dragonBalls.forEach { db ->
-                        post {
-                            addView(
-                                ItemDiscoverDragonBallBinding.inflate(
-                                    LayoutInflater.from(context),
-                                    this,
-                                    false
-                                ).apply {
-                                    dragonBall = db
-                                    setOnClickListener {
-                                        onDragonBallClick(db.type)
-                                    }
-                                    executePendingBindings()
-                                }.root.also { it ->
-                                    it.layoutParams = LinearLayout.LayoutParams(
-                                        0,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                                        1.0f
-                                    )
-                                },
-                            )
+                        val binding = ItemDiscoverDragonBallBinding.inflate(
+                            LayoutInflater.from(context),
+                            this,
+                            false
+                        ).apply {
+                            dragonBall = db
                         }
-
+                        val root = binding.root.apply {
+                            layoutParams = LinearLayout.LayoutParams(
+                                0,
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                1.0f
+                            )
+                            setOnClickListener {
+                                onDragonBallClick(db.type)
+                            }
+                        }
+                        post { addView(root) }
                     }
                 }
             }

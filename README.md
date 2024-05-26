@@ -49,7 +49,6 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- Fix issue that discover dragonball clicks always open Top Lists
 - Fix playlist info overlapping with toolbar
 - *Basic* screens / major features
   - Search
