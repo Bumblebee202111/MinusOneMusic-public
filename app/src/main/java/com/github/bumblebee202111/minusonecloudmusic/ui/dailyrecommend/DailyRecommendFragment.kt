@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.fragment.app.viewModels
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDailyRecommendBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
@@ -42,6 +43,11 @@ class DailyRecommendFragment : AbstractPlaylistFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
+
         val dailyRecommendList = binding.dailyRecommendList
         val adapter = PlaylistSongWithAlbumAdapter(viewModel::onSongItemClick)
         dailyRecommendList.adapter = adapter
@@ -49,7 +55,6 @@ class DailyRecommendFragment : AbstractPlaylistFragment() {
         val typeface = Typeface.createFromAsset(requireContext().assets, "bamboo.ttf")
         binding.tvPendantDayRecommendDateInfo.typeface = typeface
         binding.tvPendantMonthText.typeface = typeface
-
 
         repeatWithViewLifecycle {
             launch {

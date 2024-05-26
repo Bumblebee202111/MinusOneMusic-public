@@ -49,7 +49,6 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- Add missing navigation icon click listeners
 - *Basic* screens / major features
   - Search
   - Comments

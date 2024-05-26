@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentTopListsBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.mainNavController
@@ -36,6 +37,11 @@ class TopListsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
+
         val adapter = BillboardGroupAdapter { playlistId ->
             mainNavController.navigate(
                 MobileNavigationDirections.actionGlobalNavPlaylist(

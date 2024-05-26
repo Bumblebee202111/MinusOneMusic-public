@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.media3.common.util.UnstableApi
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentPlaylistBinding
@@ -59,6 +60,10 @@ class PlaylistFragment : AbstractPlaylistFragment() {
             (binding.playlistDetail.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
                 topMargin + resources.getDimensionPixelSize(R.dimen.toolbar_size)
             WindowInsetsCompat.CONSUMED
+        }
+
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
         }
 
         binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
