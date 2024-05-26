@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+## Version 1.0.0-dev08 (baseline: NCM 9.0.80)
+
+- Improve Top Lists which was just draft
+- Fix playlist info overlapping with toolbar
+- Fix: Add missing click listeners for toolbar navigation icons
+
 ## Version 1.0.0-dev07 (baseline: NCM 9.0.80)
 
 - Update DiscoverFragment from draft to basic one
