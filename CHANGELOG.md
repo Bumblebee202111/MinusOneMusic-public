@@ -1,6 +1,8 @@
 Change Log
 ==========
 
+## Version 1.0.0-dev09 (baseline: NCM 9.0.80)
+
 ## Version 1.0.0-dev08 (baseline: NCM 9.0.80)
 
 - Improve Top Lists which was just draft
