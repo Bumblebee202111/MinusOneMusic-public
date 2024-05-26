@@ -15,15 +15,10 @@ import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.data.model.Billboard
-import com.github.bumblebee202111.minusonecloudmusic.ui.toplists.BillboardAdapter
 import kotlin.math.roundToInt
 
 
@@ -33,6 +28,11 @@ fun View.setIsGone(
     isGone: Boolean
 ) {
     visibility = if (isGone) View.GONE else View.VISIBLE
+}
+
+@BindingAdapter("isFakeBoldText")
+fun TextView.bindIsFakeBoldText(isFakeBoldText: Boolean) {
+    paint.isFakeBoldText = isFakeBoldText
 }
 
 @BindingAdapter(
@@ -136,19 +136,6 @@ fun setText(view: TextView, @StringRes resId: Int) {
     }
 }
 
-
-
-@BindingAdapter("billboards")
-fun bindBillboards(view: RecyclerView, billboards: List<Billboard>?) {
-    if (!billboards.isNullOrEmpty()) {
-        view.isVisible = true
-        val adapter = (view.adapter as? BillboardAdapter ?: BillboardAdapter())
-        view.adapter = adapter
-        adapter.submitList(billboards)
-    } else {
-        view.isGone = true
-    }
-}
 
 @BindingAdapter("artists")
 fun TextView.artists(artists: List<String>?) {

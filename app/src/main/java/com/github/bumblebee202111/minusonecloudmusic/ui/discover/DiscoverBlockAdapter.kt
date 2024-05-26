@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.data.model.DiscoverBlock
-import com.github.bumblebee202111.minusonecloudmusic.databinding.IncludeDiscoverBlockTitleBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ItemDiscoverDragonBallBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemDiscoverBlockPlaylistsBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemDiscoverBlockTopListsBinding
@@ -74,7 +73,6 @@ class DiscoverBlockAdapter(
                 }
             }
 
-
             R.layout.list_item_discover_block_top_lists -> {
                 val binding = ListItemDiscoverBlockTopListsBinding.inflate(
                     inflater,
@@ -97,7 +95,11 @@ class DiscoverBlockAdapter(
                     }
                 }
                 ViewHolder.TopListsHolder(binding) {
-                    onPlaylistClick(it, PlaylistFragment.ARG_PLAYLIST_CREATOR_ID_UNKNOWN, false)
+                    onPlaylistClick(
+                        it,
+                        PlaylistFragment.ARG_VALUE_PLAYLIST_CREATOR_ID_UNKNOWN,
+                        false
+                    )
                 }
             }
 
@@ -192,11 +194,6 @@ class DiscoverBlockAdapter(
                             }
                         }
                     }
-
-                    IncludeDiscoverBlockTitleBinding.bind(root).title.apply {
-                        text = playlists.title
-                        paint.isFakeBoldText = true
-                    }
                     executePendingBindings()
                 }
             }
@@ -208,10 +205,6 @@ class DiscoverBlockAdapter(
         ) : ViewHolder(binding.root) {
             fun bind(topLists: DiscoverBlock.TopLists) {
                 binding.apply {
-                    IncludeDiscoverBlockTitleBinding.bind(root).title.apply {
-                        text = topLists.title
-                        paint.isFakeBoldText = true
-                    }
                     topListsBlock = topLists
                     topListList.apply {
                         topLists.topLists.let { topListList ->

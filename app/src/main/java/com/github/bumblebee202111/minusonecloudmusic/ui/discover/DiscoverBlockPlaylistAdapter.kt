@@ -23,7 +23,10 @@ class DiscoverBlockPlaylistAdapter(private val onPlaylistClick: (playlistId: Lon
             binding.apply {
                 setPlaylist(playlist)
                 root.setOnClickListener {
-                    onPlaylistClick(playlist.id, PlaylistFragment.ARG_PLAYLIST_CREATOR_ID_UNKNOWN)
+                    onPlaylistClick(
+                        playlist.id,
+                        PlaylistFragment.ARG_VALUE_PLAYLIST_CREATOR_ID_UNKNOWN
+                    )
                 }
                 executePendingBindings()
             }

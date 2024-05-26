@@ -33,7 +33,7 @@ class PlaylistFragment : AbstractPlaylistFragment() {
     companion object {
         fun newInstance() = PlaylistFragment()
 
-        const val ARG_PLAYLIST_CREATOR_ID_UNKNOWN = -1L
+        const val ARG_VALUE_PLAYLIST_CREATOR_ID_UNKNOWN = -1L
     }
 
     @UnstableApi

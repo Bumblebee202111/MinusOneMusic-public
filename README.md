@@ -8,8 +8,8 @@ Meanwhile, we are attempting to make it as good as possible.
 
 Note we are very inexperienced and this app is at a very early stage of development. Current progress: 
 
-- 高完成度[^*]：我的—音乐、迷你播放器、播放页、我的播放列表、每日推荐
-- 低完成度：发现首页（顶部入口、私人雷达、排行榜）、密码登录/退出登录、最近播放—歌曲、云盘、本地音乐
+- :star::star::star::star:[^*]：我的—音乐、迷你播放器、播放页、我的播放列表、每日推荐
+- :star::star::star: ：排行榜、发现首页（顶部入口、私人雷达、排行榜）、密码登录/退出登录、最近播放—歌曲、云盘、本地音乐
 
 [^*]: 一般不包括子界面、子菜单、子对话框等
 
@@ -45,25 +45,30 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## Screenshot
 
-<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=192 /> <img src="docs\screenshots\Screenshot_discover.png" alt="Discover" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=192/> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=192 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=192 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="local music and player playlist dialog" width=192 />
+<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=192 /> <img src="docs\screenshots\Screenshot_discover.png" alt="Discover" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=192/> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=192 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=192 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="local music and player playlist dialog" width=192 />  <img src="docs\screenshots\Screenshot_top_lists.png" alt="top lists" width=192 />
 
 ## To-dos
 
-- Basic screens / major features
-  - Billboards
-
+- Fix issue that discover dragonball clicks always open Top Lists
+- Fix playlist info overlapping with toolbar
+- *Basic* screens / major features
   - Search
   - Comments
   - My Chart (听歌排行)
-- MinusTue: A minimum NCM app for exploring Vue3 from scratch (not part of this project but related)
-  - The development of this project will then be slowed down but any user request that is not too challeging will be prioritized.
+- Optimize toolbar navigation icon sizes
+  - `enum` binding
 
-- Extended screens / major features
+- Release alpha at some point
+- MinusTue: A minimum NCM app for exploring Vue3 from scratch (not part of this project)
+  - The development of MOM will then be slowed down but any user request that is not too challeging will be prioritized.
 
+- *Extended* screens / major features
   - Personal FMs
   - Friends
   - MVs
+  - Playlist Square?
   - Drawer
+- Sync: WorkManager
 - Statusbar lyrics
 - Mini Player: Swipe, Hide like `PlayControlView`
 - Mini Player & Now Playing: Transition
