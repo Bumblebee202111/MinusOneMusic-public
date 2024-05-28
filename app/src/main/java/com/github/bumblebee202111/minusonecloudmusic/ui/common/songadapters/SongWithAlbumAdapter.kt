@@ -1,16 +1,17 @@
-package com.github.bumblebee202111.minusonecloudmusic.ui.playlist
+package com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemPlaylistSongWithAlbumBinding
+import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemNormalSongWithPositionBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SongItemUiModel
 
-class PlaylistSongWithAlbumAdapter(override val onItemClick: (position: Int) -> Unit) :
-    BasePlaylistSongAdapter<PlaylistSongWithAlbumAdapter.ViewHolder>() {
+class SongWithAlbumAdapter(override val onItemClick: (position: Int) -> Unit) :
+    BaseSongAdapter<SongWithAlbumAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ListItemPlaylistSongWithAlbumBinding.inflate(
+            ListItemNormalSongWithPositionBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -23,10 +24,10 @@ class PlaylistSongWithAlbumAdapter(override val onItemClick: (position: Int) -> 
         holder.bind(song) { onItemClick(position) }
     }
 
-    class ViewHolder(private val binding: ListItemPlaylistSongWithAlbumBinding) :
+    class ViewHolder(private val binding: ListItemNormalSongWithPositionBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(
-            song: PlaylistSongItemUiModel,
+            song: SongItemUiModel,
             itemOnClickListener: View.OnClickListener
         ) {
             binding.song = song

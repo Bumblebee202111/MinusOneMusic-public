@@ -7,7 +7,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
-import com.github.bumblebee202111.minusonecloudmusic.domain.GetPagedPlaylistSongItemsUseCase
+import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongPagingDataFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistViewModel
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
@@ -22,7 +22,7 @@ import javax.inject.Inject
 class MyPrivateCloudViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
     private val loggedInUserDataRepository: LoggedInUserDataRepository,
-    private val getPagedPlaylistSongItemsUseCase: GetPagedPlaylistSongItemsUseCase,
+    private val mapSongPagingDataFlowToUiItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase,
     private val musicServiceConnection: MusicServiceConnection,
     playPlaylistUseCase: PlayPlaylistUseCase
 ) : AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
@@ -47,7 +47,7 @@ class MyPrivateCloudViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val songUiItemsPagingData = isLoggedIn.flatMapLatest { isLoggedIn ->
         if (isLoggedIn) {
-            getPagedPlaylistSongItemsUseCase(cloudSongsCountAndPagingData.second.map {
+            mapSongPagingDataFlowToUiItemsUseCase(cloudSongsCountAndPagingData.second.map {
                 it.map { song ->
                     loadedSongs += song
                     song

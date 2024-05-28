@@ -1,5 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
+import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.map
@@ -33,7 +34,10 @@ inline fun <ApiResultDataType, reified ResultType : Any> apiResultFlow(
     }
 }
     .onStart { emit(Result.Loading()) }
-    .catch { emit(Result.Error(Exception(it))) }
+    .catch {
+        Log.d("minusonecloudmusic", "apiResultFlow: ${it.message}")
+        emit(Result.Error(Exception(it)))
+    }
 
 
 inline fun <ApiResultDataType, ResultType> offlineFirstApiResultFlow(

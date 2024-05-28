@@ -14,7 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDailyRecommendBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistSongWithAlbumAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.SongWithAlbumAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -49,7 +49,7 @@ class DailyRecommendFragment : AbstractPlaylistFragment() {
         }
 
         val dailyRecommendList = binding.dailyRecommendList
-        val adapter = PlaylistSongWithAlbumAdapter(viewModel::onSongItemClick)
+        val adapter = SongWithAlbumAdapter(viewModel::onSongItemClick)
         dailyRecommendList.adapter = adapter
 
         val typeface = Typeface.createFromAsset(requireContext().assets, "bamboo.ttf")

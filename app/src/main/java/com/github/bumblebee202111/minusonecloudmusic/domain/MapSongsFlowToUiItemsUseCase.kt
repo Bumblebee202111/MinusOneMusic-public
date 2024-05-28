@@ -4,44 +4,44 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractSong
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistSongItemUiModel
+import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SongItemUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
-class GetPlaylistSongItemsUseCase @Inject constructor(private val musicServiceConnection: MusicServiceConnection) {
-    operator fun invoke(songsFlow: Flow<List<AbstractSong>?>): Flow<List<PlaylistSongItemUiModel>?> {
+class MapSongsFlowToUiItemsUseCase @Inject constructor(private val musicServiceConnection: MusicServiceConnection) {
+    operator fun invoke(songsFlow: Flow<List<AbstractSong>?>): Flow<List<SongItemUiModel>?> {
         return combine(
             songsFlow,
             musicServiceConnection.currentMediaId,
             musicServiceConnection.isPlaying
         ) { songs, currentSongId, isPlaying ->
             songs?.map { song ->
-                createPlaylistSongItemUiModel(song, currentSongId, isPlaying)
+                createSongUiItem(song, currentSongId, isPlaying)
             }
         }
     }
 }
 
-class GetPagedPlaylistSongItemsUseCase @Inject constructor(private val musicServiceConnection: MusicServiceConnection) {
-    operator fun invoke(songsFlow: Flow<PagingData<out AbstractSong>>): Flow<PagingData<PlaylistSongItemUiModel>> {
+class MapSongPagingDataFlowToUiItemsUseCase @Inject constructor(private val musicServiceConnection: MusicServiceConnection) {
+    operator fun invoke(songsFlow: Flow<PagingData<out AbstractSong>>): Flow<PagingData<SongItemUiModel>> {
         return combine(
             songsFlow,
             musicServiceConnection.currentMediaId,
             musicServiceConnection.isPlaying
         ) { songs, currentMediaId, isPlaying ->
             songs.map { song ->
-                createPlaylistSongItemUiModel(song, currentMediaId, isPlaying)
+                createSongUiItem(song, currentMediaId, isPlaying)
             }
         }
     }
 }
 
-private fun createPlaylistSongItemUiModel(
+private fun createSongUiItem(
     song: AbstractSong,
     currentMediaId: String?,
     isPlaying: Boolean,
-) = PlaylistSongItemUiModel(
+) = SongItemUiModel(
     song, song.mediaId == currentMediaId,
     isBeingPlayed = song.mediaId == currentMediaId && isPlaying
 )

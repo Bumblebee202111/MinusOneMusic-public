@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMyPrivateCloudBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PagedPlaylistSongWithPositionAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.PagedSongWithPositionAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 @AndroidEntryPoint
@@ -36,7 +36,7 @@ class MyPrivateCloudFragment : AbstractPlaylistFragment() {
         super.onViewCreated(view, savedInstanceState)
         val cloudSongsList = binding.privateSongsList
 
-        val adapter = PagedPlaylistSongWithPositionAdapter(viewModel::onSongItemClick)
+        val adapter = PagedSongWithPositionAdapter(viewModel::onSongItemClick)
         cloudSongsList.adapter = adapter
 
         repeatWithViewLifecycle {

@@ -3,7 +3,7 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.dailyrecommend
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.DailyRecommendSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
-import com.github.bumblebee202111.minusonecloudmusic.domain.GetPlaylistSongItemsUseCase
+import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongsFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistViewModel
 import com.github.bumblebee202111.minusonecloudmusic.utils.DateUtils
@@ -16,14 +16,14 @@ import javax.inject.Inject
 class DailyRecommendViewModel @Inject constructor(
     loggedInUserDataRepository: LoggedInUserDataRepository,
     private val playPlaylistUseCase: PlayPlaylistUseCase,
-    private val getPlaylistSongItemsUseCase: GetPlaylistSongItemsUseCase,
+    private val mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
     private val musicServiceConnection: MusicServiceConnection
 ) : AbstractPlaylistViewModel<DailyRecommendSong>(playPlaylistUseCase) {
 
    private val songs=loggedInUserDataRepository.getDailyRecommendSongs().map { it.data }.stateInUi()
 
     val songItems =
-        getPlaylistSongItemsUseCase(songs).stateInUi()
+        mapSongsFlowToUiItemsUseCase(songs).stateInUi()
 
     override val loadedSongs: List<DailyRecommendSong>
         get() = songs.value?: emptyList()

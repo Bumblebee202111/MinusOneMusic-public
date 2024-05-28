@@ -13,7 +13,7 @@ import androidx.fragment.app.viewModels
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentLocalMusicBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SimplePlaySongAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.SimpleSongAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -26,7 +26,7 @@ class LocalMusicFragment : AbstractPlaylistFragment() {
 
     override val viewModel: LocalMusicViewModel by viewModels()
     private lateinit var binding: FragmentLocalMusicBinding
-    private lateinit var adapter: SimplePlaySongAdapter
+    private lateinit var adapter: SimpleSongAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,7 +41,7 @@ class LocalMusicFragment : AbstractPlaylistFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = SimplePlaySongAdapter(viewModel::onSongItemClick)
+        adapter = SimpleSongAdapter(viewModel::onSongItemClick)
         binding.list.adapter = adapter
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->

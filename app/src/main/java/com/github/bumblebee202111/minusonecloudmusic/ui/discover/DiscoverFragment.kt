@@ -46,8 +46,14 @@ class DiscoverFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         mainFragment =
             ((requireParentFragment() as NavHostFragment).requireParentFragment() as MainFragment)
-        binding.topAppBar.setNavigationOnClickListener {
-            mainFragment.openDrawerLayout()
+        binding.topAppBar.apply {
+            setNavigationOnClickListener {
+                mainFragment.openDrawerLayout()
+            }
+            setOnMenuItemClickListener {
+                mainNavController.navigate(R.id.nav_search)
+                true
+            }
         }
 
         val discoverBlockAdapter = DiscoverBlockAdapter(

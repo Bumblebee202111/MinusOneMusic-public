@@ -1,9 +1,11 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.PaintDrawable
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
 import androidx.annotation.ColorRes
 import androidx.appcompat.widget.Toolbar
@@ -120,4 +122,10 @@ fun View.setBackgroundColorAndTopCorner(@ColorRes color: Int, radius: Float) {
     setBackground(PaintDrawable(background).apply {
         setCornerRadii(floatArrayOf(radius, radius, radius, radius, 0F, 0F, 0F, 0F))
     })
+}
+
+context (Fragment)
+fun View.hideSoftInput() {
+    val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    imm?.hideSoftInputFromWindow(windowToken, 0)
 }

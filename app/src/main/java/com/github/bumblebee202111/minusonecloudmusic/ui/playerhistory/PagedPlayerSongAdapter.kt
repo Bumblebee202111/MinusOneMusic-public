@@ -6,13 +6,17 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemPlayerPlaylistSongBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistSongItemUiModel
+import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SongItemUiModel
 
-class PagedPlayerSongAdapter(private val onItemClick: ((PlaylistSongItemUiModel, Int) -> Unit)) :
-    PagingDataAdapter<PlaylistSongItemUiModel, PagedPlayerSongAdapter.ViewHolder>(PlaylistSongItemUiModel.DIFF_CALLBACK) {
+class PagedPlayerSongAdapter(private val onItemClick: ((SongItemUiModel, Int) -> Unit)) :
+    PagingDataAdapter<SongItemUiModel, PagedPlayerSongAdapter.ViewHolder>(SongItemUiModel.DIFF_CALLBACK) {
     class ViewHolder(private val binding: ListItemPlayerPlaylistSongBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(song: PlaylistSongItemUiModel?, position: Int, itemOnClickListener: View.OnClickListener?) {
+        fun bind(
+            song: SongItemUiModel?,
+            position: Int,
+            itemOnClickListener: View.OnClickListener?
+        ) {
             binding.song = song
             binding.position = position + 1
             binding.root.setOnClickListener(itemOnClickListener)

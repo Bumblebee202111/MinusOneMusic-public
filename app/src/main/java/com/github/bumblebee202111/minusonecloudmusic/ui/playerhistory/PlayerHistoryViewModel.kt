@@ -10,7 +10,7 @@ import com.github.bumblebee202111.minusonecloudmusic.coroutines.AppDispatchers
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.Dispatcher
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
-import com.github.bumblebee202111.minusonecloudmusic.domain.GetPagedPlaylistSongItemsUseCase
+import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongPagingDataFlowToUiItemsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlayerHistoryViewModel @Inject constructor(
     private val musicServiceConnection: MusicServiceConnection,
-    private val getPagedPlaylistSongItemsUseCase: GetPagedPlaylistSongItemsUseCase,
+    private val mapSongPagingDataFlowToUiItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase,
     private val playlistRepository: PlaylistRepository,
     @Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -32,7 +32,7 @@ class PlayerHistoryViewModel @Inject constructor(
     }
 
     val songItemsPagingData =
-        getPagedPlaylistSongItemsUseCase(
+        mapSongPagingDataFlowToUiItemsUseCase(
             playlistRepository.getPlayerPlaylistPagingData().cachedIn(viewModelScope),
         ).cachedIn(viewModelScope)
 

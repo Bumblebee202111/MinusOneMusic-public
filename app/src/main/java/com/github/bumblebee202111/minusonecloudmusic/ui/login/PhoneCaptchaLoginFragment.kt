@@ -1,13 +1,10 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.login
 
-import android.content.Context
 import android.os.Bundle
-import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
@@ -17,6 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentPhoneCaptchaLoginBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.hideSoftInput
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -54,7 +52,7 @@ class PhoneCaptchaLoginFragment : Fragment() {
                     }
                     loginButton.isEnabled = phoneNumberState.isDataValid
                     if (phoneNumberState.isDataValid) {
-                        dismissKeyboard(phoneNumberEditText.windowToken)
+                        phoneNumberEditText.hideSoftInput()
                     }
                     phoneNumberState.error?.let {
                         phoneNumberEditText.error = getString(it)
@@ -67,7 +65,7 @@ class PhoneCaptchaLoginFragment : Fragment() {
                         return@collect
                     }
                     if (captchaState.isDataValid) {
-                        dismissKeyboard(captchaEditText.windowToken)
+                        captchaEditText.hideSoftInput()
                         phoneCaptchaLoginViewModel.login(
                             phoneNumberEditText.text.toString(),
                             captchaEditText.text.toString()
@@ -180,9 +178,4 @@ class PhoneCaptchaLoginFragment : Fragment() {
         Toast.makeText(appContext, errorString, Toast.LENGTH_LONG).show()
     }
 
-
-    private fun dismissKeyboard(windowToken: IBinder) {
-        val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        imm?.hideSoftInputFromWindow(windowToken, 0)
-    }
 }

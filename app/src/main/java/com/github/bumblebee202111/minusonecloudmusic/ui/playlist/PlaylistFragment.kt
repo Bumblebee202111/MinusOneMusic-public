@@ -19,6 +19,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistF
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.extractDominantColor
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.setBackgroundColorAndTopCorner
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.PagedSongWithPositionAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -79,7 +80,7 @@ class PlaylistFragment : AbstractPlaylistFragment() {
 
        playlistActions.setBackgroundColorAndTopCorner(R.color.colorBackgroundAndroid,12F)
 
-        val songAdapter = PagedPlaylistSongWithPositionAdapter(viewModel::onSongItemClick)
+        val songAdapter = PagedSongWithPositionAdapter(viewModel::onSongItemClick)
 
         binding.songList.adapter = songAdapter
         repeatWithViewLifecycle {

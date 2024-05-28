@@ -6,7 +6,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.MyRecentMusicData
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.UserRepository
-import com.github.bumblebee202111.minusonecloudmusic.domain.GetPlaylistSongItemsUseCase
+import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongsFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistViewModel
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MyRecentPlayViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val getPlaylistSongItemsUseCase: GetPlaylistSongItemsUseCase,
+    private val mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
     private val playPlaylistUseCase: PlayPlaylistUseCase,
     @Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
     private val musicServiceConnection: MusicServiceConnection
@@ -31,7 +31,7 @@ class MyRecentPlayViewModel @Inject constructor(
         )
     }.flowOn(ioDispatcher).stateInUi()
 
-    val recentPlaySongUiList = getPlaylistSongItemsUseCase(recentPlaySongs)
+    val recentPlaySongUiList = mapSongsFlowToUiItemsUseCase(recentPlaySongs)
         .stateInUi()
     override val loadedSongs: List<RemoteSong>
         get() = recentPlaySongs.value ?: emptyList()

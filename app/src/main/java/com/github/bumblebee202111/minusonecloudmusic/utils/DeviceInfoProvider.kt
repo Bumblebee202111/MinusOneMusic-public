@@ -30,14 +30,14 @@ class DeviceInfoProvider @Inject constructor(@ApplicationContext context: Contex
         get() {
             val androidModelCandidate= androidModelCandicates.random(rng)
             return mapOf(
-                "versioncode" to "9000020",
-                "buildver" to "240124144329",
+                "versioncode" to "9000080",
+                "buildver" to "240522204909",
                 "resolution" to androidModelCandidate[ "resolution" ],
                 "mobilename" to androidModelCandidate["mobilename"],
                 "osver" to androidOsVersionCandidates.random(rng),
                 "os" to "android",
                 COOKIE_NAME_DEVICE_ID to deviceId,
-                "appver" to "9.0.20",
+                "appver" to "9.0.80",
                 "channel" to "netease",
                 "screenType" to androidModelCandidate["screenType"],
                 "sDeviceId" to deviceId
@@ -63,8 +63,8 @@ class DeviceInfoProvider @Inject constructor(@ApplicationContext context: Contex
         val androidOsVersionCandidates = listOf("8.1.0", "12")
 
         val myDeviceInfoCookies = listOf(
-            "versioncode=9000020",
-            "buildver=240124144329",
+            "versioncode=9000080",
+            "buildver=240522204909",
             "resolution=1104x1920",
             "mobilename=MIPAD4",
             "osver=8.1.0",
@@ -94,7 +94,7 @@ class DeviceInfoProvider @Inject constructor(@ApplicationContext context: Contex
         )
 
         private val androidUserAgent =
-            "NeteaseMusic/9.0.20.240124144329(9000020);Dalvik/2.1.0 (Linux; U; Android 8.1.0; MI PAD 4 MIUI/V10.3.2.0.ODJCNXM)"
+            "NeteaseMusic/9.0.80.240522204909(9000080);Dalvik/2.1.0 (Linux; U; Android 8.1.0; MI PAD 4 MIUI/V10.3.2.0.ODJCNXM)"
 
         val allUserAgents = bujuanUserAgents + androidUserAgent
 

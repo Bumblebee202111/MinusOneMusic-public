@@ -12,7 +12,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.model.SimpleRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
-import com.github.bumblebee202111.minusonecloudmusic.domain.GetPagedPlaylistSongItemsUseCase
+import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongPagingDataFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistViewModel
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
@@ -33,7 +33,7 @@ class PlaylistViewModel @Inject constructor(
     private val songRepository: SongRepository,
     musicServiceConnection: MusicServiceConnection,
     private val playPlaylistUseCase: PlayPlaylistUseCase,
-    private val getPlaylistSongItemsUseCase: GetPagedPlaylistSongItemsUseCase
+    private val getPlaylistSongItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase
 ) :
     AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
 
@@ -48,7 +48,7 @@ class PlaylistViewModel @Inject constructor(
     private val _playlistDetail = MutableStateFlow<PlaylistDetail?>(null)
     val playlistDetail get() = _playlistDetail.stateInUi()
 
-    private val _songs = MutableStateFlow<PagingData<PlaylistSongItemUiModel>?>(null)
+    private val _songs = MutableStateFlow<PagingData<SongItemUiModel>?>(null)
     val playlistSongs get() = _songs.filterNotNull().cachedIn(viewModelScope)
 
     override val loadedSongs = mutableListOf<RemoteSong>()

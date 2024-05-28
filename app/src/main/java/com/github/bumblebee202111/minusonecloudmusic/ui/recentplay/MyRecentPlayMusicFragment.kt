@@ -9,7 +9,7 @@ import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMyRecen
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistViewModel
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SimplePlaySongAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.SimpleSongAdapter
 import kotlinx.coroutines.launch
 
 class MyRecentPlayMusicFragment : AbstractPlaylistFragment() {
@@ -37,7 +37,7 @@ class MyRecentPlayMusicFragment : AbstractPlaylistFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = SimplePlaySongAdapter {
+        val adapter = SimpleSongAdapter {
             viewModel.onSongItemClick(it)
         }
         binding.list.adapter=adapter

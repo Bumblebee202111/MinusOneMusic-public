@@ -137,6 +137,11 @@ class NetworkDataSource @Inject constructor(
         source
     )
 
+    suspend fun searchComplex(
+        keyword: String,
+        cursor: String,
+    ) = eapiService.searchComplex(keyword = keyword, cursor = cursor)
+
     suspend fun getAllCloudVideoSublist(
         limit: Int, offset: Int, total: Boolean = true
     ) = ncmBapiService.getAllCloudVideoSublist(limit, offset, total)
@@ -153,5 +158,4 @@ class NetworkDataSource @Inject constructor(
     suspend fun checkLoginQrCode(
         key: String, noCookie: Boolean? = null
     ) = ncmBapiService.checkLoginQrCode(key, noCookie)
-
 }
