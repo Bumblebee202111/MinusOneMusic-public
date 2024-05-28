@@ -142,6 +142,10 @@ class NetworkDataSource @Inject constructor(
         cursor: String,
     ) = eapiService.searchComplex(keyword = keyword, cursor = cursor)
 
+    suspend fun getV2ResourceComments(
+        threadId: String
+    ) = eapiService.getV2ResourceComments(threadId = threadId)
+
     suspend fun getAllCloudVideoSublist(
         limit: Int, offset: Int, total: Boolean = true
     ) = ncmBapiService.getAllCloudVideoSublist(limit, offset, total)

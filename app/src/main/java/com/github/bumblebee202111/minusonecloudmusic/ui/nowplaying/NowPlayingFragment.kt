@@ -47,9 +47,11 @@ import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentNowPlayingBinding
+import com.github.bumblebee202111.minusonecloudmusic.player.CountUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleModeUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleToggleMode
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlayerFragment
@@ -302,9 +304,19 @@ class NowPlayingFragment : AbstractPlayerFragment() {
             addBadge(likeBadge)
             setOnClickListener(likeClickListener)
         }
+
         val commentBadge = createBadgeDrawable(context)
         commentButton = binding.commentButton.apply {
             addBadge(commentBadge)
+            setOnClickListener {
+                val threadId =
+                    nowPlayingViewModel.commentInfo.value?.threadId ?: return@setOnClickListener
+                findNavController().navigate(
+                    MobileNavigationDirections.actionGlobalNavComments(
+                        threadId
+                    )
+                )
+            }
         }
 
         lyricsModeLikeButton = binding.lyricLikeBtn.apply {
@@ -425,7 +437,6 @@ class NowPlayingFragment : AbstractPlayerFragment() {
                         }
                         applyTo(playBottomContainer)
                     }
-                    deviceButton
                 }
             }
 
@@ -459,26 +470,20 @@ class NowPlayingFragment : AbstractPlayerFragment() {
                             }
                             lyricsModeLikeButton.setImageResource(lyricsModeNotLiked)
                         }
-
-
                     }
-
                 }
-
             }
             launch {
-                nowPlayingViewModel.commentCountDisplayText.collect { commentCountDisplayText ->
-
-                    commentBadge.text = commentCountDisplayText ?: ""
-
-                    if (commentCountDisplayText != null) {
+                nowPlayingViewModel.commentInfo.collect { commentInfo ->
+                    commentBadge.text =
+                        commentInfo?.commentCount?.let(CountUtil::getAbbreviatedCommentCount)
+                            ?: ""
+                    if (commentInfo != null) {
                         commentButton.setImageDrawable(commentWithCountDrawable)
                     } else {
                         commentButton.setImageDrawable(commentWithoutCountDrawable)
-
                     }
                 }
-
 
             }
             launch {

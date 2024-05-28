@@ -8,7 +8,6 @@ import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUse
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
-import com.github.bumblebee202111.minusonecloudmusic.player.CountUtil
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,11 +67,11 @@ class NowPlayingViewModel @Inject constructor(
         LikeState(like, likeCountText)
     }.stateInUi(LikeState(false, null))
 
-    val commentCountDisplayText = currentRemoteSongId.flatMapLatest { songId ->
+    val commentInfo = currentRemoteSongId.flatMapLatest { songId ->
         if (songId != null) {
-            songRepository.getCommentCount(songId)
+            songRepository.getCommentInfo(songId)
                 .map { commentCount ->
-                    commentCount.data?.let(CountUtil::getAbbreviatedCommentCount)
+                    commentCount.data
                 }
 
         } else {

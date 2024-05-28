@@ -16,6 +16,8 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.So
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongPrivilegeApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.asExternalModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.resource.NetworkComment
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.resource.asExternalModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.SongUrlInfo
 import com.github.bumblebee202111.minusonecloudmusic.data.network.requestparam.CParamSongInfo
 import com.squareup.moshi.JsonAdapter
@@ -111,9 +113,9 @@ class SongRepository @Inject constructor(
     )
 
 
-    fun getCommentCount(songId: Long) = apiResultFlow(
+    fun getCommentInfo(songId: Long) = apiResultFlow(
         fetch = { networkDataSource.getCommentInfoResourceList(moshiAdapter.toJson(listOf(songId))) },
-        mapSuccess = { it[0].commentCount }
+        mapSuccess = { it[0].asExternalModel() }
     )
 
     fun getLocalSongs(): List<LocalSong> {
@@ -129,5 +131,14 @@ class SongRepository @Inject constructor(
             }
         }
     }
+
+    fun getComments(threadId: String) = apiResultFlow(
+        fetch = {
+            networkDataSource.getV2ResourceComments(threadId)
+        },
+        mapSuccess = {
+            it.comments.map(NetworkComment::asExternalModel)
+        }
+    )
 
 }

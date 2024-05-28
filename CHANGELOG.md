@@ -3,7 +3,7 @@ Change Log
 
 ## Version 1.0.0-dev10 (baseline: NCM 9.0.80)
 
-- 
+- Support browsing the first page of hottest comments of a song
 
 ## Version 1.0.0-dev09 (baseline: NCM 9.0.80)
 
