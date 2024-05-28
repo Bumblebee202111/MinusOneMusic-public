@@ -49,12 +49,14 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- *Basic* screens / major feature
+- *Basic* screen / major feature
   - My Chart (听歌排行)
 - Optimize toolbar navigation icons
   - Try to port the recently found "back" nav icon from SearchFragment to other Fragments that use the old one and stop using the reflect magic
   - If icon size still not fixed, `enum` binding
 
+- Allow notification clicks
+- PlaylistFragment: Fix mask
 - Enter maintainance mode and release alpha at some point
   - However, any user request that is not too challeging will be very likely to be accepted.
   - MinusTue: A minimum NCM app for exploring Vue3 from scratch (not part of this project)
