@@ -3,6 +3,9 @@ Change Log
 
 ## Version 1.0.0-dev11 (baseline: NCM 9.0.80)
 
+- Add Listen Rank
+- Fix issues when playing empty playlist
+
 ## Version 1.0.0-dev10 (baseline: NCM 9.0.80)
 
 - Support browsing the first page of the hottest comments of a song

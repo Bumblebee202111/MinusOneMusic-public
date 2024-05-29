@@ -75,20 +75,19 @@ class MyMusicTabFragment : Fragment() {
 
         })
 
-repeatWithViewLifecycle {
-    launch {
-        mineViewModel.myPlaylistTabs.collect {
-            it?.let { tabs ->
-                UserPlaylistTab.entries.forEachIndexed { index, userPlaylistTab ->
-                    tabLayout.getTabAt(index)?.badge?.number =
-                        tabs[userPlaylistTab]?.size ?: 0
+        repeatWithViewLifecycle {
+            launch {
+                mineViewModel.myPlaylistTabs.collect {
+                    it?.let { tabs ->
+                        UserPlaylistTab.entries.forEachIndexed { index, userPlaylistTab ->
+                            tabLayout.getTabAt(index)?.badge?.number =
+                                tabs[userPlaylistTab]?.size ?: 0
+                        }
+                    }
                 }
             }
         }
     }
-}
-}
-
 
 
     private inner class MyMusicPlaylistTabsPagerAdapter :

@@ -25,12 +25,13 @@ class PlayPlaylistUseCase @Inject constructor(
     suspend operator fun invoke(
         loadedSongs: List<AbstractSong>,
         loadRemainingSongs: (suspend () -> List<AbstractSong>)? = null,
-        startIndex: Int = 0,
+        startIndex: Int = if (loadedSongs.isEmpty()) C.INDEX_UNSET else 0,
     ) {
+
         val player = musicServiceConnection.player.value ?: return
 
-        val isSongChanged =
-            musicServiceConnection.currentMediaId.value != loadedSongs[startIndex].mediaId
+        val isSongChanged = startIndex == C.INDEX_UNSET || (
+                musicServiceConnection.currentMediaId.value != loadedSongs[startIndex].mediaId)
 
         val loadedMediaItems =
             loadedSongs.map(::mapSongToMediaItem)

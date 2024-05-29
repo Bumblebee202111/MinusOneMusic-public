@@ -173,7 +173,7 @@ class MiniPlayerBarView @JvmOverloads constructor(
 
     fun updateForCurrentTrackSelections(isNewPlayer: Boolean) {
         val player = player ?: return
-        if (!player.isCommandAvailable(Player.COMMAND_GET_TRACKS) || player.currentTracks.isEmpty
+        if (!player.isCommandAvailable(Player.COMMAND_GET_TRACKS)
         ) {
             return
         }

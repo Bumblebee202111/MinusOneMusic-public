@@ -54,13 +54,10 @@ class UserPlaylistTabFragment : Fragment() {
                 }
 
                 is UserChartsItem -> {
-                    null
+                    MobileNavigationDirections.actionGlobalNavListenRank(userPlaylistItem.userId)
                 }
             }
-            if (direction != null) {
-                mainNavController.navigate(direction)
-
-            }
+            mainNavController.navigate(direction)
 
         }
         binding.playlists.adapter = playlistAdapter

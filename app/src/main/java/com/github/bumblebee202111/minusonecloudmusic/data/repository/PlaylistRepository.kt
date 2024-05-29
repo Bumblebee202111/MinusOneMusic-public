@@ -1,10 +1,12 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
+import PlayRecordsApiResult
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
+import asExternalModel
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.Result
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
@@ -198,9 +200,12 @@ class PlaylistRepository @Inject constructor(
         preferenceStorage.setCurrentSongPosition(position)
     }
 
-    suspend fun updatePlayerPlaylistSongPrivileges(privileges: List<Boolean>) {
-
-    }
+    fun playRecords(userId: Long) = apiResultFlow(
+        fetch = {
+            networkDataSource.getV1PlayRecords(userId)
+        },
+        mapSuccess = PlayRecordsApiResult::asExternalModel
+    )
 
     companion object {
         const val TOP_LIST_ID: Long = 3778678

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemUserPlaylistChartsBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemUserPlaylistNormalBinding
 
-class MyPlaylistAdapter(private val onItemClick: (UserPlaylistItem) -> Unit) :
+class MyPlaylistAdapter(private val onPlaylistItemClick: (UserPlaylistItem) -> Unit) :
     ListAdapter<UserPlaylistItem, RecyclerView.ViewHolder>(UserPlaylistItemDiffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -37,12 +37,12 @@ class MyPlaylistAdapter(private val onItemClick: (UserPlaylistItem) -> Unit) :
         when (holder) {
             is UserNormalPlaylistViewHolder -> {
                 val normalPlaylistItem = getItem(position) as NormalPlaylistItem
-                holder.bind(normalPlaylistItem) { onItemClick(normalPlaylistItem) }
+                holder.bind(normalPlaylistItem) { onPlaylistItemClick(normalPlaylistItem) }
             }
 
             is UserChartsViewHolder -> {
                 val userChartsItem = getItem(position) as UserChartsItem
-                holder.bind(userChartsItem) { onItemClick(userChartsItem) }
+                holder.bind(userChartsItem) { onPlaylistItemClick(userChartsItem) }
             }
         }
     }

@@ -162,4 +162,7 @@ class NetworkDataSource @Inject constructor(
     suspend fun checkLoginQrCode(
         key: String, noCookie: Boolean? = null
     ) = ncmBapiService.checkLoginQrCode(key, noCookie)
+
+    suspend fun getV1PlayRecords(uid: Long) = eapiService.getV1PlayRecords(uid)
+
 }
