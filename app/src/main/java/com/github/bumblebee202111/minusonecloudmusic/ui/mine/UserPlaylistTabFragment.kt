@@ -50,7 +50,11 @@ class UserPlaylistTabFragment : Fragment() {
         val playlistAdapter = MyPlaylistAdapter { userPlaylistItem ->
             val direction = when (userPlaylistItem) {
                 is NormalPlaylistItem -> {
-                    MobileNavigationDirections.actionGlobalNavPlaylist(userPlaylistItem.playlist.id,userPlaylistItem.playlist.creatorId?:0)
+                    MobileNavigationDirections.actionGlobalNavPlaylist(
+                        playlistId = userPlaylistItem.playlist.id,
+                        playlistCreatorId = userPlaylistItem.playlist.creatorId ?: 0,
+                        isMyPL = true
+                    )
                 }
 
                 is UserChartsItem -> {

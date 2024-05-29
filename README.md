@@ -49,19 +49,13 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
+- Discover Sirenleidas
+  - Reduce cover size
+  - Add the GOD sirenleida to sirenleida block from unused tuijiangedan block data
 - Optimize toolbar navigation icons
   - Try to port the recently found "back" nav icon from SearchFragment to other Fragments that use the old one and stop using the reflect magic for wrong icons
   - If icon size still not fixed, `enum` binding
 - Allow notification clicks
-- Sirenleidas
-  - Reduce cover size as Dicover items
-  - Add the GOD sirenleida to sirenleida block from unused tuijiangedan block in Discover
-  - Fix wrong api when navigated from My Collect
-
-- My Collect
-  - Fix crash when opening sirenleidas and some other playlists
-
-- PlaylistFragment: Fix mask not fully masking when collapsed on some devices
 - Optimize mine dragonballs
 - Enter maintainance mode and release alpha at some point
   - However, any user request that is not too challeging will be very likely to be accepted.
