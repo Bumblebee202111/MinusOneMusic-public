@@ -4,6 +4,9 @@ Change Log
 ## Version 1.0.0-dev11 (baseline: NCM 9.0.80)
 
 - Add Listen Rank
+- Optimize Discover Private Radars
+  - Reduce cover size
+  - Port main radar to radar block from pl rcmd block data (the latter block is not shown yet)
 - Fix issues when playing empty playlist
 - PlaylistFragment: Fix mask not fully masking when collapsed on some devices
 - Fix choice of api for my collected playlists
