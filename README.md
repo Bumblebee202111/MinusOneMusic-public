@@ -22,7 +22,7 @@ It will bring you 99% pure music experience with basic support of social feature
 - **-1 (jiǎn yī)!** No ads. No podcast. No square. Fewer VIP UI elements. Tailored UI content. Incredibly small APK size.
 - What are kept. Core functionalities and UI kept but only on best effort
 - (Non additive or subtractive) Modifications. Some limited number of convenient changes to the official UI/behaviors can be toggled in Settings. (planned)
-- No additions.
+- No additional features.
 - Music playback.
 - *Natural* (= without special adaptations) tablet/landscape support.
 - Direct up-to-date NCM service provided.
