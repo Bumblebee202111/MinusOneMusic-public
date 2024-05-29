@@ -1,23 +1,26 @@
 # MinusOne Music
 
-MinusOne Cloud Music (减一云音乐, also *MinusOne Music* as app name) is a lite third-party NCM app for Android.
+MinusOne Cloud Music (减一云音乐, also _MinusOne Music_ as app name) is a lite third-party NCM app for Android.
 
 In developing this app, I will explore how to create a more complex app. The focus is not on creativity but on the technical aspects of implementing core features of NCM using modern approaches.
 
-Note: I am very inexperienced and this app is at a very early stage of development. Current progress:
+Note: I am very inexperienced and this app is at a very early stage of development. Current progress by screens:
 
 - Well Implemented
 
   - 我的
 
     - **我的—音乐**
+
   - 播放
 
     - **迷你播放器**
     - **播放页**
     - **播放列表（即歌单）**
+
   - 发现
     - **每日推荐**
+
 - Partial Implementation
 
   - 密码登录/退出登录
@@ -29,35 +32,33 @@ Note: I am very inexperienced and this app is at a very early stage of developme
   - 发现
     - **发现首页（顶部入口、私人雷达、排行榜）**
     - **排行榜**
-    
   - **搜索（“综合”Tab之“单曲”）**
   - **评论（Hottest Page 1）**
 
+> - 一般不包括跳转界面等
+> - Other UI elements, pages or functionalities are nowhere near completed although some drafts exist.
 
-> 一般不包括跳转界面等
-
-Other UI elements, pages or functionalities are nowhere near completed although some drafts exist. 
-
-*The project is currently in maintenance mode, meaning no major new features will be implemented in the short term. However, I'm open to considering user requests that are not overly complex.* 
+_The project is currently in maintenance mode, meaning no major new features will be implemented in the short term. However, I'm open to considering user requests that are not overly complex._
 
 > Focus has now shifted primarily to MinusTue, a minimal NCM toy app for exploring Vue3 **from scratch** (not part of this project). Occasionally, I will also code for [doubean](https://github.com/Bumblebee202111/doubean-public).
 
 ## Features
 
-It will  provide a 99% pure music experience with basic support of ~~social features~~ (not implemented yet).
+It will provide a 99% pure music experience with basic support of ~~social features~~ (not implemented yet).
 
-- **-1 (jiǎn yī)!** No ads. No podcasts. No square. Fewer VIP UI elements. Tailored UI content. Incredibly small APK size. 
-  
+- **-1 (jiǎn yī)!** No ads. No podcasts. No square. Fewer VIP UI elements. Tailored UI content. Incredibly small APK size.
+
   > [Here](#intd) are important non-to-dos
+
 - Core functionalities and UI retained, but only on a best-effort basis.
 - Non additive or subtractive Modifications. Some convenient UI/behavior changes can be toggled in Settings (not implemented yet).
 - No extra features.
 - Music playback.
-- *Natural* (without special adaptations) tablet/landscape support.
+- _Natural_ (without special adaptations) tablet/landscape support.
 - Direct up-to-date NCM service provided.
 - Uses the traditional View-based system & Single Activity architecture.
-- Uses `deviceId` as the seed to *pseudo*-randomly generate device specs for privacy. 
-- Does NOT hack music resources. 
+- Uses `deviceId` as the seed to _pseudo_-randomly generate device specs for privacy.
+- Does NOT hack music resources.
 
 ## Notices
 
@@ -68,14 +69,15 @@ To strongly encourage the use of official NCM app, it is required that you must 
 - The app is almost fully **closed source**. (Maintaining an extra semi-open code base would lead to heavy burden!) hence the simple public repo. If you don't trust me, you can reverse-engineer the app. If interested in some non-NCM-bound code, feel free to request it.
 
 ### Your do's and don'ts
-- Please use it only for personal learning purposes. 
+
+- Please use it only for personal learning purposes.
 - Please don't share it on other websites/apps without permission.
 
 ## Screenshot
 
 <img src="docs\screenshots\Screenshot_main.png" alt="Main" width=160 /><img src="docs\screenshots\Screenshot_discover.png" alt="Discover" width=160 /> <img src="docs\screenshots\Screenshot_top_lists.png" alt="Top lists" width=160 />
 <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=160 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=400/> <img src="docs\screenshots\Screenshot_comments_landscape.png" alt="Comments (landscape)" width=320 />
-<img src="docs\screenshots\Screenshot_playlist.png" alt="Playlist" width=160 /> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=160 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=240 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="Local music and player playlist dialog" width=240 />    <img src="docs\screenshots\Screenshot_listen_rank.png" alt="Listen rank" width=160 />  <img src="docs\screenshots\Screenshot_search_landscape.png" alt="Search (landscape)" width=320 />   
+<img src="docs\screenshots\Screenshot_playlist.png" alt="Playlist" width=160 /> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=160 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=240 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="Local music and player playlist dialog" width=240 /> <img src="docs\screenshots\Screenshot_listen_rank.png" alt="Listen rank" width=160 /> <img src="docs\screenshots\Screenshot_search_landscape.png" alt="Search (landscape)" width=320 />
 
 ## :coffee:
 
@@ -83,70 +85,76 @@ To strongly encourage the use of official NCM app, it is required that you must 
 
 ## To-dos
 
--  What to maintain 
-  -  Minor adjustments
-     -  Hide Look from Top List
+- What to maintain
+  - Minor adjustments
+    - Hide Look from Top List
 
-  -  Code optimizations
-  -  User requests
-  -  Release alpha at some point
+  - Code optimizations
+  - User requests
 
--  New screens / major features
+- Release alpha at some point
+- New screens / major features
   - Personal FMs
   - Friends
   - MVs
   - Drawer
   - Playlist Square (wonder if it's necessary)
   - Statusbar lyrics
--  Player & playlist UI
+- Player & playlist UI
 
-   -  Mini Player Bar
-      -  Swipe
-      -  Hide like `PlayControlView`
-      -  Fix top shadow
-   -  Transition between Mini Player Bar & Now Playing
-   -  Now Playing
-      -  Use light status bar text
-      -  Follow
-      -  Provide bottom volume bar dialog (instead of showing sytem volume toast) for systems of lower versions (where the built-in output switcher dialog is unavailable).
-      -  Use LinearLayout with "weight" things for control buttons
-   -  Playlist UI items
-      - Actions
-      - Cloud/favorite/试听(trial)/unavailable UI state
-   -  On-boarding
-   -  Link local/downloaded songs with remote ones
-      - Lyrics and cover matching
-   -  Show current audio qualities
--  Player
+  - Mini Player Bar
+    - Swipe
+    - Hide like `PlayControlView`
+    - Fix top shadow
+  - Transition between Mini Player Bar & Now Playing
+  - Now Playing
+    - Use light status bar text
+    - Follow
+    - Provide bottom volume bar dialog (instead of showing sytem volume toast) for systems of lower versions (where the built-in output switcher dialog is unavailable).
+    - Use LinearLayout with "weight" things for control buttons
+  - Playlist UI items
+    - Actions
+    - Cloud/favorite/试听(trial)/unavailable UI state
+  - On-boarding
+  - Link local/downloaded songs with remote ones
+    - Lyrics and cover matching
+  - Show current audio qualities
 
-   -  Continue the work of moving Player to VM
-   -  Handle fetch error
--  Mine
+- Player
 
-   -  Optimize dragonballs
-   -  Add shadow for profile background
-   -  Top crop profile background
-   -  Fix top margin of user profile
--  Arch
+  - Continue the work of moving Player to VM
+  - Handle fetch error
 
-   -  Use Channel to manage Toast-s
-   -  Sync user data with WorkManager
-   -  More caching when RemoteMediator becomes non-experimental
-      -  Playlist, lyrics ...
--  Settings
-  -  Add 底部导航自定义
-     -  It can be found with some trick in the official app now. But if it's not officially supported, it will become a non-to-do.  
+- Mine
 
--  Network: More elegant
+  - Optimize dragonballs
+  - Add shadow for profile background
+  - Top crop profile background
+  - Fix top margin of user profile
+
+- Arch
+
+  - Use Channel to manage Toast-s
+  - Sync user data with WorkManager
+  - More caching when RemoteMediator becomes non-experimental
+    - Playlist, lyrics ...
+
+- Settings
+- Add 底部导航自定义
+
+  - It can be found with some trick in the official app now. But if it's not officially supported, it will become a non-to-do.
+
+- Network: More elegant
   - My own CookieJar implementation
   - Custom param annotation
   - Consider removing the `NetworkDataSource` wrapper
   - Fully deprecate NCMB
--  The UI is generally not interactive enough
--  Download: advanced
--  Login: SMS captcha login
--  Compose: Write non-NCM screens in Compose
--  Qualification: Add quiz activity/app based on JetSurvey
+
+- The UI is generally not interactive enough
+- Download: advanced
+- Login: SMS captcha login
+- Compose: Write non-NCM screens in Compose
+- Qualification: Add quiz activity/app based on JetSurvey
 
 ### <span id="intd">Important non-to-dos</span>
 
@@ -156,74 +164,54 @@ To strongly encourage the use of official NCM app, it is required that you must 
 
 ## Libraries used
 
-* [Foundation][foundation]
-    * [AppCompat][appcompat]
-    * [Android KTX][android-ktx]
-    * [Test][test] \(TODO\)
-* [Architecture][arch]
-    * [Data Binding][data-binding]
-    * [Lifecycles][lifecycle]
-    * [Navigation][navigation]
-    * [Paging][paging]
-    * [Room][room]
-    * [ViewModel][viewmodel]
-    * [WorkManager][workmanager] \(TODO\)
-    * Data store & SP
-* [UI][ui]
-    * [Animations & Transitions][animation]
-    * [Fragment][fragment]
-    * [Layout][layout]
-* Behavior
-    * [Notifications][notifications]
-    * Media 3
-* Third party and miscellaneous libraries
-    * javax.crypto
-    * [Retrofit][retrofit]
-    * [Glide][glide]
-    * [Kotlin Coroutines][kotlin-coroutines]
-    * Moshi
-    * PersistentCookieJar
+- [Foundation][foundation]
+  - [AppCompat][appcompat]
+  - [Android KTX][android-ktx]
+  - [Test][test] \(TODO\)
+- [Architecture][arch]
+  - [Data Binding][data-binding]
+  - [Lifecycles][lifecycle]
+  - [Navigation][navigation]
+  - [Paging][paging]
+  - [Room][room]
+  - [ViewModel][viewmodel]
+  - [WorkManager][workmanager] \(TODO\)
+  - Data store & SP
+- [UI][ui]
+  - [Animations & Transitions][animation]
+  - [Fragment][fragment]
+  - [Layout][layout]
+- Behavior
+  - [Notifications][notifications]
+  - Media 3
+- Third party and miscellaneous libraries
+  - javax.crypto
+  - [Retrofit][retrofit]
+  - [Glide][glide]
+  - [Kotlin Coroutines][kotlin-coroutines]
+  - Moshi
+  - PersistentCookieJar
 
 [foundation]: https://developer.android.com/jetpack/components
-
 [appcompat]: https://developer.android.google.cn/jetpack/androidx/releases/appcompat
-
 [android-ktx]: https://developer.android.com/kotlin/ktx
-
 [test]: https://developer.android.com/training/testing/
-
 [arch]: https://developer.android.com/jetpack/arch/
-
 [data-binding]: https://developer.android.com/topic/libraries/data-binding/
-
 [lifecycle]: https://developer.android.com/topic/libraries/architecture/lifecycle
-
 [navigation]: https://developer.android.com/topic/libraries/architecture/navigation/
-
 [paging]: https://developer.android.com/topic/libraries/architecture/paging/v3-overview
-
 [room]: https://developer.android.com/topic/libraries/architecture/room
-
 [viewmodel]: https://developer.android.com/topic/libraries/architecture/viewmodel
-
-[workmanager]:https://developer.android.com/topic/libraries/architecture/workmanager
-
+[workmanager]: https://developer.android.com/topic/libraries/architecture/workmanager
 [ui]: https://developer.android.com/guide/topics/ui
-
 [animation]: https://developer.android.com/training/animation/
-
 [fragment]: https://developer.android.com/guide/components/fragments
-
 [layout]: https://developer.android.com/guide/topics/ui/declaring-layout
-
 [notifications]: https://developer.android.com/develop/ui/views/notifications
-
 [retrofit]: https://square.github.io/retrofit/
-
 [apache-commons]: https://commons.apache.org/
-
 [glide]: https://bumptech.github.io/glide/
-
 [kotlin-coroutines]: https://kotlinlang.org/docs/reference/coroutines-overview.html
 
 ## Utilities used
@@ -236,13 +224,13 @@ To strongly encourage the use of official NCM app, it is required that you must 
 
 ## References
 
-* Countless NCM app/service repos, including a well-known repo that has recently been shut down
-* Media3 references:
-  * uamp-media3
-  * horologist/media
-  * socialite
+- Countless NCM app/service repos, including a well-known repo that has recently been shut down
+- Media3 references:
+  - uamp-media3
+  - horologist/media
+  - socialite
 
-## Misc. 
+## Misc.
 
 <details>
     <summary>Misc.</summary>
@@ -254,5 +242,3 @@ To strongly encourage the use of official NCM app, it is required that you must 
     - Security and cryptography. We do use the very basic of NDK, which is apparently redundant in non-toy apps but worth for learning purposes.
     </p>
 </details>
-
-
