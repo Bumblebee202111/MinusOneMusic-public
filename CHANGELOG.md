@@ -13,6 +13,7 @@ Change Log
 - Fix issues when playing empty playlist
 - PlaylistFragment: Fix mask not fully masking when collapsed on some devices
 - Fix choice of playlist api for my collected playlists
+- Fix Recent Play music load error
 
 ## Version 1.0.0-dev10 (baseline: NCM 9.0.80)
 

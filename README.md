@@ -50,7 +50,6 @@ Below are some factors that may hinder you from using it, which can change over 
 ## To-dos
 
 - Allow notification clicks
-- Optimize mine dragonballs
 - Enter maintainance mode and release alpha at some point
   - However, any user request that is not too challeging will be very likely to be accepted.
   - MinusTue: A minimum NCM app for exploring Vue3 from scratch (not part of this project)
@@ -67,6 +66,7 @@ Below are some factors that may hinder you from using it, which can change over 
 - Player: Continue the work of moving Player to VM
 - Now Playing: Use light status bar text
 - Now Playing: Follow
+- Optimize mine dragonballs
 - Playlist: Items
   - Actions
   - Cloud/favorite/试听(trial)/unavailable UI state

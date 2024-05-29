@@ -18,6 +18,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.recentpl
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.recentplay.asEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.asEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.asExternalModel
+import com.squareup.moshi.JsonAdapter
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,7 +27,8 @@ import javax.inject.Singleton
 class UserRepository @Inject constructor(
     private val preferenceStorage: PreferenceStorage,
     private val appDatabase: AppDatabase,
-    private val networkDataSource: NetworkDataSource
+    private val networkDataSource: NetworkDataSource,
+    private val moshiAdapter: JsonAdapter<Any>
 ) {
 
     private val userDao = appDatabase.userDao()
@@ -43,35 +45,28 @@ class UserRepository @Inject constructor(
     },
         mapSuccess = { result -> UserDetail(result.listenSongs, result.profile.asExternalModel()) })
 
-    private fun getOfflineFirstUserDetail(uid: Long) = offlineFirstApiResultFlow(
-        loadFromDb = {
-            userDao.observeUserDetail(uid).map { it?.asExternalModel() }
-        },
-        call = {
-            networkDataSource.getUserDetail(uid)
-        },
-        saveSuccess = { data ->
-            userDao.insertUserProfile(data.profile.asEntity())
-            userDao.insertUserDetail(UserDetailEntity(data.profile.userId, data.listenSongs))
-        })
+    private fun getOfflineFirstUserDetail(uid: Long) = offlineFirstApiResultFlow(loadFromDb = {
+        userDao.observeUserDetail(uid).map { it?.asExternalModel() }
+    }, call = {
+        networkDataSource.getUserDetail(uid)
+    }, saveSuccess = { data ->
+        userDao.insertUserProfile(data.profile.asEntity())
+        userDao.insertUserDetail(UserDetailEntity(data.profile.userId, data.listenSongs))
+    })
 
     fun getCachedUserDetail(uid: Long) = userDao.observeUserDetail(uid)
 
-    fun getUserPlaylists(userId: Long) = offlineFirstApiResultFlow(
-        loadFromDb = {
-            userDao.observeUserPlaylists(userId)
-                .map { it.map { populatedUserPlaylist -> populatedUserPlaylist.playlist.asExternalModel() } }
-        },
+    fun getUserPlaylists(userId: Long) = offlineFirstApiResultFlow(loadFromDb = {
+        userDao.observeUserPlaylists(userId)
+            .map { it.map { populatedUserPlaylist -> populatedUserPlaylist.playlist.asExternalModel() } }
+    },
         call = { networkDataSource.getUserPlaylists(userId) },
         saveSuccess = { ncmPlaylistsResult ->
-            val userPlaylists =
-                ncmPlaylistsResult.playlist.mapIndexed { index, p ->
-                    UserPlaylistEntity(
-                        userId,
-                        p.id,
-                        index
-                    )
-                }
+            val userPlaylists = ncmPlaylistsResult.playlist.mapIndexed { index, p ->
+                UserPlaylistEntity(
+                    userId, p.id, index
+                )
+            }
             val playlists = ncmPlaylistsResult.playlist.map { it.asEntity() }
 
             appDatabase.withTransaction {
@@ -79,37 +74,27 @@ class UserRepository @Inject constructor(
                 userDao.insertUserPlaylists(userPlaylists)
                 playlistDao.insertPlaylist(playlists)
             }
+        })
+
+    fun getRecentPlayMusic() = offlineFirstApiResultFlow(loadFromDb = {
+        recentPlayDao.observeMyRecentPlayMusic()
+            .map { it.map(PopulatedMyRecentMusicData::asExternalModel) }
+    }, call = {
+        networkDataSource.getMyRecentMusic().combine {
+            networkDataSource.getSongEnhancePrivilege(moshiAdapter.toJson(this.list.map { item ->
+                item.musicInfo.id
+            }))
         }
-    )
-
-    fun getRecentPlayMusic() = offlineFirstApiResultFlow(
-        loadFromDb = {
-            recentPlayDao.observeMyRecentPlayMusic()
-                .map { it.map(PopulatedMyRecentMusicData::asExternalModel) }
-        },
-        call = {
-            networkDataSource.getMyRecentMusic().combine {
-                networkDataSource.getSongEnhancePrivilege(this.list.map { item ->
-                    item.musicInfo.id
-                }
-                    .joinToString(","))
-            }
-
-
-        },
-        saveSuccess = { pair ->
-            recentPlayDao.deleteAndInsertRecentPlayMusic(
-                pair.first.list.map(
-                    MyRecentMusicDataApiModel::asEntity
-                )
+    }, saveSuccess = { pair ->
+        recentPlayDao.deleteAndInsertRecentPlayMusic(
+            pair.first.list.map(
+                MyRecentMusicDataApiModel::asEntity
             )
-            musicInfoDao.insertRemoteSongs(
-                pair.first.list.zip(pair.second) { a, b ->
-                    Pair(a.data, b)
-                }
-                    .map(Pair<MusicInfoApiModel, SongPrivilegeApiModel>::asEntity))
-        }
-    )
+        )
+        musicInfoDao.insertRemoteSongs(pair.first.list.zip(pair.second) { a, b ->
+            Pair(a.data, b)
+        }.map(Pair<MusicInfoApiModel, SongPrivilegeApiModel>::asEntity))
+    })
 
 
     fun getUserFollows(userId: Long, offset: Int = 0, limit: Int = 20) =
