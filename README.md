@@ -1,43 +1,71 @@
 # MinusOne Music
 
-MinusOne Cloud Music (减一云音乐, also *MinusOne Music* as app name) is a third-party NCM app for Android.
+MinusOne Cloud Music (减一云音乐, also *MinusOne Music* as app name) is a lite third-party NCM app for Android.
 
-In developing this app, we (actually me alone) will explore how to develop a more complicated app. This project is not going to be very creative. Instead, we will focus on the technical details of how to implement core features of NCM with modern approaches. 
+In developing this app, I will explore how to create a more complex app. The focus is not on creativity but on the technical aspects of implementing core features of NCM using modern approaches.
 
-Meanwhile, we are attempting to make it as good as possible.
+Note: I am very inexperienced and this app is at a very early stage of development. Current progress:
 
-Note we are very inexperienced and this app is at a very early stage of development. Current progress: 
+- Well Implemented
 
-- :star::star::star::star:[^*]：我的—音乐、迷你播放器、播放页、播放列表（即歌单）、每日推荐
-- :star::star::star: ：排行榜、发现首页（顶部入口、私人雷达、排行榜）、最近播放—歌曲、云盘、本地音乐、搜索（“综合”Tab之“单曲”）、评论（Hottest Page 1）、听歌排行、密码登录/退出登录
+  - 我的
 
-[^*]: 一般不包括跳转界面等
+    - **我的—音乐**
+  - 播放
 
-Other UI elements/pages or functionalities are nowhere near completed even if some drafts can be found now. 
+    - **迷你播放器**
+    - **播放页**
+    - **播放列表（即歌单）**
+  - 发现
+    - **每日推荐**
+- Partial Implementation
+
+  - 密码登录/退出登录
+  - 我的
+    - **最近播放—歌曲**
+    - **云盘**
+    - **本地音乐**
+    - **听歌排行**
+  - 发现
+    - **发现首页（顶部入口、私人雷达、排行榜）**
+    - **排行榜**
+    
+  - **搜索（“综合”Tab之“单曲”）**
+  - **评论（Hottest Page 1）**
+
+
+> 一般不包括跳转界面等
+
+Other UI elements, pages or functionalities are nowhere near completed although some drafts exist. 
+
+*The project is currently in maintenance mode, meaning no major new features will be implemented in the short term. However, I'm open to considering user requests that are not overly complex.* 
+
+> Focus has now shifted primarily to MinusTue, a minimal NCM toy app for exploring Vue3 **from scratch** (not part of this project). Occasionally, I will also code for [doubean](https://github.com/Bumblebee202111/doubean-public).
 
 ## Features
 
-It will bring you 99% pure music experience with basic support of social features.
+It will  provide a 99% pure music experience with basic support of ~~social features~~ (not implemented yet).
 
-- **-1 (jiǎn yī)!** No ads. No podcast. No square. Fewer VIP UI elements. Tailored UI content. Incredibly small APK size.
-- What are kept. Core functionalities and UI kept but only on best effort
-- (Non additive or subtractive) Modifications. Some limited number of convenient changes to the official UI/behaviors can be toggled in Settings. (planned)
-- No additional features.
+- **-1 (jiǎn yī)!** No ads. No podcasts. No square. Fewer VIP UI elements. Tailored UI content. Incredibly small APK size. 
+  
+  > [Here](#intd) are important non-to-dos
+- Core functionalities and UI retained, but only on a best-effort basis.
+- Non additive or subtractive Modifications. Some convenient UI/behavior changes can be toggled in Settings (not implemented yet).
+- No extra features.
 - Music playback.
-- *Natural* (= without special adaptations) tablet/landscape support.
+- *Natural* (without special adaptations) tablet/landscape support.
 - Direct up-to-date NCM service provided.
-- Uses the good old View-based system, e.g. XML-based.
-- Single Activity. If not, two or three in the future.
-- Uses `deviceId` as the seed to *pseudo*-randomly generate device specs. 
-- Does NOT hack music resources.
+- Uses the traditional View-based system & Single Activity architecture.
+- Uses `deviceId` as the seed to *pseudo*-randomly generate device specs for privacy. 
+- Does NOT hack music resources. 
 
 ## Notices
 
-To strongly encourage the use of official NCM app, we decided that you must be "authorized" to use it. But you can easily gain access to it anyway.
-Below are some factors that may hinder you from using it, which can change over time.
+To strongly encourage the use of official NCM app, it is required that you must be "authorized" to use my app. Below are some factors that may hinder you from using it, which can change over time:
+
 - The official app must be installed and co-exist with it.
 - The docs are written in broken English.
-- The app is almost fully **closed source**. (Maintaining an extra semi-open code base would lead to heavy burden!) So was the simple public repo born. If you don't trust me, simply reverse-engineer the app. If you are interested in some non-NCM-bound code, I can post it somewhere.
+- The app is almost fully **closed source**. (Maintaining an extra semi-open code base would lead to heavy burden!) hence the simple public repo. If you don't trust me, you can reverse-engineer the app. If interested in some non-NCM-bound code, feel free to request it.
 
 ### Your do's and don'ts
 - Please use it only for personal learning purposes. 
@@ -45,57 +73,86 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## Screenshot
 
-<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=192 /> <img src="docs\screenshots\Screenshot_discover.png" alt="Discover" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=192 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=192/> <img src="docs\screenshots\Screenshot_playlist.png" alt="Playlist" width=192 /> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=192 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=192 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="Local music and player playlist dialog" width=192 />  <img src="docs\screenshots\Screenshot_top_lists.png" alt="Top lists" width=192 />  <img src="docs\screenshots\Screenshot_listen_rank.png" alt="Listen rank" width=192 />  <img src="docs\screenshots\Screenshot_search_landscape.png" alt="Search (landscape)" height=192 />   <img src="docs\screenshots\Screenshot_comments_landscape.png" alt="Comments (landscape)" height=192 />
+<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=160 /><img src="docs\screenshots\Screenshot_discover.png" alt="Discover" width=160 /> <img src="docs\screenshots\Screenshot_top_lists.png" alt="Top lists" width=160 />
+<img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=160 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=400/> <img src="docs\screenshots\Screenshot_comments_landscape.png" alt="Comments (landscape)" width=320 />
+<img src="docs\screenshots\Screenshot_playlist.png" alt="Playlist" width=160 /> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=160 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=240 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="Local music and player playlist dialog" width=240 />    <img src="docs\screenshots\Screenshot_listen_rank.png" alt="Listen rank" width=160 />  <img src="docs\screenshots\Screenshot_search_landscape.png" alt="Search (landscape)" width=320 />   
+
+## :coffee:
+
+:heart::heart::heart:
 
 ## To-dos
 
-- Enter maintainance mode and release alpha at some point
-  - However, any user request that is not too challeging will be very likely to be accepted.
-  - MinusTue: A minimum NCM app for exploring Vue3 from scratch (not part of this project)
-- *Extended* screens / major features
+-  What to maintain 
+  -  Minor adjustments
+     -  Hide Look from Top List
+
+  -  Code optimizations
+  -  User requests
+  -  Release alpha at some point
+
+-  New screens / major features
   - Personal FMs
   - Friends
   - MVs
-  - Playlist Square?
   - Drawer
-- Sync: WorkManager
-- Statusbar lyrics
-- Mini Player: Swipe, Hide like `PlayControlView`
-- Mini Player & Now Playing: Transition
-- Player: Continue the work of moving Player to VM
-- Now Playing: Use light status bar text
-- Now Playing: Follow
-- Optimize mine dragonballs
-- Playlist: Items
-  - Actions
-  - Cloud/favorite/试听(trial)/unavailable UI state
-- Use Channel to manage Toast-s
-- Player: Handle fetch error
-- More caching when RemoteMediator becomes non-experimental
-  - Playlist, lyrics ...
-- Now Playing: Provide bottom volume bar dialog (instead of showing sytem volume toast) for systems where the built-in output switcher dialog is unavailable.
-- Settings: Add 底部导航自定义
-  - ~~Delayed since: it's gone forever in our installed official app; it's not officially supported~~ Seems it can be found with some tricks
-- Network: More elegant
+  - Playlist Square (wonder if it's necessary)
+  - Statusbar lyrics
+-  Player & playlist UI
+
+   -  Mini Player Bar
+      -  Swipe
+      -  Hide like `PlayControlView`
+      -  Fix top shadow
+   -  Transition between Mini Player Bar & Now Playing
+   -  Now Playing
+      -  Use light status bar text
+      -  Follow
+      -  Provide bottom volume bar dialog (instead of showing sytem volume toast) for systems of lower versions (where the built-in output switcher dialog is unavailable).
+      -  Use LinearLayout with "weight" things for control buttons
+   -  Playlist UI items
+      - Actions
+      - Cloud/favorite/试听(trial)/unavailable UI state
+   -  On-boarding
+   -  Link local/downloaded songs with remote ones
+      - Lyrics and cover matching
+   -  Show current audio qualities
+-  Player
+
+   -  Continue the work of moving Player to VM
+   -  Handle fetch error
+-  Mine
+
+   -  Optimize dragonballs
+   -  Add shadow for profile background
+   -  Top crop profile background
+   -  Fix top margin of user profile
+-  Arch
+
+   -  Use Channel to manage Toast-s
+   -  Sync user data with WorkManager
+   -  More caching when RemoteMediator becomes non-experimental
+      -  Playlist, lyrics ...
+-  Settings
+  -  Add 底部导航自定义
+     -  It can be found with some trick in the official app now. But if it's not officially supported, it will become a non-to-do.  
+
+-  Network: More elegant
   - My own CookieJar implementation
   - Custom param annotation
-- On-boarding
-- Link local/downloaded songs with remote ones
-  - Lyrics and cover matching
-  - Advanced download
-- Nav: Continue the work of optimizing navigation code
-- Player: Support various audio qualities
-- Arch: Clarify the dividing line between network layer and repo layer and consider removing the `NetworkDataSource` wrapper
-- NCMB: Fully deprecate it 
-- Login: SMS captcha login
-- Arch: More elegant data mapping
-- Compose: Write non-NCM screens in Compose
-- Qualification: Add quiz activity/app based on JetSurvey
-- Mine: Add shadow for profile background
-- Mine: Top crop profile background
-- Mine: Fix top margin of user profile
-- Full-screen Player: Use LinearLayout with "weight" things for control buttons
-- Music Player Bar: Fix top shadow
+  - Consider removing the `NetworkDataSource` wrapper
+  - Fully deprecate NCMB
+-  The UI is generally not interactive enough
+-  Download: advanced
+-  Login: SMS captcha login
+-  Compose: Write non-NCM screens in Compose
+-  Qualification: Add quiz activity/app based on JetSurvey
+
+### <span id="intd">Important non-to-dos</span>
+
+- Search Tabs other than the default, search pagination
+- Custom default audio quality (we prefer 320 kbps when making requests)
+- Support 32-bit systems or ones with android versions lower than 6.0 Marshmallow (API level 23)
 
 ## Libraries used
 
@@ -107,7 +164,7 @@ Below are some factors that may hinder you from using it, which can change over 
     * [Data Binding][data-binding]
     * [Lifecycles][lifecycle]
     * [Navigation][navigation]
-    * [Paging][paging] \(TODO\)
+    * [Paging][paging]
     * [Room][room]
     * [ViewModel][viewmodel]
     * [WorkManager][workmanager] \(TODO\)
@@ -189,8 +246,13 @@ Below are some factors that may hinder you from using it, which can change over 
 
 <details>
     <summary>Misc.</summary>
+<p>
     - Initially, I named it as 'NaCl'. Letters extracted from that of the official NCE app, it indicated that this third-party variant would be a lite alternative to the official one, due to technical limitations and omission of useless features. However, I found that Salt Music, another existing well-designed music app had a similar name. Now my app has been renamed to MinusOne Cloud Music, matching both of the '-1'
-  slogan and the name format of NCM. - Security and cryptography. We do use the very basic of NDK, which is apparently redundant in non-toy apps but worth for learning purposes.
+    slogan and the name format of NCM. 
+    </p>
+<p>
+    - Security and cryptography. We do use the very basic of NDK, which is apparently redundant in non-toy apps but worth for learning purposes.
+    </p>
 </details>
 
 
