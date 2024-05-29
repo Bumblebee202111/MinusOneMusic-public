@@ -29,9 +29,7 @@ class TopListsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentTopListsBinding.inflate(inflater, container, false).apply {
-            lifecycleOwner = viewLifecycleOwner
-        }
+        binding = FragmentTopListsBinding.inflate(inflater, container, false)
         return binding.root
     }
 

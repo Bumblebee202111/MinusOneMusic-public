@@ -2,17 +2,13 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.PaintDrawable
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageButton
 import androidx.annotation.ColorRes
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -97,24 +93,6 @@ data class ViewPaddingState(
     val start: Int,
     val end: Int
 )
-
-val Toolbar.mNavButtonView: ImageButton?
-    get() = navButtonViewField.get(this) as? ImageButton
-
-fun Toolbar.setFitHeightNavigationIcon(icon: Drawable) {
-    val size = resources.getDimensionPixelSize(R.dimen.toolbar_size)
-    setNavigationIcon(icon)
-    mNavButtonView?.apply {
-        updateLayoutParams {
-            height = size
-            width = size
-        }
-    }
-}
-
-private val navButtonViewField = Toolbar::class.java.getDeclaredField("mNavButtonView")
-    .also { it.isAccessible = true }
-
 
 fun View.setBackgroundColorAndTopCorner(@ColorRes color: Int, radius: Float) {
     val background =

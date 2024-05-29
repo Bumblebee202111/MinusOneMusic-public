@@ -13,7 +13,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
@@ -220,9 +219,4 @@ fun LinearLayout.setIsCurrentSong(isCurrentSong: Boolean) {
     if (isCurrentSong)
         setBackgroundResource(R.color.colorText7)
     else setBackgroundColor(Color.WHITE)
-}
-
-@BindingAdapter("app:navigationIcon")
-fun Toolbar.bindNavigationIcon(icon: Drawable) {
-    setFitHeightNavigationIcon(icon)
 }

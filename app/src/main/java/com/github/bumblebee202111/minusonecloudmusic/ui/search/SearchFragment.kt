@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentSearchBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractMiniPlayerBarFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.hideSoftInput
@@ -30,6 +31,11 @@ class SearchFragment : AbstractMiniPlayerBarFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
         binding.searchView.apply {
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {

@@ -49,9 +49,6 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- Optimize toolbar navigation icons
-  - Try to port the recently found "back" nav icon from SearchFragment to other Fragments that use the old one and stop using wrong icons along with reflect magic
-  - If icon size still not fixed, `enum` binding magic
 - Allow notification clicks
 - Optimize mine dragonballs
 - Enter maintainance mode and release alpha at some point
