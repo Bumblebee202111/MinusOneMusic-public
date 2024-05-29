@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.media3.common.util.UnstableApi
@@ -20,6 +21,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.extractDominantCo
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.setBackgroundColorAndTopCorner
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.PagedSongWithPositionAdapter
+import com.google.android.material.appbar.MaterialToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -31,6 +33,8 @@ class PlaylistFragment : AbstractPlaylistFragment() {
 
     override val viewModel: PlaylistViewModel by viewModels()
     private lateinit var binding: FragmentPlaylistBinding
+    private lateinit var toolbar: MaterialToolbar
+    private lateinit var toolbarBackground: View
 
     companion object {
         fun newInstance() = PlaylistFragment()
@@ -53,17 +57,28 @@ class PlaylistFragment : AbstractPlaylistFragment() {
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        toolbar = binding.toolbar
+        toolbarBackground = binding.toolbarBackground
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.appBarLayout) { _, insets ->
-            val topMargin = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
-            (binding.toolbar.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
-                topMargin
+            val topInset = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
+            val toolbarSize = resources.getDimensionPixelSize(R.dimen.toolbar_size)
+            (toolbar.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
+                topInset
             (binding.playlistDetail.layoutParams as ViewGroup.MarginLayoutParams).topMargin =
-                topMargin + resources.getDimensionPixelSize(R.dimen.toolbar_size)
+                topInset + toolbarSize
+
+            toolbarBackground.run {
+                layoutParams.height =
+                    toolbarSize + topInset
+                isVisible = true
+                requestLayout()
+            }
+
             WindowInsetsCompat.CONSUMED
         }
 
-        binding.toolbar.setNavigationOnClickListener {
+        toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
 
@@ -74,11 +89,11 @@ class PlaylistFragment : AbstractPlaylistFragment() {
             val timeInterpolator = FastOutSlowInInterpolator()
             val interpolation = timeInterpolator.getInterpolation(fraction)
             val alpha = 0.0F + interpolation * (0.3F - 0.0F)
-            binding.toolbarBackground.alpha=alpha
+            toolbarBackground.alpha = alpha
 
         }
 
-       playlistActions.setBackgroundColorAndTopCorner(R.color.colorBackgroundAndroid,12F)
+        playlistActions.setBackgroundColorAndTopCorner(R.color.colorBackgroundAndroid, 12F)
 
         val songAdapter = PagedSongWithPositionAdapter(viewModel::onSongItemClick)
 
@@ -89,11 +104,11 @@ class PlaylistFragment : AbstractPlaylistFragment() {
             }
             launch {
                 viewModel.playlistDetail.collect {
-                    val playlistCover = it?.coverImgUrl?:return@collect
+                    val playlistCover = it?.coverImgUrl ?: return@collect
                     Log.d("fuvk", playlistCover)
                     Glide.with(binding.playlistCover).load(playlistCover)
                         .placeholder(R.drawable.h_1)
-                        .extractDominantColor(binding.gradientBg, Color.BLACK,0.45F,0.75F)
+                        .extractDominantColor(binding.gradientBg, Color.BLACK, 0.45F, 0.75F)
                         .optionalCenterCrop().into(binding.playlistCover)
 
                 }
