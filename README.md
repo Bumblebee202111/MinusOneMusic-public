@@ -49,7 +49,6 @@ Below are some factors that may hinder you from using it, which can change over 
 
 ## To-dos
 
-- Allow notification clicks
 - Enter maintainance mode and release alpha at some point
   - However, any user request that is not too challeging will be very likely to be accepted.
   - MinusTue: A minimum NCM app for exploring Vue3 from scratch (not part of this project)

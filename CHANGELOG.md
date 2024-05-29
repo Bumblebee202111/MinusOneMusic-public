@@ -4,6 +4,7 @@ Change Log
 ## Version 1.0.0-dev11 (baseline: NCM 9.0.80)
 
 - Add Listen Rank
+- Set MediaSession Activity to allow Notification tapping
 - Optimize toolbar navigation icons
   - Update back icons
   - Add missing listener for SearchFragment
