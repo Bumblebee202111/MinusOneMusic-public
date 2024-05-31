@@ -40,7 +40,7 @@ Note: I am very inexperienced and this app is at a very early stage of developme
 
 _The project is currently in maintenance mode, meaning no major new features will be implemented in the short term. However, I'm open to considering user requests that are not overly complex._
 
-> Focus has now shifted primarily to MinusTue, a minimal NCM toy app for exploring Vue3 **from scratch** (not part of this project). Occasionally, I will also code for [doubean](https://github.com/Bumblebee202111/doubean-public).
+> Focus has now shifted primarily to MinusTue, a minimal NCM toy app for exploring `Vue.js` **from scratch** (not part of this project). Occasionally, I will also code for [doubean](https://github.com/Bumblebee202111/doubean-public).
 
 ## Features
 
@@ -87,12 +87,12 @@ To strongly encourage the use of official NCM app, it is required that you must 
 
 - What to maintain
   - Minor adjustments
-    - Hide Look from Top List
-
+    - Daily Recommend: Fix list type regression
+    - Top Lists: Hide Look
+    - ...
   - Code optimizations
   - User requests
-
-- Release alpha at some point
+- Release alpha on arrival of new star/issue
 - New screens / major features
   - Personal FMs
   - Friends
@@ -115,41 +115,35 @@ To strongly encourage the use of official NCM app, it is required that you must 
   - Playlist UI items
     - Actions
     - Cloud/favorite/试听(trial)/unavailable UI state
-  - On-boarding
   - Link local/downloaded songs with remote ones
     - Lyrics and cover matching
+  - On-boarding
   - Show current audio qualities
-
 - Player
 
   - Continue the work of moving Player to VM
   - Handle fetch error
-
 - Mine
 
   - Optimize dragonballs
   - Add shadow for profile background
   - Top crop profile background
   - Fix top margin of user profile
-
 - Arch
 
-  - Use Channel to manage Toast-s
-  - Sync user data with WorkManager
-  - More caching when RemoteMediator becomes non-experimental
+  - Use `Channel` to manage Toast-s
+  - Sync user data with `WorkManager`
+  - More caching when `RemoteMediator` becomes non-experimental
     - Playlist, lyrics ...
-
 - Settings
 - Add 底部导航自定义
 
   - It can be found with some trick in the official app now. But if it's not officially supported, it will become a non-to-do.
-
 - Network: More elegant
   - My own CookieJar implementation
   - Custom param annotation
   - Consider removing the `NetworkDataSource` wrapper
   - Fully deprecate NCMB
-
 - The UI is generally not interactive enough
 - Download: advanced
 - Login: SMS captcha login
