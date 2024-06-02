@@ -23,7 +23,7 @@ Note: I am very inexperienced and this app is at a very early stage of developme
 
 - Partial Implementation
 
-  - 密码登录/退出登录
+  - **密码登录/退出登录**
   - 我的
     - **最近播放—歌曲**
     - **云盘**
@@ -38,9 +38,9 @@ Note: I am very inexperienced and this app is at a very early stage of developme
 > - 一般不包括跳转界面等
 > - Other UI elements, pages or functionalities are nowhere near completed although some drafts exist.
 
-_The project is currently in maintenance mode, meaning no major new features will be implemented in the short term. However, I'm open to considering user requests that are not overly complex._
+_**The project is currently in [maintenance](#wtm) mode**, meaning no major new features will be implemented in the short term. However, I'm open to considering user requests that are not overly complex._
 
-> Focus has now shifted primarily to MinusTue, a minimal NCM toy app for exploring `Vue.js` **from scratch** (not part of this project). Occasionally, I will also code for [doubean](https://github.com/Bumblebee202111/doubean-public).
+> Focus has now shifted primarily to MinusTue, a minimal NCM toy app for exploring `Vue.js` /`TypeScript` **from scratch** (not part of this project). Occasionally, I will also code for [doubean](https://github.com/Bumblebee202111/doubean-public).
 
 ## Features
 
@@ -51,7 +51,7 @@ It will provide a 99% pure music experience with basic support of ~~social featu
   > [Here](#intd) are important non-to-dos
 
 - Core functionalities and UI retained, but only on a best-effort basis.
-- Non additive or subtractive Modifications. Some convenient UI/behavior changes can be toggled in Settings (not implemented yet).
+- Non additive or subtractive modifications. Some convenient UI/behavior changes can be toggled in Settings (not implemented yet).
 - No extra features.
 - Music playback.
 - _Natural_ (without special adaptations) tablet/landscape support.
@@ -62,7 +62,7 @@ It will provide a 99% pure music experience with basic support of ~~social featu
 
 ## Notices
 
-To strongly encourage the use of official NCM app, it is required that you must be "authorized" to use my app. Below are some factors that may hinder you from using it, which can change over time:
+To strongly encourage the use of official NCM app, it is required that you must be "authorized" to use my app by agreeing on the following restrictions, which can change over time:
 
 - The official app must be installed and co-exist with it.
 - The docs are written in broken English.
@@ -85,23 +85,23 @@ To strongly encourage the use of official NCM app, it is required that you must 
 
 ## To-dos
 
-- What to maintain
+- <span id="wtm">What to maintain</span>
   - Minor adjustments
     - Daily Recommend: Fix list type regression
     - Top Lists: Hide Look
+    - Reduce image size of list items by adding additional parameters
     - ...
   - Code optimizations
-  - User requests
+  - User requests open
 - Release alpha on arrival of new star/issue
 - New screens / major features
   - Personal FMs
   - Friends
   - MVs
   - Drawer
-  - Playlist Square (wonder if it's necessary)
+  - Playlist Square (uncertain if it's necessary)
   - Statusbar lyrics
 - Player & playlist UI
-
   - Mini Player Bar
     - Swipe
     - Hide like `PlayControlView`
@@ -120,24 +120,20 @@ To strongly encourage the use of official NCM app, it is required that you must 
   - On-boarding
   - Show current audio qualities
 - Player
-
   - Continue the work of moving Player to VM
   - Handle fetch error
 - Mine
-
   - Optimize dragonballs
   - Add shadow for profile background
   - Top crop profile background
   - Fix top margin of user profile
 - Arch
-
   - Use `Channel` to manage Toast-s
   - Sync user data with `WorkManager`
   - More caching when `RemoteMediator` becomes non-experimental
     - Playlist, lyrics ...
 - Settings
 - Add 底部导航自定义
-
   - It can be found with some trick in the official app now. But if it's not officially supported, it will become a non-to-do.
 - Network: More elegant
   - My own CookieJar implementation
@@ -229,7 +225,7 @@ To strongly encourage the use of official NCM app, it is required that you must 
 <details>
     <summary>Misc.</summary>
 <p>
-    - Initially, I named it as 'NaCl'. Letters extracted from that of the official NCE app, it indicated that this third-party variant would be a lite alternative to the official one, due to technical limitations and omission of useless features. However, I found that Salt Music, another existing well-designed music app had a similar name. Now my app has been renamed to MinusOne Cloud Music, matching both of the '-1'
+    - Initially, I named it as 'NaCl'. Letters extracted from that of the official NCE app, it indicated that this third-party variant would be a lite alternative to the official one, due to technical skill limitations and omission of useless features. However, I found that Salt Music, another existing well-designed music app had a similar name. Now my app has been renamed to MinusOne Cloud Music, matching both of the '-1'
     slogan and the name format of NCM. 
     </p>
 <p>
