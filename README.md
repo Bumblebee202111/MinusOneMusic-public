@@ -60,7 +60,7 @@ It will provide a 99% pure music experience with basic support of ~~social featu
 - Direct up-to-date NCM service provided. You will see a lot of new interfaces that haven't been discovered by any other developer.
 - Uses `View`-based system & Single Activity architecture.
 - Uses `deviceId` as the seed to _pseudo_-randomly generate device specs for privacy.
-- Is NOT the decompiled and modified version of the official NCM app although the two apps look very similar.
+- Is NOT modified from the decompiled official NCM app although the two apps look very similar.
 - Does NOT hack music resources.
 
 ## Notices
@@ -90,17 +90,16 @@ It is strongly encouraged to use the official NCM app rather than third-party on
 
 - <span id="wtm">What to maintain</span>
   - Minor adjustments
-    - Update item icon of Listen Rank
     - ...
   - Code optimizations
   - User requests are open
 - Dark theme support
+- Basic drawer
 - Update UI for latest NCM
   - Discover
   - Mini player bar
   - Player screen
   - Should be delayed until at least NCM 9.1.10 when the official UI is more "stable"
-- Basic drawer
 - Release alpha on arrival of new star/issue
 - Play log (need help)
 - New screens / major features

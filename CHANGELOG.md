@@ -3,7 +3,12 @@ Change Log
 
 ## Version 1.0.0-dev12 (baseline: NCM 9.1.00)
 
-- Latest UI will not be introduced in this version
+- Top Lists: Hide Look
+- Introduce compressed images
+  - This massively improves network image experience & saves a lot of network usage
+- Update item icon of Listen Rank
+- Daily Recommend: Fix list type regression
+- Latest UI is not introduced in this version
 
 ## Version 1.0.0-dev11 (baseline: NCM 9.0.80)
 
