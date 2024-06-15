@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+## Version 1.0.0-dev12 (baseline: NCM 9.1.00)
+
+- Latest UI will not be introduced in this version
+
 ## Version 1.0.0-dev11 (baseline: NCM 9.0.80)
 
 - Add Listen Rank

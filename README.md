@@ -90,7 +90,7 @@ To strongly encourage the use of official NCM app, it is required that you must 
 
 - <span id="wtm">What to maintain</span>
   - Minor adjustments
-    - Update AS, NCM & dependencies
+    - Update dependencies
     - Daily Recommend: Fix list type regression
     - Top Lists: Hide Look
     - Reduce image size of list items by appending additional parameters: `imageUrlWithSize` extension
@@ -99,6 +99,11 @@ To strongly encourage the use of official NCM app, it is required that you must 
   - Code optimizations
   - User requests are open
 - Dark theme support
+- Update UI for latest NCM
+  - Discover
+  - Mini player bar
+  - Player screen
+
 - Basic drawer
 - Release alpha on arrival of new star/issue
 - Play log (need help)
