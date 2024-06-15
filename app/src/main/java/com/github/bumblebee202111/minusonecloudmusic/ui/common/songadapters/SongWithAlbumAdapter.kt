@@ -4,14 +4,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemNormalSongWithPositionBinding
+import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemNormalSongWithAlbumBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SongItemUiModel
 
 class SongWithAlbumAdapter(override val onItemClick: (position: Int) -> Unit) :
     BaseSongAdapter<SongWithAlbumAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ListItemNormalSongWithPositionBinding.inflate(
+            ListItemNormalSongWithAlbumBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -24,7 +24,7 @@ class SongWithAlbumAdapter(override val onItemClick: (position: Int) -> Unit) :
         holder.bind(song) { onItemClick(position) }
     }
 
-    class ViewHolder(private val binding: ListItemNormalSongWithPositionBinding) :
+    class ViewHolder(private val binding: ListItemNormalSongWithAlbumBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(
             song: SongItemUiModel,

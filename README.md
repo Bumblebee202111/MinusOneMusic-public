@@ -90,10 +90,8 @@ To strongly encourage the use of official NCM app, it is required that you must 
 
 - <span id="wtm">What to maintain</span>
   - Minor adjustments
-    - Update dependencies
-    - Daily Recommend: Fix list type regression
     - Top Lists: Hide Look
-    - Reduce image size of list items by appending additional parameters: `imageUrlWithSize` extension
+    - Reduce image size of list items by appending additional parameters: `imageUrl` extension
     - Update item icon of Listen Rank
     - ...
   - Code optimizations
@@ -103,7 +101,7 @@ To strongly encourage the use of official NCM app, it is required that you must 
   - Discover
   - Mini player bar
   - Player screen
-
+  - Should be delayed until at least NCM 9.1.10 when the official UI is more "stable"
 - Basic drawer
 - Release alpha on arrival of new star/issue
 - Play log (need help)
@@ -150,12 +148,8 @@ To strongly encourage the use of official NCM app, it is required that you must 
 - Settings
   - About
   - Link of APK of latest NCM
-  - Add 底部导航自定义
-    - It can be found with some trick in the official app now. When it loses the official support, it will become a non-to-do.
-
 - Login
   - UI
-
 - Share
 - Network: More elegant
   - My own CookieJar implementation
@@ -176,6 +170,8 @@ To strongly encourage the use of official NCM app, it is required that you must 
 - Custom default audio quality (320 kbps is preferred when making requests)
 - Support 32-bit systems or ones with android versions lower than 6.0 Marshmallow (API level 23)
 - Advanced cover disk
+- Add 底部导航自定义
+  - Since it loses the official support
 
 ## Libraries used
 
