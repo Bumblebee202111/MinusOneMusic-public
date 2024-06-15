@@ -65,7 +65,7 @@ It will provide a 99% pure music experience with basic support of ~~social featu
 
 ## Notices
 
-To strongly encourage the use of official NCM app, it is required that you must be "authorized" to use my app by agreeing on the following restrictions, which can change over time:
+It is strongly encouraged to use the official NCM app rather than third-party ones like mine. If you insist in using my app, please agree on the following restrictions, which can change over time:
 
 - The official app must be installed and co-exist with it.
 - The docs are written in broken English.
@@ -90,8 +90,6 @@ To strongly encourage the use of official NCM app, it is required that you must 
 
 - <span id="wtm">What to maintain</span>
   - Minor adjustments
-    - Top Lists: Hide Look
-    - Reduce image size of list items by appending additional parameters: `imageUrl` extension
     - Update item icon of Listen Rank
     - ...
   - Code optimizations

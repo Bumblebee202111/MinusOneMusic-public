@@ -3,7 +3,6 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.common
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
@@ -18,6 +17,7 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.github.bumblebee202111.minusonecloudmusic.R
+import com.github.bumblebee202111.minusonecloudmusic.utils.imageUrl
 import kotlin.math.roundToInt
 
 
@@ -35,65 +35,27 @@ fun TextView.bindIsFakeBoldText(isFakeBoldText: Boolean) {
 }
 
 @BindingAdapter(
-    value = ["imageUrl", "circleCrop", "placeholder", "crossFadeDuration"],
-    requireAll = false
-)
-fun ImageView.imageUrl(
-    imageUrl: String?,
-    circleCrop: Boolean? = false,
-    placeholder: Drawable? = null,
-    crossFadeDuration: Int? = null
-) {
-    if (imageUrl == null && placeholder == null) return
-
-    var rb = Glide.with(context).load(imageUrl ?: placeholder)
-    with(rb) {
-        if (imageUrl != null && placeholder != null) {
-            rb = placeholder(placeholder)
-        }
-        if (circleCrop == true) {
-            rb = optionalCircleCrop()
-        }
-        if (crossFadeDuration != null) {
-            rb = transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
-        }
-        into(this@imageUrl)
-    }
-}
-
-@BindingAdapter(
-    value = ["imageUrl", "circleCrop", "placeholder", "crossFadeDuration"],
-    requireAll = false
-)
-fun ImageView.imageUrl(
-    imageUrl: String?,
-    circleCrop: Boolean? = false,
-    placeholder: String? = null,
-    crossFadeDuration: Int? = null
-) {
-    imageUrl(
-        imageUrl,
-        circleCrop,
-        placeholder?.let { ColorDrawable(Color.parseColor(it)) },
-        crossFadeDuration
-    )
-}
-
-@BindingAdapter(
-    value = ["image", "circleCrop", "placeholder", "crossFadeDuration"],
+    value = ["image", "thumbnailSize", "quality", "circleCrop", "placeholder", "crossFadeDuration"],
     requireAll = false
 )
 fun ImageView.image(
-    imageUri: Any?,
+    model: Any?,
+    thumbnailSize: Int? = null,
+    quality: Int? = null,
     circleCrop: Boolean? = false,
     placeholder: Drawable? = null,
     crossFadeDuration: Int? = null
 ) {
-    if (imageUri == null && placeholder == null) return
+    if (model == null && placeholder == null) return
 
-    var rb = Glide.with(context).load(imageUri ?: placeholder)
+    val remoteImageUrl = if (model is String) {
+        model.imageUrl(thumbnailSize = thumbnailSize, quality = quality)
+    } else {
+        model
+    }
+    var rb = Glide.with(context).load(remoteImageUrl ?: placeholder)
     with(rb) {
-        if (imageUri != null && placeholder != null) {
+        if (model != null && placeholder != null) {
             rb = placeholder(placeholder)
         }
         if (circleCrop == true) {
@@ -107,20 +69,24 @@ fun ImageView.image(
 }
 
 @BindingAdapter(
-    value = ["image", "circleCrop", "placeholder", "crossFadeDuration"],
+    value = ["image", "thumbnailSize", "quality", "circleCrop", "placeholder", "crossFadeDuration"],
     requireAll = false
 )
 fun ImageView.image(
-    imageUri: Uri?,
+    model: Any?,
+    thumbnailSize: Int? = null,
+    quality: Int? = null,
     circleCrop: Boolean? = false,
     placeholder: String? = null,
     crossFadeDuration: Int? = null
 ) {
     image(
-        imageUri,
-        circleCrop,
-        placeholder?.let { ColorDrawable(Color.parseColor(it)) },
-        crossFadeDuration
+        model = model,
+        thumbnailSize = thumbnailSize,
+        quality = quality,
+        circleCrop = circleCrop,
+        placeholder = placeholder?.let { ColorDrawable(Color.parseColor(it)) },
+        crossFadeDuration = crossFadeDuration
     )
 }
 
