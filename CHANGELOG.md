@@ -1,6 +1,9 @@
 Change Log
 ==========
 
+## Version 1.0.0-dev13 (baseline: NCM 9.1.0)
+
+
 ## Version 1.0.0-dev12 (baseline: NCM 9.1.00)
 
 - Top Lists: Hide Look
