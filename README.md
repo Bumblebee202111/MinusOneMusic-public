@@ -2,7 +2,7 @@
 
 MinusOne Cloud Music (减一云音乐, also _MinusOne Music_ as app name) is a lite third-party NCM app for Android.
 
-In developing this app, I will explore how to create a more complex app. The focus is not on creativity but on the technical aspects of implementing core features of NCM using modern approaches.
+In developing this app, I will explore how to create a more complex app. The focus is not on creativity but on the technical aspects of implementing core features of NCM using relatively modern approaches.
 
 Note: I am very inexperienced and this app is at a very early stage of development. Current progress by screens:
 
@@ -35,12 +35,13 @@ Note: I am very inexperienced and this app is at a very early stage of developme
   - **搜索（“综合”Tab之“单曲”）**
   - **评论（Hottest Page 1）**
 
-> - 一般不包括跳转界面等
+> - 所述界面一般不包括二级界面等
 > - Other UI elements, pages or functionalities are nowhere near completed although some drafts exist.
 
-_**The project is currently in [maintenance](#wtm) mode**, meaning no major new features will be implemented in the short term. However, I'm open to considering user requests that are not overly complex._
+_**The project is currently in [maintenance](#wtm) mode**, meaning no major new features will be implemented in the short term. However, its development doesn't stop and I'm open to considering user requests that are not overly complex._
 
-> Focus has now shifted primarily to MinusTue, a minimal NCM toy app for exploring `Vue.js` /`TypeScript` **from scratch** (not part of this project). Occasionally, I will also code for [doubean](https://github.com/Bumblebee202111/doubean-public).
+> - Focus has now shifted a little bit away from mobile Android dev to other areas.
+> - Occasionally, I will also code for [doubean](https://github.com/Bumblebee202111/doubean-public).
 
 ## Features
 
@@ -50,19 +51,21 @@ It will provide a 99% pure music experience with basic support of ~~social featu
 
   > [Here](#intd) are important non-to-dos
 
-- Core functionalities and UI retained, but only on a best-effort basis.
-- Non additive or subtractive modifications. Some convenient UI/behavior changes can be toggled in Settings (not implemented yet).
-- No extra features.
+  - Core functionalities and UI retained, but only on a best-effort basis.
+  - Non additive or subtractive modifications. Some convenient UI/behavior changes can be toggled in Settings (not implemented yet).
+  - No extra features.
+
 - Music playback.
 - _Natural_ (without special adaptations) tablet/landscape support.
-- Direct up-to-date NCM service provided.
-- Uses the traditional View-based system & Single Activity architecture.
+- Direct up-to-date NCM service provided. You will see a lot of new interfaces that haven't been discovered by any other developer.
+- Uses `View`-based system & Single Activity architecture.
 - Uses `deviceId` as the seed to _pseudo_-randomly generate device specs for privacy.
+- Is NOT modified from the decompiled official NCM app although the two apps look very similar.
 - Does NOT hack music resources.
 
 ## Notices
 
-To strongly encourage the use of official NCM app, it is required that you must be "authorized" to use my app by agreeing on the following restrictions, which can change over time:
+It is strongly encouraged to use the official NCM app rather than third-party ones like mine. If you insist in using my app, please agree on the following restrictions, which can change over time:
 
 - The official app must be installed and co-exist with it.
 - The docs are written in broken English.
@@ -81,24 +84,28 @@ To strongly encourage the use of official NCM app, it is required that you must 
 
 ## :coffee:
 
-:heart::heart::heart:
+:heart:
 
 ## To-dos
 
 - <span id="wtm">What to maintain</span>
   - Minor adjustments
-    - Daily Recommend: Fix list type regression
-    - Top Lists: Hide Look
-    - Reduce image size of list items by adding additional parameters
     - ...
   - Code optimizations
-  - User requests open
+  - User requests are open
+- Dark theme support
+- Basic drawer
+- Update UI for latest NCM
+  - Discover
+  - Mini player bar
+  - Player screen
+  - Should be delayed until at least NCM 9.1.10 when the official UI is more "stable"
 - Release alpha on arrival of new star/issue
+- Play log (need help)
 - New screens / major features
   - Personal FMs
   - Friends
   - MVs
-  - Drawer
   - Playlist Square (uncertain if it's necessary)
   - Statusbar lyrics
 - Player & playlist UI
@@ -112,6 +119,7 @@ To strongly encourage the use of official NCM app, it is required that you must 
     - Follow
     - Provide bottom volume bar dialog (instead of showing sytem volume toast) for systems of lower versions (where the built-in output switcher dialog is unavailable).
     - Use LinearLayout with "weight" things for control buttons
+    - Disk rotation like https://music.163.com/m/song
   - Playlist UI items
     - Actions
     - Cloud/favorite/试听(trial)/unavailable UI state
@@ -122,6 +130,8 @@ To strongly encourage the use of official NCM app, it is required that you must 
 - Player
   - Continue the work of moving Player to VM
   - Handle fetch error
+- Search
+  - Hint
 - Mine
   - Optimize dragonballs
   - Add shadow for profile background
@@ -133,24 +143,32 @@ To strongly encourage the use of official NCM app, it is required that you must 
   - More caching when `RemoteMediator` becomes non-experimental
     - Playlist, lyrics ...
 - Settings
-- Add 底部导航自定义
-  - It can be found with some trick in the official app now. But if it's not officially supported, it will become a non-to-do.
+  - About
+  - Link of APK of latest NCM
+- Login
+  - UI
+- Share
 - Network: More elegant
   - My own CookieJar implementation
   - Custom param annotation
   - Consider removing the `NetworkDataSource` wrapper
   - Fully deprecate NCMB
 - The UI is generally not interactive enough
+- Rearrange UI for landscape like NCM
 - Download: advanced
 - Login: SMS captcha login
+- Firebase Crashlytics
 - Compose: Write non-NCM screens in Compose
 - Qualification: Add quiz activity/app based on JetSurvey
 
 ### <span id="intd">Important non-to-dos</span>
 
 - Search Tabs other than the default, search pagination
-- Custom default audio quality (we prefer 320 kbps when making requests)
+- Custom default audio quality (320 kbps is preferred when making requests)
 - Support 32-bit systems or ones with android versions lower than 6.0 Marshmallow (API level 23)
+- Advanced cover disk
+- Add 底部导航自定义
+  - Since it loses the official support
 
 ## Libraries used
 
