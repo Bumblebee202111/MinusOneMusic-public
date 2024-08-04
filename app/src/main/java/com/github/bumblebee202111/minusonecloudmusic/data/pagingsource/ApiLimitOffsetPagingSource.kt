@@ -7,7 +7,7 @@ import kotlinx.coroutines.Deferred
 
 class ApiLimitOffsetPagingSource<InitialFetchResultType : Any, NonInitialFetchResultType, Value : Any>(
     private val deferredInitialFetch: Deferred<ApiResult<InitialFetchResultType>>,
-    val nonInitialFetch: suspend (limit: Int,offset: Int, precondition: InitialFetchResultType) -> ApiResult<NonInitialFetchResultType>,
+    val nonInitialFetch: suspend (limit: Int, offset: Int, precondition: InitialFetchResultType) -> ApiResult<NonInitialFetchResultType>,
     val getTotalCount: suspend InitialFetchResultType.() -> Int,
     val mapToFirstPageData: suspend InitialFetchResultType.() -> List<Value>,
     val mapToNonFirstPageData: suspend NonInitialFetchResultType.() -> List<Value>,
@@ -32,18 +32,22 @@ class ApiLimitOffsetPagingSource<InitialFetchResultType : Any, NonInitialFetchRe
     private lateinit var initialFetchData: InitialFetchResultType
     private var totalCount: Int = 0
     private suspend fun initialLoad(params: LoadParams<Int>): LoadResult<Int, Value> {
-        return when (val response = deferredInitialFetch.await()) {
-            is ApiResult.ApiSuccessResult -> {
-                initialFetchData = response.data
-                totalCount = getTotalCount(initialFetchData)
-                LoadResult.Page(
-                    data = mapToFirstPageData(initialFetchData),
-                    prevKey = null,
-                    nextKey = if (totalCount > params.loadSize) 1 else null
-                )
-            }
+        return try {
+            when (val response = deferredInitialFetch.await()) {
+                is ApiResult.ApiSuccessResult -> {
+                    initialFetchData = response.data
+                    totalCount = getTotalCount(initialFetchData)
+                    LoadResult.Page(
+                        data = mapToFirstPageData(initialFetchData),
+                        prevKey = null,
+                        nextKey = if (totalCount > params.loadSize) 1 else null
+                    )
+                }
 
-            else -> LoadResult.Invalid()
+                else -> LoadResult.Invalid()
+            }
+        } catch (ex: Exception) {
+            LoadResult.Error(ex)
         }
     }
 
@@ -51,17 +55,23 @@ class ApiLimitOffsetPagingSource<InitialFetchResultType : Any, NonInitialFetchRe
         params: LoadParams<Int>,
         pageIndex: Int
     ): LoadResult<Int, Value> {
-        val loadSize=params.loadSize
-        return when (val response = nonInitialFetch(loadSize,pageIndex*loadSize,initialFetchData)) {
-            is ApiResult.ApiSuccessResult -> {
-                val result = response.data
-                LoadResult.Page(
-                    data = mapToNonFirstPageData(result),
-                    prevKey = null,
-                    nextKey = if (totalCount > (pageIndex+1) *loadSize) pageIndex + 1 else null
-                )
+        val loadSize = params.loadSize
+        return try {
+            when (val response =
+                nonInitialFetch(loadSize, pageIndex * loadSize, initialFetchData)) {
+                is ApiResult.ApiSuccessResult -> {
+                    val result = response.data
+                    LoadResult.Page(
+                        data = mapToNonFirstPageData(result),
+                        prevKey = null,
+                        nextKey = if (totalCount > (pageIndex + 1) * loadSize) pageIndex + 1 else null
+                    )
+                }
+
+                else -> LoadResult.Invalid()
             }
-            else -> LoadResult.Invalid()
+        } catch (ex: Exception) {
+            LoadResult.Error(ex)
         }
     }
 }
