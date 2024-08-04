@@ -35,7 +35,7 @@ Note: I am very inexperienced and this app is at a very early stage of developme
   - **搜索（“综合”Tab之“单曲”）**
   - **评论（Hottest Page 1）**
 
-> - 所述界面一般不包括二级界面等
+> - 所列界面一般不包括二级界面等
 > - Other UI elements, pages or functionalities are nowhere near completed although some drafts exist.
 
 _**The project is currently in [maintenance](#wtm) mode**, meaning no major new features will be implemented in the short term. However, its development doesn't stop and I'm open to considering user requests that are not overly complex._
@@ -57,7 +57,7 @@ It will provide a 99% pure music experience with basic support of ~~social featu
 
 - Music playback.
 - _Natural_ (without special adaptations) tablet/landscape support.
-- Direct up-to-date NCM service provided. You will see a lot of new interfaces that haven't been discovered by any other developer.
+- Direct up-to-date NCM service provided. Plenty of new interfaces which haven't been discovered by others are used to bring you consistent experience.
 - Uses `View`-based system & Single Activity architecture.
 - Uses `deviceId` as the seed to _pseudo_-randomly generate device specs for privacy.
 - Is NOT modified from the decompiled official NCM app although the two apps look very similar.
@@ -76,7 +76,7 @@ It is strongly encouraged to use the official NCM app rather than third-party on
 - Please use it only for personal learning purposes.
 - Please don't share it on other websites/apps without permission.
 
-## Screenshot
+## Screenshots
 
 <img src="docs\screenshots\Screenshot_main.png" alt="Main" width=160 /><img src="docs\screenshots\Screenshot_discover.png" alt="Discover" width=160 /> <img src="docs\screenshots\Screenshot_top_lists.png" alt="Top lists" width=160 />
 <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=160 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=400/> <img src="docs\screenshots\Screenshot_comments_landscape.png" alt="Comments (landscape)" width=320 />
@@ -99,7 +99,8 @@ It is strongly encouraged to use the official NCM app rather than third-party on
   - Discover
   - Mini player bar
   - Player screen
-  - Should be delayed until at least NCM 9.1.10 when the official UI is more "stable"
+  - Should be postponed at the earliest to NCM 9.1.10 when the official UI is more "stable"
+- Compress more images
 - Release alpha on arrival of new star/issue
 - Play log (need help)
 - New screens / major features
