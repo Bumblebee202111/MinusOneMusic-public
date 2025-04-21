@@ -97,6 +97,7 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 ## To-dos
 
 - Deprecate `dev` prefix  →  `beta`
+- Coil
 - Handle common errors gracefully
 - Introduce Compose for non-core player UI
 - Fix login
