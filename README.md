@@ -43,6 +43,10 @@ _**The project is currently in [maintenance](#wtm) mode**, meaning no major new 
 > - Focus has now shifted a little bit away from mobile Android dev to other areas.
 > - Occasionally, I will also code for [doubean](https://github.com/Bumblebee202111/doubean-public).
 
+**Known issues:**
+
+- Cellphone login is broken
+
 ## Features
 
 It will provide a 99% pure music experience with basic support of ~~social features~~ (not implemented yet).
