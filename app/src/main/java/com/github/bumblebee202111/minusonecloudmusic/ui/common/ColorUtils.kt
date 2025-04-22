@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
 import androidx.core.graphics.ColorUtils
 import androidx.palette.graphics.Palette
-import kotlin.math.min
 
 object ColorUtils {
     fun getDominantColor(

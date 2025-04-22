@@ -32,7 +32,7 @@ class PlaylistViewModel @Inject constructor(
     private val playlistRepository: PlaylistRepository,
     private val songRepository: SongRepository,
     musicServiceConnection: MusicServiceConnection,
-    private val playPlaylistUseCase: PlayPlaylistUseCase,
+    playPlaylistUseCase: PlayPlaylistUseCase,
     private val getPlaylistSongItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase
 ) :
     AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {

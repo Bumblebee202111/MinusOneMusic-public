@@ -16,7 +16,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CollectedMvListViewModel  @Inject constructor(
-    private val loginRepository: LoginRepository,
+    loginRepository: LoginRepository,
     private val loggedInUserDataRepository: LoggedInUserDataRepository
 ): ViewModel() {
 

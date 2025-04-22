@@ -34,7 +34,7 @@ class SongRepository @Inject constructor(
     private val moshiAdapter: JsonAdapter<Any>,
     private val mediaStoreDataSource: MediaStoreDataSource,
     private val mediaDownloadDataSource: SongDownloadDataSource,
-    private val appDatabase: AppDatabase
+    appDatabase: AppDatabase
 ) {
     private val songDao = appDatabase.songDao()
 

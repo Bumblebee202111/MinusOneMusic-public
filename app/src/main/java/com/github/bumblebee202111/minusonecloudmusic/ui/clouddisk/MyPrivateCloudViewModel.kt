@@ -20,10 +20,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyPrivateCloudViewModel @Inject constructor(
-    private val loginRepository: LoginRepository,
+    loginRepository: LoginRepository,
     private val loggedInUserDataRepository: LoggedInUserDataRepository,
     private val mapSongPagingDataFlowToUiItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase,
-    private val musicServiceConnection: MusicServiceConnection,
+    musicServiceConnection: MusicServiceConnection,
     playPlaylistUseCase: PlayPlaylistUseCase
 ) : AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
 

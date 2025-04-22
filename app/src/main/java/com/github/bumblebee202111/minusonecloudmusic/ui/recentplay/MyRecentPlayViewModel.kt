@@ -18,11 +18,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyRecentPlayViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    private val mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
-    private val playPlaylistUseCase: PlayPlaylistUseCase,
+    userRepository: UserRepository,
+    mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
+    playPlaylistUseCase: PlayPlaylistUseCase,
     @Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
-    private val musicServiceConnection: MusicServiceConnection
+    musicServiceConnection: MusicServiceConnection
 ) :
     AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
     private val recentPlaySongs = userRepository.getRecentPlayMusic().map {

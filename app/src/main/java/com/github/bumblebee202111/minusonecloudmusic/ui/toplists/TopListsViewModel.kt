@@ -11,6 +11,6 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class TopListsViewModel @Inject constructor(private val playlistRepository: PlaylistRepository) : ViewModel() {
+class TopListsViewModel @Inject constructor(playlistRepository: PlaylistRepository) : ViewModel() {
     val topLists=playlistRepository.getTopLists().map { it.data }.stateIn(viewModelScope, SharingStarted.Lazily,null).stateInUi()
 }

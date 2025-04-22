@@ -15,9 +15,9 @@ import javax.inject.Inject
 @HiltViewModel
 class DailyRecommendViewModel @Inject constructor(
     loggedInUserDataRepository: LoggedInUserDataRepository,
-    private val playPlaylistUseCase: PlayPlaylistUseCase,
-    private val mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
-    private val musicServiceConnection: MusicServiceConnection
+    playPlaylistUseCase: PlayPlaylistUseCase,
+    mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
+    musicServiceConnection: MusicServiceConnection
 ) : AbstractPlaylistViewModel<DailyRecommendSong>(playPlaylistUseCase) {
 
    private val songs=loggedInUserDataRepository.getDailyRecommendSongs().map { it.data }.stateInUi()

@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CommentsViewModel @Inject constructor(
-    private val songRepository: SongRepository,
+    songRepository: SongRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val threadId = CommentsFragmentArgs.fromSavedStateHandle(savedStateHandle).threadId

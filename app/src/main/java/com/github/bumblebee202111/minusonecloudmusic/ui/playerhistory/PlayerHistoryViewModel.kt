@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlayerHistoryViewModel @Inject constructor(
     private val musicServiceConnection: MusicServiceConnection,
-    private val mapSongPagingDataFlowToUiItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase,
+    mapSongPagingDataFlowToUiItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase,
     private val playlistRepository: PlaylistRepository,
     @Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {

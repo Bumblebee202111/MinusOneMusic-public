@@ -23,8 +23,8 @@ import javax.inject.Inject
 class NowPlayingViewModel @Inject constructor(
     private val songRepository: SongRepository,
     private val loggedInUserDataRepository: LoggedInUserDataRepository,
-    private val musicServiceConnection: MusicServiceConnection,
-    private val loginRepository: LoginRepository,
+    musicServiceConnection: MusicServiceConnection,
+    loginRepository: LoginRepository,
     private val playlistRepository: PlaylistRepository
 ) : ViewModel() {
 

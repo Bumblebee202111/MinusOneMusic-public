@@ -19,6 +19,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.utils.imageUrl
 import kotlin.math.roundToInt
+import androidx.core.graphics.toColorInt
+import androidx.core.graphics.drawable.toDrawable
 
 
 
@@ -85,7 +87,7 @@ fun ImageView.image(
         thumbnailSize = thumbnailSize,
         quality = quality,
         circleCrop = circleCrop,
-        placeholder = placeholder?.let { ColorDrawable(Color.parseColor(it)) },
+        placeholder = placeholder?.toColorInt()?.toDrawable(),
         crossFadeDuration = crossFadeDuration
     )
 }
@@ -166,7 +168,7 @@ fun TextView.playerSongItem(
         if (isCurrentSong) ContextCompat.getColor(
             context,
             R.color.colorPrimary1
-        ) else Color.parseColor("#7f000000")
+        ) else "#7f000000".toColorInt()
     )
 }
 
@@ -176,7 +178,7 @@ fun TextView.setIsCurrentSong(isCurrentSong: Boolean) {
         if (isCurrentSong) ContextCompat.getColor(
             context,
             R.color.colorPrimary1
-        ) else Color.parseColor("#CC000000")
+        ) else "#CC000000".toColorInt()
     )
 }
 

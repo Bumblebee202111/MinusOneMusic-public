@@ -23,10 +23,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DiscoverViewModel @Inject constructor(
-    private val playlistRepository: PlaylistRepository,
-    private val discoverRepository: DiscoverRepository,
+    playlistRepository: PlaylistRepository,
+    discoverRepository: DiscoverRepository,
     private val musicServiceConnection: MusicServiceConnection,
-    private val playPlaylistUseCase: PlayPlaylistUseCase,
+    playPlaylistUseCase: PlayPlaylistUseCase,
     @ApplicationScope private val coroutineScope: CoroutineScope,
     private val mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase
 ) : AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {

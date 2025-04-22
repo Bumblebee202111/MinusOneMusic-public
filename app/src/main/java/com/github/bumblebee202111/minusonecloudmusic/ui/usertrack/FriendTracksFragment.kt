@@ -25,9 +25,8 @@ class FriendTracksFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_friend_tracks, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(FriendTracksViewModel::class.java)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this)[FriendTracksViewModel::class.java]
     }
-
 }

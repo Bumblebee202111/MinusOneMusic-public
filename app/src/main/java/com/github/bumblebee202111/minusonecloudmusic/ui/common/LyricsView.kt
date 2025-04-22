@@ -15,6 +15,7 @@ import android.widget.Scroller
 import androidx.core.view.isVisible
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LyricsEntry
 import kotlin.math.roundToInt
+import androidx.core.graphics.toColorInt
 
 class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
@@ -28,12 +29,12 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var scrollDestination: Int? = null
     private var lyricsLines: List<LyricsLine>? = null
     private val normalTextPaint: TextPaint = TextPaint(ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#AAFFFFFF")
+        color = "#AAFFFFFF".toColorInt()
         textAlign = android.graphics.Paint.Align.CENTER
         textSize = normalTextSize
     }
     private val highlightedTextPaint: TextPaint = TextPaint(ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#DDFFFFFF")
+        color = "#DDFFFFFF".toColorInt()
         textAlign = Paint.Align.CENTER
         textSize = highlightedTextSize
     }

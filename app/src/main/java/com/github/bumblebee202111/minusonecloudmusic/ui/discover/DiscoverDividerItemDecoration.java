@@ -26,6 +26,7 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,7 +39,7 @@ public class DiscoverDividerItemDecoration extends RecyclerView.ItemDecoration {
     private static final String TAG = "DividerItem";
     private static final int[] ATTRS = new int[]{android.R.attr.listDivider};
 
-    private Drawable mDivider;
+    private final Drawable mDivider;
 
     private final Rect mBounds = new Rect();
 
@@ -60,8 +61,7 @@ public class DiscoverDividerItemDecoration extends RecyclerView.ItemDecoration {
     }
 
     @Override
-    @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
-    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+    public void onDraw(@NonNull Canvas c, RecyclerView parent, @NonNull RecyclerView.State state) {
         if (parent.getLayoutManager() == null || mDivider == null) {
             return;
         }
@@ -98,9 +98,8 @@ public class DiscoverDividerItemDecoration extends RecyclerView.ItemDecoration {
     }
 
     @Override
-    @SuppressLint("UnknownNullness") // b/240775049: Cannot annotate properly
-    public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
-                               RecyclerView.State state) {
+    public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent,
+                               @NonNull RecyclerView.State state) {
         if (mDivider == null || parent.getChildAdapterPosition(view) == 0 || parent.getChildAdapterPosition(view) == parent.getChildCount() - 1) {
             outRect.set(0, 0, 0, 0);
             return;

@@ -12,6 +12,7 @@ import androidx.annotation.FloatRange
 import androidx.appcompat.widget.AppCompatImageView
 import com.github.bumblebee202111.minusonecloudmusic.R
 import kotlin.math.pow
+import androidx.core.graphics.withRotation
 
   
 class MiniPlayPauseButton(context: Context, attributeSet: AttributeSet?) :
@@ -204,22 +205,21 @@ object C105946c {
         f5: Float,
         paint: Paint
     ) {
-        canvas.save()
-        canvas.rotate(f4, f, f2)
-        val f6 = f - f3 * 0.5f
-        val d = 3.0
-        val d2 = 0.5
-        val pow = d.pow(d2).toFloat() * f3 / 6.0f + f2
-        val f7 = f6 + f3
-        val pow2 = f2 - f3 * d.pow(d2).toFloat() / 3.0f
-        paint.pathEffect = CornerPathEffect(f5)
-        path.reset()
-        path.moveTo(f6, pow)
-        path.lineTo(f7, pow)
-        path.lineTo(f, pow2)
-        path.lineTo(f6, pow)
-        path.close()
-        canvas.drawPath(path, paint)
-        canvas.restore()
+        canvas.withRotation(f4, f, f2) {
+            val f6 = f - f3 * 0.5f
+            val d = 3.0
+            val d2 = 0.5
+            val pow = d.pow(d2).toFloat() * f3 / 6.0f + f2
+            val f7 = f6 + f3
+            val pow2 = f2 - f3 * d.pow(d2).toFloat() / 3.0f
+            paint.pathEffect = CornerPathEffect(f5)
+            path.reset()
+            path.moveTo(f6, pow)
+            path.lineTo(f7, pow)
+            path.lineTo(f, pow2)
+            path.lineTo(f6, pow)
+            path.close()
+            drawPath(path, paint)
+        }
     }
 }

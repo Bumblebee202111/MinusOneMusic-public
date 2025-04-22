@@ -16,7 +16,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class FansViewModel @Inject constructor(
-    private val loginRepository: LoginRepository,
+    loginRepository: LoginRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
     val userFans=loginRepository.loggedInUserId.flatMapLatest { userId ->
