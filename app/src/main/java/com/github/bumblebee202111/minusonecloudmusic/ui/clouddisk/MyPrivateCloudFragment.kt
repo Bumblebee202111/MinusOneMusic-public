@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMyPrivateCloudBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarController
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistDialogController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.PagedSongWithPositionAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,9 +49,7 @@ class MyPrivateCloudFragment : AbstractPlaylistFragment() {
 
             }
             launch {
-                viewModel.player.collect{
-                    miniPlayerBar.player=it
-                }
+                viewModel.player.collect(miniPlayerBarController::setPlayer)
             }
         }
     }
