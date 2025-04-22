@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.forEach
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.NavHostFragment
@@ -14,7 +15,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMainBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractMiniPlayerBarFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarController
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistDialogController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -23,9 +25,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainFragment : AbstractMiniPlayerBarFragment() {
+class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
+    private lateinit var playlistDialogController: PlaylistDialogController
+    private lateinit var miniPlayerBarController: MiniPlayerBarController
+
     private val mainViewModel by viewModels<MainViewModel>()
 
     override fun onCreateView(
@@ -40,6 +45,12 @@ class MainFragment : AbstractMiniPlayerBarFragment() {
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        playlistDialogController = PlaylistDialogController(parentFragmentManager)
+        miniPlayerBarController = MiniPlayerBarController(
+            view = view,
+            navController = findNavController(),
+            playlistDialogController = playlistDialogController
+        )
 
 
         val bottomNavView: BottomNavigationView = binding.bottomNavView
@@ -85,7 +96,7 @@ class MainFragment : AbstractMiniPlayerBarFragment() {
 
         repeatWithViewLifecycle {
             launch {
-                mainViewModel.player.collect(::setPlayer)
+                mainViewModel.player.collect(miniPlayerBarController::setPlayer)
             }
             launch {
                 mainViewModel.isLoggedIn().collect {
@@ -110,6 +121,10 @@ class MainFragment : AbstractMiniPlayerBarFragment() {
         findNavController().navigate(destinationId)
     }
 
+    override fun onStop() {
+        miniPlayerBarController.onStop()
+        super.onStop()
+    }
 
     companion object {
 

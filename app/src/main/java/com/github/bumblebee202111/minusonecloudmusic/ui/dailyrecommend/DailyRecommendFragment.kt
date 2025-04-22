@@ -8,11 +8,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.OptIn
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDailyRecommendBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarController
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistDialogController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.SongWithAlbumAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,14 +23,16 @@ import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
-class DailyRecommendFragment : AbstractPlaylistFragment() {
+class DailyRecommendFragment : Fragment() {
 
     companion object {
         fun newInstance() = DailyRecommendFragment()
     }
 
     private lateinit var binding: FragmentDailyRecommendBinding
-    override val viewModel: DailyRecommendViewModel by viewModels()
+    val viewModel: DailyRecommendViewModel by viewModels()
+    private lateinit var playlistDialogController: PlaylistDialogController
+    private lateinit var miniPlayerBarController: MiniPlayerBarController
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,6 +48,12 @@ class DailyRecommendFragment : AbstractPlaylistFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        playlistDialogController = PlaylistDialogController(parentFragmentManager)
+        miniPlayerBarController = MiniPlayerBarController(
+            view = view,
+            navController = findNavController(),
+            playlistDialogController = playlistDialogController
+        )
 
         binding.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
@@ -62,13 +73,16 @@ class DailyRecommendFragment : AbstractPlaylistFragment() {
                     adapter.submitList(it)
                 }
             }
-            launch {
-                viewModel.player.collect {
-                    setPlayer(it)
+            repeatWithViewLifecycle {
+                launch {
+                    viewModel.player.collect(miniPlayerBarController::setPlayer)
                 }
             }
-
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        miniPlayerBarController.onStop()
+    }
 }

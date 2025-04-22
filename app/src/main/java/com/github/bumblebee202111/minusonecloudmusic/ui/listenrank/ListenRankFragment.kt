@@ -5,17 +5,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IntDef
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentListenRankBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractMiniPlayerBarFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarController
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarView
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistDialogController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 @AndroidEntryPoint
-class ListenRankFragment : AbstractMiniPlayerBarFragment() {
+class ListenRankFragment : Fragment() {
 
     companion object {
         fun newInstance() = ListenRankFragment()
@@ -31,6 +35,9 @@ class ListenRankFragment : AbstractMiniPlayerBarFragment() {
 
     lateinit var binding: FragmentListenRankBinding
     private val viewModel: ListenRankViewModel by viewModels()
+    private lateinit var playlistDialogController: PlaylistDialogController
+    private lateinit var miniPlayerBarController: MiniPlayerBarController
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,6 +48,13 @@ class ListenRankFragment : AbstractMiniPlayerBarFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        playlistDialogController = PlaylistDialogController(parentFragmentManager)
+        miniPlayerBarController = MiniPlayerBarController(
+            view = view,
+            navController = findNavController(),
+            playlistDialogController = playlistDialogController
+        )
+
         binding.apply {
             toolbar.setNavigationOnClickListener {
                 findNavController().navigateUp()
@@ -57,7 +71,7 @@ class ListenRankFragment : AbstractMiniPlayerBarFragment() {
         }
         repeatWithViewLifecycle {
             launch {
-                viewModel.player.collect(::setPlayer)
+                viewModel.player.collect(miniPlayerBarController::setPlayer)
             }
         }
     }
@@ -67,6 +81,11 @@ class ListenRankFragment : AbstractMiniPlayerBarFragment() {
         override fun getItemCount() = 2
 
         override fun createFragment(position: Int) = ListenRankTabFragment.newInstance(position)
+    }
+
+    override fun onStop() {
+        miniPlayerBarController.onStop()
+        super.onStop()
     }
 }
 

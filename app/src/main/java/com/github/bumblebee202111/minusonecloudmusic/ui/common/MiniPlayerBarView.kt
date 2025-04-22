@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.annotation.OptIn
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.Assertions
@@ -17,7 +18,7 @@ import com.github.bumblebee202111.minusonecloudmusic.R
 
 
 
-@UnstableApi
+@OptIn(UnstableApi::class)
 class MiniPlayerBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

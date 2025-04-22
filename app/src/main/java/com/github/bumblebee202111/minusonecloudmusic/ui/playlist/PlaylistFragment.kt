@@ -100,7 +100,7 @@ class PlaylistFragment : AbstractPlaylistFragment() {
         binding.songList.adapter = songAdapter
         repeatWithViewLifecycle {
             launch {
-                viewModel.player.collect(::setPlayer)
+                viewModel.player.collect(miniPlayerBarController::setPlayer)
             }
             launch {
                 viewModel.playlistDetail.collect {

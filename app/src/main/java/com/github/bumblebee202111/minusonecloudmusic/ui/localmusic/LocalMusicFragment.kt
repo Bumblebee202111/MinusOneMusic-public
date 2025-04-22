@@ -64,7 +64,7 @@ class LocalMusicFragment : AbstractPlaylistFragment() {
                 viewModel.songItems.collect(adapter::submitList)
             }
             launch {
-                viewModel.player.collect(::setPlayer)
+                viewModel.player.collect(miniPlayerBarController::setPlayer)
             }
         }
     }

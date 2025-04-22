@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.media3.common.C
 import androidx.media3.common.Player
@@ -54,8 +55,8 @@ import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentNowPlay
 import com.github.bumblebee202111.minusonecloudmusic.player.CountUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleModeUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleToggleMode
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlayerFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.LyricsView
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistDialogController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
@@ -72,10 +73,11 @@ import java.util.Locale
 
 @AndroidEntryPoint
 @UnstableApi
-class NowPlayingFragment : AbstractPlayerFragment() {
+class NowPlayingFragment : Fragment() {
 
     lateinit var binding: FragmentNowPlayingBinding
     private val nowPlayingViewModel: NowPlayingViewModel by viewModels()
+    private lateinit var playlistDialogController: PlaylistDialogController
 
     private lateinit var resources: Resources
     private lateinit var playerListener: PlayerListener
@@ -179,6 +181,7 @@ class NowPlayingFragment : AbstractPlayerFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val context = requireContext()
+        playlistDialogController = PlaylistDialogController(parentFragmentManager)
 
         repeatToggleModes = RepeatShuffleToggleMode.REPEAT_SHUFFLE_MODE_ALL_OFF
         timeBarMinUpdateIntervalMs = TIME_BAR_MIN_UPDATE_INTERVAL_MS
@@ -242,7 +245,7 @@ class NowPlayingFragment : AbstractPlayerFragment() {
             }
         }
 
-        binding.openPlaylist.setOnClickListener { openPlayerPlaylistDialog() }
+        binding.openPlaylist.setOnClickListener { playlistDialogController.showPlayerPlaylistDialog() }
 
         audioManager =
             requireContext().applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -341,7 +344,6 @@ class NowPlayingFragment : AbstractPlayerFragment() {
         }
 
 
-        resources = getResources()
         repeatAllShuffleOffButtonDrawable =
             getDrawable(
                 context,
@@ -488,8 +490,8 @@ class NowPlayingFragment : AbstractPlayerFragment() {
             }
             launch {
                 nowPlayingViewModel.isLoggedIn.collect {
-                    likeButton.isEnabled = it ?: false
-                    lyricsModeLikeButton.isEnabled = it ?: false
+                    likeButton.isEnabled = it == true
+                    lyricsModeLikeButton.isEnabled = it == true
                 }
             }
         }

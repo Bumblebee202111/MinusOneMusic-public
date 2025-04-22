@@ -5,10 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentSearchBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractMiniPlayerBarFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarController
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistDialogController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.hideSoftInput
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.SimpleSongAdapter
@@ -16,11 +18,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SearchFragment : AbstractMiniPlayerBarFragment() {
+class SearchFragment : Fragment() {
 
     lateinit var binding: FragmentSearchBinding
-
     private val viewModel: SearchViewModel by viewModels()
+    private lateinit var playlistDialogController: PlaylistDialogController
+    private lateinit var miniPlayerBarController: MiniPlayerBarController
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -31,7 +35,12 @@ class SearchFragment : AbstractMiniPlayerBarFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        playlistDialogController = PlaylistDialogController(parentFragmentManager)
+        miniPlayerBarController = MiniPlayerBarController(
+            view = view,
+            navController = findNavController(),
+            playlistDialogController = playlistDialogController
+        )
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -58,8 +67,13 @@ class SearchFragment : AbstractMiniPlayerBarFragment() {
                 viewModel.result.collect(adapter::submitList)
             }
             launch {
-                viewModel.player.collect(::setPlayer)
+                viewModel.player.collect(miniPlayerBarController::setPlayer)
             }
         }
+    }
+
+    override fun onStop() {
+        miniPlayerBarController.onStop()
+        super.onStop()
     }
 }
