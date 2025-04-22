@@ -28,7 +28,7 @@ class NestedScrollableHost : FrameLayout {
             while (v != null && v !is ViewPager2) {
                 v = v.parent as? View
             }
-            return v
+            return v as? ViewPager2
         }
 
     private val child: View? get() = if (isNotEmpty()) getChildAt(0) else null
