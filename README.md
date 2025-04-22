@@ -40,6 +40,7 @@ Note: Early development stage. Current progress by screens:
 
 **Known issues:**
 
+- Historically, code really badly written
 - Cellphone login broken
 
 ## Features
@@ -100,6 +101,8 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 - Coil
 - Handle common errors gracefully
 - Introduce Compose for non-core player UI
+  - RecyclerView to LazyList migration
+
 - Fix login
 - Dark theme support
 - Basic drawer
@@ -164,6 +167,8 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 - Download: advanced
 - Login: SMS captcha login
 - Firebase Crashlytics
+- Add 底部导航自定义
+  - Since the official support is back
 - Qualification: Add quiz activity/app based on JetSurvey (?)
 
 ### <span id="intd">Important non-to-dos</span>
@@ -171,8 +176,6 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 - Additional search tabs/pagination
 - Custom default audio quality (320 kbps is preferred when making requests)
 - Advanced cover disk
-- Add 底部导航自定义
-  - Since it loses the official support
 
 ## Tech Stack
 
@@ -217,7 +220,6 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 [layout]: https://developer.android.com/guide/topics/ui/declaring-layout
 [notifications]: https://developer.android.com/develop/ui/views/notifications
 [retrofit]: https://square.github.io/retrofit/
-[apache-commons]: https://commons.apache.org/
 [glide]: https://bumptech.github.io/glide/
 [kotlin-coroutines]: https://kotlinlang.org/docs/reference/coroutines-overview.html
 
