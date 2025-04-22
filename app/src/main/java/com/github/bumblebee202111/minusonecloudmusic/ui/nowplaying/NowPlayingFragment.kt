@@ -2,7 +2,6 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying
 
 import android.Manifest
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -79,7 +78,6 @@ class NowPlayingFragment : Fragment() {
     private val nowPlayingViewModel: NowPlayingViewModel by viewModels()
     private lateinit var playlistDialogController: PlaylistDialogController
 
-    private lateinit var resources: Resources
     private lateinit var playerListener: PlayerListener
     private lateinit var artworkView: ImageView
     private lateinit var toolbar: Toolbar
