@@ -12,7 +12,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.login.as
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.asEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.network.util.encodedAsBase64String
 import com.github.bumblebee202111.minusonecloudmusic.data.network.util.md5
-import com.github.bumblebee202111.minusonecloudmusic.utils.DeviceInfoProvider
+import com.github.bumblebee202111.minusonecloudmusic.utils.AppAndDeviceInfoProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -30,14 +30,14 @@ class LoginRepository @Inject constructor(
     private val preferenceStorage: PreferenceStorage,
     private val appDatabase: AppDatabase,
     private val networkDataSource: NetworkDataSource,
-    private val deviceInfoProvider: DeviceInfoProvider
+    private val appAndDeviceInfoProvider: AppAndDeviceInfoProvider
 ) {
     private val userDao = appDatabase.userDao()
     private var loginQrCodeKey: String? = null
 
     fun registerAnonymous(): Flow<Result<Unit?>> {
         val deviceId =
-            deviceInfoProvider.deviceId
+            appAndDeviceInfoProvider.deviceId
         val username = createUsername(deviceId)
         return apiResultFlow(
             fetch = { networkDataSource.registerAnonimous(username) },
@@ -155,7 +155,7 @@ class LoginRepository @Inject constructor(
     }
 
     fun sendCaptcha(phoneNumber: String) = apiResultFlow(
-        fetch = { networkDataSource.sendSMSCaptcha(phoneNumber) }
+        fetch = { networkDataSource.sendSmsCaptcha(phoneNumber) }
     ) { _ ->
     }
 

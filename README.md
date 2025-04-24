@@ -66,7 +66,6 @@ Provides a 99% pure music experience with basic support of ~~social features~~ (
 - Tablet/landscape support without special adaptations
 - Direct NCM API integration (new undiscovered endpoints)
 - `View`-based system & Single Activity architecture
-- Pseudo-random device specs from `deviceId` for privacy
 - **NOT** modified from the decompiled official app (despite visual similarities)
 - Does NOT hack music resources
 
@@ -97,13 +96,13 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 
 ## To-dos
 
-- Deprecate `dev` prefix  →  `beta`
 - Coil
-- Handle common errors gracefully
-- Introduce Compose for non-core player UI
-  - RecyclerView to LazyList migration
+- Code optimization
+  - Handle common errors gracefully
 
-- Fix login
+- Introduce Compose for non-core player UI
+  - Also migrate RecyclerView to LazyList
+
 - Dark theme support
 - Basic drawer
 - Request compressed images
@@ -233,7 +232,7 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 
 ## References
 
-- NCM app/service repos, including a well-known repo that has recently been shut down
+- NCM app/service repos, including a well-known one
 - Media3 references:
   - uamp-media3
   - horologist/media

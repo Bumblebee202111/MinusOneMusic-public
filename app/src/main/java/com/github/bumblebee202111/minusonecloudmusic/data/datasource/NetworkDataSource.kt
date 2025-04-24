@@ -1,6 +1,7 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.datasource
 
-import com.github.bumblebee202111.minusonecloudmusic.data.network.NCMAOkHttpClient
+import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmApiWService
+import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmaOkHttpClient
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmBapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmOkHttpClient
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalStdlibApi::class)
 class NetworkDataSource @Inject constructor(
-    @NCMAOkHttpClient val ncmaOkHttpClient: OkHttpClient,
+    @NcmaOkHttpClient val ncmaOkHttpClient: OkHttpClient,
     @NcmOkHttpClient val ncmHttpClient: OkHttpClient
 ) {
 
@@ -25,10 +26,11 @@ class NetworkDataSource @Inject constructor(
     @Suppress("DEPRECATION")
     private val ncmBapiService = NcmBapiService.create(ncmaOkHttpClient)
 
-
     private val eapiService = NcmEapiService.create(ncmHttpClient)
 
     private val weapiService = NcmWeapiService.create(ncmHttpClient)
+
+    private val apiWService = NcmApiWService.create(ncmHttpClient)
 
     suspend fun registerAnonimous(username: String) = this.eapiService.registerAnonimous(username)
 
@@ -36,11 +38,11 @@ class NetworkDataSource @Inject constructor(
 
     suspend fun getLoginStatus() = ncmBapiService.getLoginStatus()
 
-    suspend fun sendSMSCaptcha(phone: String) = this.eapiService.sendMSMCaptcha(phone)
+    suspend fun sendSmsCaptcha(phone: String) = eapiService.sendSmsCaptcha(phone)
 
     suspend fun cellphoneLogin(
         cellphone: String, password: String? = null, captcha: String? = null
-    ) = this.weapiService.cellphoneLogin(
+    ) = apiWService.cellphoneLogin(
         phone = cellphone,
         password = password,
         captcha = captcha,
@@ -48,60 +50,60 @@ class NetworkDataSource @Inject constructor(
 
     suspend fun verifyCaptcha(
         phone: String, captcha: String
-    ) = this.eapiService.verifyCaptcha(phone = phone, captcha = captcha)
+    ) = eapiService.verifyCaptcha(phone = phone, captcha = captcha)
 
-    suspend fun getUserDetail(uid: Long) = this.eapiService.getV1UserDetail(uid)
+    suspend fun getUserDetail(uid: Long) =eapiService.getV1UserDetail(uid)
 
-    suspend fun logout() = this.eapiService.logout()
+    suspend fun logout() = eapiService.logout()
 
     suspend fun getHomeDiscoveryPage(cursor: String) =
         eapiService.getHomepageBlockPage(cursor = cursor)
 
-    suspend fun getUserPlaylists(uid: Long) = this.eapiService.getUserPlaylists(uid)
+    suspend fun getUserPlaylists(uid: Long) = eapiService.getUserPlaylists(uid)
     suspend fun getStarMusicIds(): ApiResult<LikedSongApiResult> =
-        this.eapiService.getStarMusicIds()
+        eapiService.getStarMusicIds()
 
     suspend fun getUserFollows(
         uid: Long, offset: Int, limit: Int, order: Boolean = false
-    ) = this.eapiService.getUserFollows(uid, offset, limit, order)
+    ) = eapiService.getUserFollows(uid, offset, limit, order)
 
     suspend fun getUserFolloweds(
         uid: Long, offset: Int, limit: Int
-    ) = this.eapiService.getUserFolloweds(uid, offset, limit)
+    ) = eapiService.getUserFolloweds(uid, offset, limit)
 
     suspend fun getPlaylistV4Detail(
         id: Long, n: Int = 1000, s: Int = 5
-    ) = this.eapiService.getPlaylistDetail(id = id, n = n, s = s)
+    ) = eapiService.getPlaylistDetail(id = id, n = n, s = s)
 
     suspend fun getPlaylistPrivilege(
         id: Long, n: Int = 1000
-    ) = this.eapiService.getPlaylistPrivilege(id = id, n = n)
+    ) = eapiService.getPlaylistPrivilege(id = id, n = n)
 
     suspend fun getV6PlaylistDetail(
         id: Long, trackUpdateTime: Long = 0, n: Int = 1000, s: Int = 5
-    ) = this.eapiService.getMyPlaylistDetail(id, trackUpdateTime, n, s)
+    ) = eapiService.getMyPlaylistDetail(id, trackUpdateTime, n, s)
 
     suspend fun getToplistDetail(): ApiResult<List<NetworkBillboardGroup>> =
         eapiService.getTopListDetailsV2()
 
-    suspend fun getSongDetails(cJsonString: String) = this.eapiService.getSongDetails(cJsonString)
+    suspend fun getSongDetails(cJsonString: String) = eapiService.getSongDetails(cJsonString)
 
     suspend fun getCloudSongs(
         limit: Int, offset: Int = 0
     ) = this.eapiService.getV1Cloud(limit, offset)
 
-    suspend fun getSongEnhancePrivilege(ids: String) = this.eapiService.getSongEnhancePrivilege(ids)
+    suspend fun getSongEnhancePrivilege(ids: String) = eapiService.getSongEnhancePrivilege(ids)
 
     @Deprecated("Deprecated by NCM")
     suspend fun getSongUrl(
         ids: String, br: Int = MusicAudioQuality.EXHIGH.bitrate
-    ) = this.eapiService.getSongUrl(ids, br)
+    ) = eapiService.getSongUrl(ids, br)
 
     suspend fun getSongUrlsV1(
         ids: String, level: String = MusicAudioQuality.EXHIGH.level
-    ) = this.eapiService.getSongUrlsV1(ids, level)
+    ) = eapiService.getSongUrlsV1(ids, level)
 
-    suspend fun getSongLyrics(songId: Long) = this.eapiService.getSongLyrics(songId)
+    suspend fun getSongLyrics(songId: Long) = eapiService.getSongLyrics(songId)
 
     suspend fun getSongLikeCount(songId: Long) = eapiService.getSongRedCount(songId)
 
@@ -112,13 +114,13 @@ class NetworkDataSource @Inject constructor(
     suspend fun getCommentInfoResourceList(songId: String) =
         eapiService.getCommentInfoResourceList(songId)
 
-    suspend fun getRecommendSongs() = this.eapiService.getV3DiscoveryRecommendSongs()
+    suspend fun getRecommendSongs() = eapiService.getV3DiscoveryRecommendSongs()
 
-    suspend fun getMyRecentMusic(limit: Int = 300) = this.eapiService.getMyRecentMusic(limit)
+    suspend fun getMyRecentMusic(limit: Int = 300) = eapiService.getMyRecentMusic(limit)
 
     suspend fun getAlbumSublist(
         limit: Int, offset: Int
-    ) = this.eapiService.getAlbumSublist(limit, offset)
+    ) = eapiService.getAlbumSublist(limit, offset)
 
     suspend fun getMlogMyCollectByTime(
         limit: Int
