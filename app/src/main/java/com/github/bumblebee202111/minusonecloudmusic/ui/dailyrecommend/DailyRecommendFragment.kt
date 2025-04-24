@@ -73,10 +73,9 @@ class DailyRecommendFragment : Fragment() {
                     adapter.submitList(it)
                 }
             }
-            repeatWithViewLifecycle {
-                launch {
-                    viewModel.player.collect(miniPlayerBarController::setPlayer)
-                }
+
+            launch {
+                viewModel.player.collect(miniPlayerBarController::setPlayer)
             }
         }
     }
