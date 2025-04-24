@@ -1,10 +1,10 @@
 # MinusOne Music
 
-MinusOne Cloud Music (减一云音乐, also _MinusOne Music_ as app name) is a lite third-party NCM app for Android.
+**MinusOne Cloud Music** (减一云音乐, app name _MinusOne Music_) is a lite, third-party NCM app for Android.
 
-In developing this app, I will explore how to create a more complex app. The focus is not on creativity but on the technical aspects of implementing core features of NCM using relatively modern approaches.
+This project explores building complex apps by implementing core NCM features using modern Android approaches. Focus is on technical implementation rather than creativity.
 
-Note: I am very inexperienced and this app is at a very early stage of development. Current progress by screens:
+Note: Early development stage. Current progress by screens:
 
 - Well Implemented
 
@@ -23,7 +23,7 @@ Note: I am very inexperienced and this app is at a very early stage of developme
 
 - Partial Implementation
 
-  - **密码登录/退出登录**
+  - **验证码登录**/**密码登录**[broken]/**退出登录**
   - 我的
     - **最近播放—歌曲**
     - **云盘**
@@ -35,48 +35,56 @@ Note: I am very inexperienced and this app is at a very early stage of developme
   - **搜索（“综合”Tab之“单曲”）**
   - **评论（Hottest Page 1）**
 
-> - 所述界面一般不包括二级界面等
+> - 所列界面一般不包括二级界面等
 > - Other UI elements, pages or functionalities are nowhere near completed although some drafts exist.
 
-_**The project is currently in [maintenance](#wtm) mode**, meaning no major new features will be implemented in the short term. However, its development doesn't stop and I'm open to considering user requests that are not overly complex._
+**Known issues:**
 
-> - Focus has now shifted a little bit away from mobile Android dev to other areas.
-> - Occasionally, I will also code for [doubean](https://github.com/Bumblebee202111/doubean-public).
+- Historically, code really badly written
+- Cellphone login broken
 
 ## Features
 
-It will provide a 99% pure music experience with basic support of ~~social features~~ (not implemented yet).
+Provides a 99% pure music experience with basic support of ~~social features~~ (not implemented yet).
 
-- **-1 (jiǎn yī)!** No ads. No podcasts. No square. Fewer VIP UI elements. Tailored UI content. Incredibly small APK size.
+- **-1 (jiǎn yī)!** 
 
-  > [Here](#intd) are important non-to-dos
+  - No ads/podcasts/square
 
-  - Core functionalities and UI retained, but only on a best-effort basis.
-  - Non additive or subtractive modifications. Some convenient UI/behavior changes can be toggled in Settings (not implemented yet).
-  - No extra features.
+  - Minimal VIP UI elements
 
-- Music playback.
-- _Natural_ (without special adaptations) tablet/landscape support.
-- Direct up-to-date NCM service provided. You will see a lot of new interfaces that haven't been discovered by any other developer.
-- Uses `View`-based system & Single Activity architecture.
-- Uses `deviceId` as the seed to _pseudo_-randomly generate device specs for privacy.
-- Is NOT modified from the decompiled official NCM app although the two apps look very similar.
-- Does NOT hack music resources.
+  - Tailored UI content
+
+  - Incredibly small APK size
+
+  - Core functionalities and UI retained, but only on a best-effort basis
+  - Non-additive or subtractive modifications (some UI/behavior changes will be togglable in Settings)
+  - No extra features
+> [Here](#intd) are important non-to-dos
+
+- Music playback
+- Tablet/landscape support without special adaptations
+- Direct NCM API integration (new undiscovered endpoints)
+- `View`-based system & Single Activity architecture
+- **NOT** modified from the decompiled official app (despite visual similarities)
+- Does NOT hack music resources
 
 ## Notices
 
-It is strongly encouraged to use the official NCM app rather than third-party ones like mine. If you insist in using my app, please agree on the following restrictions, which can change over time:
+It is strongly encouraged to use the official NCM app. If using this app, you agree to:
 
-- The official app must be installed and co-exist with it.
-- The docs are written in broken English.
-- The app is almost fully **closed source**. (Maintaining an extra semi-open code base would lead to heavy burden!) hence the simple public repo. If you don't trust me, you can reverse-engineer the app. If interested in some non-NCM-bound code, feel free to request it.
+- Must coexist with official NCM app
+- Documentation is in broken English
+- **Closed source** (reverse-engineer if needed)
+  - Non-NCM code available on request
+  - Future public repo sync planned
 
 ### Your do's and don'ts
 
-- Please use it only for personal learning purposes.
-- Please don't share it on other websites/apps without permission.
+- Use only for personal learning purposes
+- Do not share without permission
 
-## Screenshot
+## Screenshots
 
 <img src="docs\screenshots\Screenshot_main.png" alt="Main" width=160 /><img src="docs\screenshots\Screenshot_discover.png" alt="Discover" width=160 /> <img src="docs\screenshots\Screenshot_top_lists.png" alt="Top lists" width=160 />
 <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=160 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=400/> <img src="docs\screenshots\Screenshot_comments_landscape.png" alt="Comments (landscape)" width=320 />
@@ -88,20 +96,18 @@ It is strongly encouraged to use the official NCM app rather than third-party on
 
 ## To-dos
 
-- <span id="wtm">What to maintain</span>
-  - Minor adjustments
-    - ...
-  - Code optimizations
-  - User requests are open
+- Coil
+- Code optimization
+  - Handle common errors gracefully
+
+- Introduce Compose for non-core player UI
+  - Also migrate RecyclerView to LazyList
+
+- Observe & remove non EAPI services
 - Dark theme support
 - Basic drawer
-- Update UI for latest NCM
-  - Discover
-  - Mini player bar
-  - Player screen
-  - Should be delayed until at least NCM 9.1.10 when the official UI is more "stable"
-- Release alpha on arrival of new star/issue
-- Play log (need help)
+- Request compressed images
+- Play log (help needed)
 - New screens / major features
   - Personal FMs
   - Friends
@@ -115,10 +121,10 @@ It is strongly encouraged to use the official NCM app rather than third-party on
     - Fix top shadow
   - Transition between Mini Player Bar & Now Playing
   - Now Playing
-    - Use light status bar text
+    - Light status bar text
     - Follow
-    - Provide bottom volume bar dialog (instead of showing sytem volume toast) for systems of lower versions (where the built-in output switcher dialog is unavailable).
-    - Use LinearLayout with "weight" things for control buttons
+    - Volume control dialog for legacy systems
+    - LinearLayout weight distribution for controls
     - Disk rotation like https://music.163.com/m/song
   - Playlist UI items
     - Actions
@@ -140,8 +146,11 @@ It is strongly encouraged to use the official NCM app rather than third-party on
 - Arch
   - Use `Channel` to manage Toast-s
   - Sync user data with `WorkManager`
-  - More caching when `RemoteMediator` becomes non-experimental
-    - Playlist, lyrics ...
+  - More caching: Playlist, lyrics ...
+- Update UI for latest NCM
+  - Discover
+  - Mini player bar
+  - Player screen
 - Settings
   - About
   - Link of APK of latest NCM
@@ -158,24 +167,19 @@ It is strongly encouraged to use the official NCM app rather than third-party on
 - Download: advanced
 - Login: SMS captcha login
 - Firebase Crashlytics
-- Compose: Write non-NCM screens in Compose
-- Qualification: Add quiz activity/app based on JetSurvey
+- Add 底部导航自定义
+  - Since the official support is back
+- Qualification: Add quiz activity/app based on JetSurvey (?)
 
 ### <span id="intd">Important non-to-dos</span>
 
-- Search Tabs other than the default, search pagination
+- Additional search tabs/pagination
 - Custom default audio quality (320 kbps is preferred when making requests)
-- Support 32-bit systems or ones with android versions lower than 6.0 Marshmallow (API level 23)
 - Advanced cover disk
-- Add 底部导航自定义
-  - Since it loses the official support
 
-## Libraries used
+## Tech Stack
 
-- [Foundation][foundation]
-  - [AppCompat][appcompat]
-  - [Android KTX][android-ktx]
-  - [Test][test] \(TODO\)
+- [Foundation][foundation]: [Android KTX][android-ktx]
 - [Architecture][arch]
   - [Data Binding][data-binding]
   - [Lifecycles][lifecycle]
@@ -201,9 +205,7 @@ It is strongly encouraged to use the official NCM app rather than third-party on
   - PersistentCookieJar
 
 [foundation]: https://developer.android.com/jetpack/components
-[appcompat]: https://developer.android.google.cn/jetpack/androidx/releases/appcompat
 [android-ktx]: https://developer.android.com/kotlin/ktx
-[test]: https://developer.android.com/training/testing/
 [arch]: https://developer.android.com/jetpack/arch/
 [data-binding]: https://developer.android.com/topic/libraries/data-binding/
 [lifecycle]: https://developer.android.com/topic/libraries/architecture/lifecycle
@@ -218,7 +220,6 @@ It is strongly encouraged to use the official NCM app rather than third-party on
 [layout]: https://developer.android.com/guide/topics/ui/declaring-layout
 [notifications]: https://developer.android.com/develop/ui/views/notifications
 [retrofit]: https://square.github.io/retrofit/
-[apache-commons]: https://commons.apache.org/
 [glide]: https://bumptech.github.io/glide/
 [kotlin-coroutines]: https://kotlinlang.org/docs/reference/coroutines-overview.html
 
@@ -228,11 +229,11 @@ It is strongly encouraged to use the official NCM app rather than third-party on
 
 - HTTPCanary
 
-- Various online crypto tools
+- Crypto tools
 
 ## References
 
-- Countless NCM app/service repos, including a well-known repo that has recently been shut down
+- NCM app/service repos, including a well-known one
 - Media3 references:
   - uamp-media3
   - horologist/media
@@ -243,8 +244,7 @@ It is strongly encouraged to use the official NCM app rather than third-party on
 <details>
     <summary>Misc.</summary>
 <p>
-    - Initially, I named it as 'NaCl'. Letters extracted from that of the official NCE app, it indicated that this third-party variant would be a lite alternative to the official one, due to technical skill limitations and omission of useless features. However, I found that Salt Music, another existing well-designed music app had a similar name. Now my app has been renamed to MinusOne Cloud Music, matching both of the '-1'
-    slogan and the name format of NCM. 
+    - Initially, I named it as 'NaCl'. Letters extracted from that of the official NCM app, it indicated that this third-party variant would be a lite alternative to the official one, due to technical skill limitations and omission of useless features. However, I found that Salt Music, another existing well-designed music app had a similar name. Now my app has been renamed to MinusOne Cloud Music, matching both of the '-1' slogan and the name format of NCM. 
     </p>
 <p>
     - Security and cryptography. We do use the very basic of NDK, which is apparently redundant in non-toy apps but worth for learning purposes.

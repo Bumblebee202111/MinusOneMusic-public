@@ -1,12 +1,22 @@
 Change Log
 ==========
 
+## Version 1.0.0-beta01
+
+- Possibly support captcha login
+  - Password login does not work and is hidden
+- Improve request headers
+  - Update NCM parameters to 9.2.85
+  - Replace pseudo-random device specs with real ones to standardize api requests
+- Code optimizations (still terrible) & bug fixes
+- Update dependencies
+
+
 ## Version 1.0.0-dev12 (baseline: NCM 9.1.00)
 
 - Top Lists: Hide Look
 - Introduce compressed images
   - This massively improves network image experience & saves a lot of network usage
-
 - Update item icon of Listen Rank
 - Daily Recommend: Fix list type regression
 - Latest UI is not introduced in this version
