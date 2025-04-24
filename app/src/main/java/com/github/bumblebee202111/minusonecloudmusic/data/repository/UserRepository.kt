@@ -1,6 +1,7 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
 import androidx.room.withTransaction
+import com.github.bumblebee202111.minusonecloudmusic.data.Result
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserDetailEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserPlaylistEntity
@@ -9,6 +10,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.database.model.populat
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.populated.asExternalModel
 import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
+import com.github.bumblebee202111.minusonecloudmusic.data.model.FollowedUserProfile
 import com.github.bumblebee202111.minusonecloudmusic.data.model.UserDetail
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.combine
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.MusicInfoApiModel
@@ -19,6 +21,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.recentpl
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.asEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.asExternalModel
 import com.squareup.moshi.JsonAdapter
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -97,7 +100,7 @@ class UserRepository @Inject constructor(
     })
 
 
-    fun getUserFollows(userId: Long, offset: Int = 0, limit: Int = 20) =
+    fun getUserFollows(userId: Long, offset: Int = 0, limit: Int = 20): Flow<Result<List<FollowedUserProfile>>> =
         apiResultFlow(fetch = { networkDataSource.getUserFollows(userId, offset, limit) },
             mapSuccess = { result ->
                 return@apiResultFlow result.follow.map { it.asExternalModel() }
