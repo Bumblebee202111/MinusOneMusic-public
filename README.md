@@ -23,7 +23,7 @@ Note: Early development stage. Current progress by screens:
 
 - Partial Implementation
 
-  - **密码登录/退出登录** *[broken]*
+  - **验证码登录**/**密码登录**[broken]/**退出登录**
   - 我的
     - **最近播放—歌曲**
     - **云盘**
