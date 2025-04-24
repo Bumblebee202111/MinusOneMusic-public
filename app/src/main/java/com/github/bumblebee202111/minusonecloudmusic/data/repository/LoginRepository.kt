@@ -69,11 +69,13 @@ class LoginRepository @Inject constructor(
                             is ApiResult.ApiSuccessResult -> {
                                 emit(Result.Success(loginQrCodeResponse.data.qrimg))
                             }
+
                             is ApiResult.ApiErrorResult -> {
                                 emit(Result.Error(Exception(loginQrCodeResponse.message)))
                             }
                         }
                     }
+
                     is ApiResult.ApiErrorResult -> {
                         emit(Result.Error(Exception(loginQrCodeKeyResponse.message)))
                     }
@@ -165,31 +167,32 @@ class LoginRepository @Inject constructor(
 
 
     fun loginWithCaptcha(phoneNumber: String, captcha: String) =
-        apiResultFlow(fetch = {
-            networkDataSource.cellphoneLogin(
-                cellphone = phoneNumber,
-                captcha = captcha
-            )
-        },
+        apiResultFlow(
+            fetch = {
+                networkDataSource.cellphoneLogin(
+                    cellphone = phoneNumber,
+                    captcha = captcha
+                )
+            },
             mapSuccess = { result ->
                 setLoggedInUserId(result.account.id)
                 setAnonymousUserId(null)
+                userDao.insertUserProfile(result.profile.asEntity())
                 result
             })
 
     fun loginWithPassword(phoneNumber: String, password: String) =
-        apiResultFlow(fetch = {
-            networkDataSource.cellphoneLogin(
-                cellphone = phoneNumber,
-                password = password.toByteArray().md5().toHexString()
-            )
-        },
+        apiResultFlow(
+            fetch = {
+                networkDataSource.cellphoneLogin(
+                    cellphone = phoneNumber,
+                    password = password.toByteArray().md5().toHexString()
+                )
+            },
             mapSuccess = { result ->
                 setLoggedInUserId(result.account.id)
                 setAnonymousUserId(null)
-                appDatabase.withTransaction {
-                    userDao.insertUserProfile(result.profile.asEntity())
-                }
+                userDao.insertUserProfile(result.profile.asEntity())
                 result
             })
 
