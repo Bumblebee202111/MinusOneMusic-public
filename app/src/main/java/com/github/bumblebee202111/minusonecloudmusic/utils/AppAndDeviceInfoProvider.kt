@@ -72,7 +72,7 @@ class AppAndDeviceInfoProvider @Inject constructor(@ApplicationContext private v
         val config = context.resources.configuration
         val smallestScreenWidthDp = config.smallestScreenWidthDp
         Log.d(
-            TAG,            "Determining screen type based on smallestScreenWidthDp: $smallestScreenWidthDp"
+            TAG, "Determining screen type based on smallestScreenWidthDp: $smallestScreenWidthDp"
         )
         return when {
             smallestScreenWidthDp >= 600 -> "pad"

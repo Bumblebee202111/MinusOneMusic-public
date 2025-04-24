@@ -103,6 +103,7 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 - Introduce Compose for non-core player UI
   - Also migrate RecyclerView to LazyList
 
+- Observe & remove non EAPI services
 - Dark theme support
 - Basic drawer
 - Request compressed images

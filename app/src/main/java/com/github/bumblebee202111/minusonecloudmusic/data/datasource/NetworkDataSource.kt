@@ -22,15 +22,10 @@ class NetworkDataSource @Inject constructor(
     @NcmOkHttpClient val ncmHttpClient: OkHttpClient
 ) {
 
-
     @Suppress("DEPRECATION")
     private val ncmBapiService = NcmBapiService.create(ncmaOkHttpClient)
 
     private val eapiService = NcmEapiService.create(ncmHttpClient)
-
-    private val weapiService = NcmWeapiService.create(ncmHttpClient)
-
-    private val apiWService = NcmApiWService.create(ncmHttpClient)
 
     suspend fun registerAnonimous(username: String) = this.eapiService.registerAnonimous(username)
 
@@ -42,7 +37,7 @@ class NetworkDataSource @Inject constructor(
 
     suspend fun cellphoneLogin(
         cellphone: String, password: String? = null, captcha: String? = null
-    ) = apiWService.cellphoneLogin(
+    ) = eapiService.cellphoneLogin(
         phone = cellphone,
         password = password,
         captcha = captcha,

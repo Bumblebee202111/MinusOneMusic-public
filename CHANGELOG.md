@@ -9,6 +9,7 @@ Change Log
   - Update NCM parameters to 9.2.85
   - Replace pseudo-random device specs with real ones to standardize api requests
 - Code optimizations (still terrible) & bug fixes
+- Update dependencies
 
 
 ## Version 1.0.0-dev12 (baseline: NCM 9.1.00)
