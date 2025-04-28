@@ -199,7 +199,7 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 - Third party and miscellaneous libraries
   - javax.crypto
   - [Retrofit][retrofit]
-  - [Glide][glide]
+  - Coil
   - [Kotlin Coroutines][kotlin-coroutines]
   - Moshi
   - PersistentCookieJar
@@ -220,7 +220,6 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 [layout]: https://developer.android.com/guide/topics/ui/declaring-layout
 [notifications]: https://developer.android.com/develop/ui/views/notifications
 [retrofit]: https://square.github.io/retrofit/
-[glide]: https://bumptech.github.io/glide/
 [kotlin-coroutines]: https://kotlinlang.org/docs/reference/coroutines-overview.html
 
 ## Utilities used

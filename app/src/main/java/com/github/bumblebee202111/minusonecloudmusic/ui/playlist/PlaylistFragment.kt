@@ -13,11 +13,14 @@ import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
+import coil3.load
+import coil3.request.error
+import coil3.request.placeholder
+import coil3.size.Scale
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentPlaylistBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.extractDominantColor
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.applyDominantColor
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.setBackgroundColorAndTopCorner
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.PagedSongWithPositionAdapter
@@ -106,24 +109,36 @@ class PlaylistFragment : AbstractPlaylistFragment() {
                 viewModel.playlistDetail.collect {
                     val playlistCover = it?.coverImgUrl ?: return@collect
                     Log.d("fuvk", playlistCover)
-                    Glide.with(binding.playlistCover).load(playlistCover)
-                        .placeholder(R.drawable.h_1)
-                        .extractDominantColor(binding.gradientBg, Color.BLACK, 0.45F, 0.75F)
-                        .optionalCenterCrop().into(binding.playlistCover)
+                    binding.playlistCover.load(playlistCover) {
+                        placeholder(R.drawable.h_1)
+                        error(R.drawable.h_1)
+                        listener(
+                            onSuccess = { _, result ->
+                                applyDominantColor(
+                                    result = result,
+                                    targetView = binding.gradientBg,
+                                    defaultColor = Color.BLACK,
+                                    minL = 0.45F,
+                                    maxL = 0.75F
+                                )
+                            },
+                            onError = { _, _ ->
+                                binding.gradientBg.setBackgroundColor(Color.BLACK)
+                            }
+                        )
+
+                    }
+
 
                 }
+                launch {
+                    viewModel.playlistSongs.collectLatest {
+                        songAdapter.submitData(it)
 
-
-            }
-            launch {
-                viewModel.playlistSongs.collectLatest {
-                    songAdapter.submitData(it)
-
+                    }
                 }
             }
+
         }
-
     }
-
-
 }

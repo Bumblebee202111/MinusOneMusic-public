@@ -13,7 +13,7 @@ import androidx.media3.common.Timeline
 import androidx.media3.common.util.Assertions
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
-import com.bumptech.glide.Glide
+import coil3.load
 import com.github.bumblebee202111.minusonecloudmusic.R
 
 
@@ -181,10 +181,7 @@ class MiniPlayerBarView @JvmOverloads constructor(
 
         val mediaMetadata = player.mediaMetadata
 
-        artworkView?.let { artworkView ->
-            Glide.with(artworkView.context)
-                .load(mediaMetadata.artworkUri ?: mediaMetadata.artworkData).into(artworkView)
-        }
+        artworkView?.load(mediaMetadata.artworkUri ?: mediaMetadata.artworkData)
 
         titleAndArtistView?.setTitleAndArtist(
             mediaMetadata.title.toString(),

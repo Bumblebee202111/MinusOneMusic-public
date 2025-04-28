@@ -13,7 +13,7 @@ object ColorUtils {
         @ColorInt defaultColor: Int,
         minL: Float,
         maxL: Float,
-        onGenerated: Int.() -> Unit
+        onGenerated: (color: Int) -> Unit
     ) {
         Palette.from((drawable as BitmapDrawable).bitmap).generate { palette ->
             val dominantColor = palette?.getDominantColor(

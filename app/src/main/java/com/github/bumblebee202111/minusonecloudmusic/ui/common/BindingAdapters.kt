@@ -1,7 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import android.text.Spanned
@@ -13,14 +12,19 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.graphics.toColorInt
 import androidx.databinding.BindingAdapter
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import coil3.load
+import coil3.request.crossfade
+import coil3.request.error
+import coil3.request.placeholder
+import coil3.request.transformations
+import coil3.transform.CircleCropTransformation
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.utils.imageUrl
 import kotlin.math.roundToInt
-import androidx.core.graphics.toColorInt
-import androidx.core.graphics.drawable.toDrawable
 
 
 
@@ -40,58 +44,51 @@ fun TextView.bindIsFakeBoldText(isFakeBoldText: Boolean) {
     value = ["image", "thumbnailSize", "quality", "circleCrop", "placeholder", "crossFadeDuration"],
     requireAll = false
 )
-fun ImageView.image(
+fun ImageView.loadImage(
     model: Any?,
     thumbnailSize: Int? = null,
     quality: Int? = null,
     circleCrop: Boolean? = false,
-    placeholder: Drawable? = null,
+    placeholder: Any? = null,
     crossFadeDuration: Int? = null
 ) {
-    if (model == null && placeholder == null) return
+    val placeholderDrawable: Drawable? = when (placeholder) {
+        is Drawable -> placeholder
+        is Int -> try {
+            ResourcesCompat.getDrawable(resources,placeholder,null)
+        } catch (e: Exception) { null }
+        is String -> try {
+            placeholder.toColorInt().toDrawable()
+        } catch (e: Exception) { null }
+        else -> null
+    }
 
-    val remoteImageUrl = if (model is String) {
+    val dataToLoad = if (model is String) {
         model.imageUrl(thumbnailSize = thumbnailSize, quality = quality)
     } else {
         model
     }
-    var rb = Glide.with(context).load(remoteImageUrl ?: placeholder)
-    with(rb) {
-        if (model != null && placeholder != null) {
-            rb = placeholder(placeholder)
+
+    if (dataToLoad == null && placeholderDrawable == null) {
+        this.setImageDrawable(null)
+        return
+    }
+
+    load(dataToLoad) {
+        if (placeholderDrawable != null) {
+            placeholder(placeholderDrawable)
+            error(placeholderDrawable)
         }
         if (circleCrop == true) {
-            rb = optionalCircleCrop()
+            transformations(CircleCropTransformation())
         }
         if (crossFadeDuration != null) {
-            rb = transition(DrawableTransitionOptions.withCrossFade(crossFadeDuration))
+            crossfade(crossFadeDuration)
+        } else {
+            crossfade(true)
         }
-        into(this@image)
     }
 }
-
-@BindingAdapter(
-    value = ["image", "thumbnailSize", "quality", "circleCrop", "placeholder", "crossFadeDuration"],
-    requireAll = false
-)
-fun ImageView.image(
-    model: Any?,
-    thumbnailSize: Int? = null,
-    quality: Int? = null,
-    circleCrop: Boolean? = false,
-    placeholder: String? = null,
-    crossFadeDuration: Int? = null
-) {
-    image(
-        model = model,
-        thumbnailSize = thumbnailSize,
-        quality = quality,
-        circleCrop = circleCrop,
-        placeholder = placeholder?.toColorInt()?.toDrawable(),
-        crossFadeDuration = crossFadeDuration
-    )
-}
-
 
 
 @BindingAdapter("android:text")

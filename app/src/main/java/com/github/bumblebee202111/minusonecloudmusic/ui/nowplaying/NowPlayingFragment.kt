@@ -3,7 +3,6 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying
 import android.Manifest
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.media.AudioDeviceCallback
 import android.media.AudioDeviceInfo
@@ -44,9 +43,14 @@ import androidx.media3.ui.TimeBar
 import androidx.mediarouter.app.SystemOutputSwitcherDialogController
 import androidx.navigation.findNavController
 import androidx.palette.graphics.Palette
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
+import coil3.BitmapImage
+import coil3.asDrawable
+import coil3.load
+import coil3.request.allowHardware
+import coil3.request.error
+import coil3.request.placeholder
+import coil3.request.transformations
+import coil3.transform.CircleCropTransformation
 import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
@@ -518,39 +522,39 @@ class NowPlayingFragment : Fragment() {
         songActionsTitleView.text = mediaMetadata.title
         songActionsArtistView.text = mediaMetadata.artist
 
+        val defaultBgColor = ContextCompat.getColor(artworkView.context, R.color.default_player_background)
 
-        Glide.with(artworkView.context).load(mediaMetadata.artworkUri ?: mediaMetadata.artworkData)
-            .placeholder(defaultArtwork)
-            .optionalCircleCrop()
-            .into(object : CustomTarget<Drawable>() {
-                override fun onResourceReady(
-                    resource: Drawable,
-                    transition: Transition<in Drawable>?
-                ) {
-                    val drawable = resource as BitmapDrawable
+        artworkView.load(mediaMetadata.artworkUri ?: mediaMetadata.artworkData) {
+            placeholder(defaultArtwork)
+            error(defaultArtwork)
+            transformations(CircleCropTransformation())
+            allowHardware(false)
 
-                    Palette.from(drawable.bitmap).generate { palette ->
-                        val dominantColor = palette?.getDominantColor(
-                            resources.getColor(
-                                R.color.default_player_background,
-                                null
-                            )
-                        )
-                            ?: resources.getColor(R.color.default_player_background, null)
-                        val hsl = FloatArray(3)
-                        ColorUtils.colorToHSL(dominantColor, hsl)
+            target(
+                onError = { error ->
+                    artworkView.setImageDrawable(error?.asDrawable(resources))
+                    binding.bigAlbumCover.setBackgroundColor(defaultBgColor)
+                },
+                onSuccess = { result ->
+                    artworkView.setImageDrawable(result.asDrawable(resources))
 
-                        hsl[2] = hsl[2].coerceIn(0.15F, 0.45F)
-                        binding.bigAlbumCover.setBackgroundColor(Color.HSVToColor(hsl))
+                    if (result is BitmapImage) {
+                        val bitmap = result.bitmap
+                        Palette.from(bitmap).generate { palette ->
+                            val dominantColor = palette?.getDominantColor(defaultBgColor) ?: defaultBgColor
+                            val hsl = FloatArray(3)
+                            ColorUtils.colorToHSL(dominantColor, hsl)
+
+                            hsl[2] = hsl[2].coerceIn(0.15F, 0.45F)
+
+                            binding.bigAlbumCover.setBackgroundColor(Color.HSVToColor(hsl))
+                        }
+                    } else {
+                        binding.bigAlbumCover.setBackgroundColor(defaultBgColor)
                     }
-
-                    artworkView.setImageDrawable(drawable)
                 }
-
-                override fun onLoadCleared(placeholder: Drawable?) {
-                }
-
-            })
+            )
+        }
 
     }
 
