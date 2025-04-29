@@ -13,9 +13,9 @@ import androidx.fragment.app.viewModels
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDailyRecommendBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistDialogController
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.SongWithAlbumAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,8 +31,7 @@ class DailyRecommendFragment : Fragment() {
 
     private lateinit var binding: FragmentDailyRecommendBinding
     val viewModel: DailyRecommendViewModel by viewModels()
-    private lateinit var playlistDialogController: PlaylistDialogController
-    private lateinit var miniPlayerBarController: MiniPlayerBarController
+    private lateinit var uiHelper: PlaylistFragmentUIHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,11 +47,11 @@ class DailyRecommendFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        playlistDialogController = PlaylistDialogController(parentFragmentManager)
-        miniPlayerBarController = MiniPlayerBarController(
+        uiHelper = PlaylistFragmentUIHelper(
+            fragment = this,
             view = view,
             navController = findNavController(),
-            playlistDialogController = playlistDialogController
+            playAllAction = viewModel::playAll
         )
 
         binding.toolbar.setNavigationOnClickListener {
@@ -73,15 +72,16 @@ class DailyRecommendFragment : Fragment() {
                     adapter.submitList(it)
                 }
             }
-
             launch {
-                viewModel.player.collect(miniPlayerBarController::setPlayer)
+                viewModel.player.collect {
+                    binding.miniPlayerBar.player = it
+                }
             }
         }
     }
 
     override fun onStop() {
         super.onStop()
-        miniPlayerBarController.onStop()
+        uiHelper.onStop()
     }
 }

@@ -1,5 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.clouddisk
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.map
@@ -9,7 +10,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUse
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongPagingDataFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistViewModel
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlaybackHandler
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,7 +26,7 @@ class MyPrivateCloudViewModel @Inject constructor(
     private val mapSongPagingDataFlowToUiItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase,
     musicServiceConnection: MusicServiceConnection,
     playPlaylistUseCase: PlayPlaylistUseCase
-) : AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
+) : ViewModel() {
 
     val player = musicServiceConnection.player
 
@@ -42,7 +43,7 @@ class MyPrivateCloudViewModel @Inject constructor(
         }
     }.stateInUi(0)
 
-    override val loadedSongs: MutableList<RemoteSong> = mutableListOf()
+    val loadedSongs: MutableList<RemoteSong> = mutableListOf()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val songUiItemsPagingData = isLoggedIn.flatMapLatest { isLoggedIn ->
@@ -59,7 +60,14 @@ class MyPrivateCloudViewModel @Inject constructor(
         }
     }
 
-    override val loadRemainingSongs: suspend () -> List<RemoteSong> ={
-       loggedInUserDataRepository.getAllCloudSongs(loadedSongs.size)
-    }
+    private val playbackHandler = PlaylistPlaybackHandler(
+        playPlaylistUseCase = playPlaylistUseCase,
+        scope = viewModelScope,
+        getLoadedSongs = { loadedSongs },
+        loadRemainingSongs = {
+            loggedInUserDataRepository.getAllCloudSongs(start = loadedSongs.size)
+        }
+    )
+    fun onSongItemClick(startIndex: Int) = playbackHandler.onSongItemClick(startIndex)
+    fun playAll() = playbackHandler.playAll()
 }

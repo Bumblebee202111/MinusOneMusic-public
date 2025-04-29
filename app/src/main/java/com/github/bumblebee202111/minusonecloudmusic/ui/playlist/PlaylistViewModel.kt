@@ -1,6 +1,7 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.playlist
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -14,7 +15,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRep
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongPagingDataFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistViewModel
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlaybackHandler
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,7 +36,7 @@ class PlaylistViewModel @Inject constructor(
     playPlaylistUseCase: PlayPlaylistUseCase,
     private val getPlaylistSongItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase
 ) :
-    AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
+    ViewModel() {
 
 
     private val args = PlaylistFragmentArgs.fromSavedStateHandle(savedStateHandle)
@@ -51,7 +52,7 @@ class PlaylistViewModel @Inject constructor(
     private val _songs = MutableStateFlow<PagingData<SongItemUiModel>?>(null)
     val playlistSongs get() = _songs.filterNotNull().cachedIn(viewModelScope)
 
-    override val loadedSongs = mutableListOf<RemoteSong>()
+    val loadedSongs = mutableListOf<RemoteSong>()
 
     init {
         viewModelScope.launch {
@@ -80,11 +81,18 @@ class PlaylistViewModel @Inject constructor(
         }
     }
 
-    override val loadRemainingSongs: (suspend () -> List<RemoteSong>) = {
-        val allSongs = playlistDetail.value?.allSongs
-        if (allSongs != null) {
-            songRepository.getSongDetails(allSongs.map(SimpleRemoteSong::id))
+    private val playbackHandler = PlaylistPlaybackHandler(
+        playPlaylistUseCase = playPlaylistUseCase,
+        scope = viewModelScope,
+        getLoadedSongs = { loadedSongs },
+        loadRemainingSongs = {
+            val allSongs = playlistDetail.value?.allSongs
+            if (allSongs != null) {
+                songRepository.getSongDetails(allSongs.map(SimpleRemoteSong::id))
+            }
+            emptyList()
         }
-        emptyList()
-    }
+    )
+    fun onSongItemClick(startIndex: Int) = playbackHandler.onSongItemClick(startIndex)
+    fun playAll() = playbackHandler.playAll()
 }

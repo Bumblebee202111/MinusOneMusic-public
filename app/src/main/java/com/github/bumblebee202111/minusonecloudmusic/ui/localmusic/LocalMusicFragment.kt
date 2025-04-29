@@ -9,23 +9,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentLocalMusicBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.SimpleSongAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class LocalMusicFragment : AbstractPlaylistFragment() {
+class LocalMusicFragment : Fragment() {
 
     companion object {
         fun newInstance() = LocalMusicFragment()
     }
 
-    override val viewModel: LocalMusicViewModel by viewModels()
+    val viewModel: LocalMusicViewModel by viewModels()
     private lateinit var binding: FragmentLocalMusicBinding
+    private lateinit var uiHelper: PlaylistFragmentUIHelper
     private lateinit var adapter: SimpleSongAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,7 +43,12 @@ class LocalMusicFragment : AbstractPlaylistFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        uiHelper = PlaylistFragmentUIHelper(
+            fragment = this,
+            view = view,
+            navController = findNavController(),
+            playAllAction = viewModel::playAll
+        )
         adapter = SimpleSongAdapter(viewModel::onSongItemClick)
         binding.list.adapter = adapter
         val requestPermissionLauncher =
@@ -64,9 +72,16 @@ class LocalMusicFragment : AbstractPlaylistFragment() {
                 viewModel.songItems.collect(adapter::submitList)
             }
             launch {
-                viewModel.player.collect(miniPlayerBarController::setPlayer)
+                viewModel.player.collect {
+                    binding.miniPlayerBar.player = it
+                }
             }
         }
+    }
+
+    override fun onStop() {
+        uiHelper.onStop()
+        super.onStop()
     }
 
     private fun onPermissionGranted() {

@@ -1,14 +1,15 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.recentplay
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.AppDispatchers
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.Dispatcher
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.MyRecentMusicData
-import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.UserRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongsFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.AbstractPlaylistViewModel
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlaybackHandler
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,8 +24,7 @@ class MyRecentPlayViewModel @Inject constructor(
     playPlaylistUseCase: PlayPlaylistUseCase,
     @Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
     musicServiceConnection: MusicServiceConnection
-) :
-    AbstractPlaylistViewModel<RemoteSong>(playPlaylistUseCase) {
+) : ViewModel() {
     private val recentPlaySongs = userRepository.getRecentPlayMusic().map {
         it.data?.map(
             MyRecentMusicData::musicInfo
@@ -33,9 +33,15 @@ class MyRecentPlayViewModel @Inject constructor(
 
     val recentPlaySongUiList = mapSongsFlowToUiItemsUseCase(recentPlaySongs)
         .stateInUi()
-    override val loadedSongs: List<RemoteSong>
-        get() = recentPlaySongs.value ?: emptyList()
+
+    private val playbackHandler = PlaylistPlaybackHandler(
+        playPlaylistUseCase = playPlaylistUseCase,
+        scope = viewModelScope,
+        getLoadedSongs = { recentPlaySongs.value ?: emptyList() },
+        loadRemainingSongs = null
+    )
 
     val player = musicServiceConnection.player
-
+    fun onSongItemClick(startIndex: Int) = playbackHandler.onSongItemClick(startIndex)
+    fun playAll() = playbackHandler.playAll()
 }
