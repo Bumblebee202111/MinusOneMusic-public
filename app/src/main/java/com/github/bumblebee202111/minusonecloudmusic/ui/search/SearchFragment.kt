@@ -9,8 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentSearchBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarController
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistDialogController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.hideSoftInput
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.SimpleSongAdapter
@@ -22,8 +20,6 @@ class SearchFragment : Fragment() {
 
     lateinit var binding: FragmentSearchBinding
     private val viewModel: SearchViewModel by viewModels()
-    private lateinit var playlistDialogController: PlaylistDialogController
-    private lateinit var miniPlayerBarController: MiniPlayerBarController
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,12 +31,7 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        playlistDialogController = PlaylistDialogController(parentFragmentManager)
-        miniPlayerBarController = MiniPlayerBarController(
-            view = view,
-            navController = findNavController(),
-            playlistDialogController = playlistDialogController
-        )
+
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -66,14 +57,7 @@ class SearchFragment : Fragment() {
             launch {
                 viewModel.result.collect(adapter::submitList)
             }
-            launch {
-                viewModel.player.collect(miniPlayerBarController::setPlayer)
-            }
         }
     }
 
-    override fun onStop() {
-        miniPlayerBarController.onStop()
-        super.onStop()
-    }
 }

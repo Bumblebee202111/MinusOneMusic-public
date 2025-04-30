@@ -6,15 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.github.bumblebee202111.minusonecloudmusic.MainActivity
 import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.data.model.DiscoverBlock
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDiscoverBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.mainNavController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.main.MainFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 @AndroidEntryPoint
@@ -25,9 +24,6 @@ class DiscoverFragment : Fragment() {
     }
 
     private lateinit var binding: FragmentDiscoverBinding
-
-    private lateinit var mainFragment: MainFragment
-
     val viewModel: DiscoverViewModel by viewModels()
 
     override fun onCreateView(
@@ -44,11 +40,9 @@ class DiscoverFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainFragment =
-            ((requireParentFragment() as NavHostFragment).requireParentFragment() as MainFragment)
         binding.topAppBar.apply {
             setNavigationOnClickListener {
-                mainFragment.openDrawerLayout()
+                (activity as? MainActivity)?.openDrawer()
             }
             setOnMenuItemClickListener {
                 mainNavController.navigate(R.id.nav_search)

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.AppDispatchers
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.Dispatcher
-import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.MyRecentMusicData
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.UserRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongsFlowToUiItemsUseCase
@@ -22,8 +21,7 @@ class MyRecentPlayViewModel @Inject constructor(
     userRepository: UserRepository,
     mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
     playPlaylistUseCase: PlayPlaylistUseCase,
-    @Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
-    musicServiceConnection: MusicServiceConnection
+    @Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private val recentPlaySongs = userRepository.getRecentPlayMusic().map {
         it.data?.map(
@@ -41,7 +39,6 @@ class MyRecentPlayViewModel @Inject constructor(
         loadRemainingSongs = null
     )
 
-    val player = musicServiceConnection.player
     fun onSongItemClick(startIndex: Int) = playbackHandler.onSongItemClick(startIndex)
     fun playAll() = playbackHandler.playAll()
 }

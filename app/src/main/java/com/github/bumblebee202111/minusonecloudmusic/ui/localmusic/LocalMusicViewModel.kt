@@ -2,7 +2,6 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.localmusic
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongsFlowToUiItemsUseCase
@@ -14,14 +13,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LocalMusicViewModel @Inject constructor(
-    musicServiceConnection: MusicServiceConnection,
     private val songRepository: SongRepository,
     playPlaylistUseCase: PlayPlaylistUseCase,
     mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase
 ) : ViewModel() {
-
-    val player = musicServiceConnection.player
-
     val songs = MutableStateFlow<List<LocalSong>?>(null)
 
     val songItems = mapSongsFlowToUiItemsUseCase(songs)

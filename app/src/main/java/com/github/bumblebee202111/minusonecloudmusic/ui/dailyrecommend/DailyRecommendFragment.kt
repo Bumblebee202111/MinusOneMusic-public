@@ -13,8 +13,6 @@ import androidx.fragment.app.viewModels
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDailyRecommendBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarController
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistDialogController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.SongWithAlbumAdapter
@@ -48,9 +46,7 @@ class DailyRecommendFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         uiHelper = PlaylistFragmentUIHelper(
-            fragment = this,
             view = view,
-            navController = findNavController(),
             playAllAction = viewModel::playAll
         )
 
@@ -72,16 +68,7 @@ class DailyRecommendFragment : Fragment() {
                     adapter.submitList(it)
                 }
             }
-            launch {
-                viewModel.player.collect {
-                    binding.miniPlayerBar.player = it
-                }
-            }
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        uiHelper.onStop()
-    }
 }

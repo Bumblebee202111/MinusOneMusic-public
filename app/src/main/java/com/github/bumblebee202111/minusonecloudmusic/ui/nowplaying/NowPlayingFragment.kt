@@ -59,10 +59,10 @@ import com.github.bumblebee202111.minusonecloudmusic.player.CountUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleModeUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleToggleMode
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.LyricsView
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistDialogController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
 import com.github.bumblebee202111.minusonecloudmusic.utils.launchRequestPermission
 import com.github.bumblebee202111.minusonecloudmusic.utils.requestPermissionLauncher
 import com.google.android.material.badge.BadgeDrawable
@@ -80,7 +80,6 @@ class NowPlayingFragment : Fragment() {
 
     lateinit var binding: FragmentNowPlayingBinding
     private val nowPlayingViewModel: NowPlayingViewModel by viewModels()
-    private lateinit var playlistDialogController: PlaylistDialogController
 
     private lateinit var playerListener: PlayerListener
     private lateinit var artworkView: ImageView
@@ -183,7 +182,6 @@ class NowPlayingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val context = requireContext()
-        playlistDialogController = PlaylistDialogController(parentFragmentManager)
 
         repeatToggleModes = RepeatShuffleToggleMode.REPEAT_SHUFFLE_MODE_ALL_OFF
         timeBarMinUpdateIntervalMs = TIME_BAR_MIN_UPDATE_INTERVAL_MS
@@ -247,7 +245,14 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        binding.openPlaylist.setOnClickListener { playlistDialogController.showPlayerPlaylistDialog() }
+        playlistButton = binding.openPlaylist.apply {
+            setOnClickListener {
+                PlayerHistoryDialogFragment().show(
+                    parentFragmentManager,
+                    PlayerHistoryDialogFragment.TAG
+                )
+            }
+        }
 
         audioManager =
             requireContext().applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -522,7 +527,8 @@ class NowPlayingFragment : Fragment() {
         songActionsTitleView.text = mediaMetadata.title
         songActionsArtistView.text = mediaMetadata.artist
 
-        val defaultBgColor = ContextCompat.getColor(artworkView.context, R.color.default_player_background)
+        val defaultBgColor =
+            ContextCompat.getColor(artworkView.context, R.color.default_player_background)
 
         artworkView.load(mediaMetadata.artworkUri ?: mediaMetadata.artworkData) {
             placeholder(defaultArtwork)
@@ -541,7 +547,8 @@ class NowPlayingFragment : Fragment() {
                     if (result is BitmapImage) {
                         val bitmap = result.bitmap
                         Palette.from(bitmap).generate { palette ->
-                            val dominantColor = palette?.getDominantColor(defaultBgColor) ?: defaultBgColor
+                            val dominantColor =
+                                palette?.getDominantColor(defaultBgColor) ?: defaultBgColor
                             val hsl = FloatArray(3)
                             ColorUtils.colorToHSL(dominantColor, hsl)
 

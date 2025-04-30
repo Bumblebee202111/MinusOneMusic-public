@@ -29,7 +29,7 @@ val Fragment.statusBarHeight: Int
         return result
     }
 val Fragment.mainNavController: NavController
-    get() = requireActivity().findNavController(R.id.nav_host_fragment_content_main)
+    get() = requireActivity().findNavController(R.id.nav_host_fragment)
 
 inline fun Fragment.repeatWithViewLifecycle(
     minState: Lifecycle.State = Lifecycle.State.STARTED,

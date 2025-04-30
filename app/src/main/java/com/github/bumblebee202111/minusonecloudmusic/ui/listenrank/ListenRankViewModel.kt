@@ -3,7 +3,6 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.listenrank
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongsFlowToUiItemsUseCase
@@ -19,13 +18,10 @@ class ListenRankViewModel @Inject constructor(
     playlistRepository: PlaylistRepository,
     mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
     private val playPlaylistUseCase: PlayPlaylistUseCase,
-    musicServiceConnection: MusicServiceConnection,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val userId = ListenRankFragmentArgs.fromSavedStateHandle(savedStateHandle).userId
-
-    val player = musicServiceConnection.player.stateInUi()
 
     private val playRecords = playlistRepository.playRecords(userId).map { it.data }.stateInUi()
 

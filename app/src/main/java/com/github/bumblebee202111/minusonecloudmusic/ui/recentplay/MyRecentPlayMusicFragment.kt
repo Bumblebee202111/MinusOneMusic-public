@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMyRecentPlayMusicBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
@@ -32,9 +31,7 @@ class MyRecentPlayMusicFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         uiHelper = PlaylistFragmentUIHelper(
-            fragment = this,
             view = view,
-            navController = findNavController(),
             playAllAction = viewModel::playAll
         )
         val adapter = SimpleSongAdapter {
@@ -48,18 +45,7 @@ class MyRecentPlayMusicFragment : Fragment() {
                     adapter.submitList(it)
                 }
             }
-            launch {
-                viewModel.player.collect {
-                    binding.miniPlayerBar.player = it
-                }
-            }
         }
-
-    }
-
-    override fun onStop() {
-        uiHelper.onStop()
-        super.onStop()
     }
 
     companion object {

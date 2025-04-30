@@ -102,20 +102,14 @@ class PlaylistFragment : Fragment() {
 
        playlistActions.setBackgroundColorAndTopCorner(R.color.colorBackgroundAndroid, 12F)
         uiHelper = PlaylistFragmentUIHelper(
-            fragment = this,
             view = view,
-            navController = findNavController(),
             playAllAction = viewModel::playAll
         )
         val songAdapter = PagedSongWithPositionAdapter(viewModel::onSongItemClick)
 
         binding.songList.adapter = songAdapter
+
         repeatWithViewLifecycle {
-            launch {
-                viewModel.player.collect {
-                    binding.miniPlayerBar.player = it
-                }
-            }
             launch {
                 viewModel.playlistDetail.collect {
                     val playlistCover = it?.coverImgUrl ?: return@collect
@@ -150,10 +144,6 @@ class PlaylistFragment : Fragment() {
                 }
             }
         }
-    }
-    override fun onStop() {
-        uiHelper.onStop()
-        super.onStop()
     }
 
 }

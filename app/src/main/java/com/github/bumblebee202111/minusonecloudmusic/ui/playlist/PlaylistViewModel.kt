@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.PlaylistDetail
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.SimpleRemoteSong
@@ -32,7 +31,6 @@ class PlaylistViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val playlistRepository: PlaylistRepository,
     private val songRepository: SongRepository,
-    musicServiceConnection: MusicServiceConnection,
     playPlaylistUseCase: PlayPlaylistUseCase,
     private val getPlaylistSongItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase
 ) :
@@ -43,8 +41,6 @@ class PlaylistViewModel @Inject constructor(
     private val playlistId = args.playlistId
     private val creatorId = args.playlistCreatorId
     private val isMyPL = args.isMyPL
-
-    val player = musicServiceConnection.player
 
     private val _playlistDetail = MutableStateFlow<PlaylistDetail?>(null)
     val playlistDetail get() = _playlistDetail.stateInUi()

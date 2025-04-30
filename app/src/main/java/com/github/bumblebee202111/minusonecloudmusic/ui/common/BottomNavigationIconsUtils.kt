@@ -1,4 +1,4 @@
-package com.github.bumblebee202111.minusonecloudmusic.ui.main
+package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import android.content.Context
 import android.graphics.Canvas
@@ -16,7 +16,6 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
 
 object BottomNavigationIconsUtils {
     fun getBottomNavigationIcons(context: Context): Map<Int, Drawable> {
@@ -69,7 +68,7 @@ object BottomNavigationIconsUtils {
             )
             super.draw(canvas)
             paint.apply {
-                xfermode = this@BottomNavigationActiveIconDrawable.xfermode
+                xfermode =this@BottomNavigationActiveIconDrawable.xfermode
                 shader = this@BottomNavigationActiveIconDrawable.shader
             }
             val size = bounds.width().coerceAtMost(bounds.height())
@@ -109,4 +108,3 @@ object BottomNavigationIconsUtils {
         )
     )
 }
-

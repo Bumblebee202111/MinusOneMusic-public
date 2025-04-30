@@ -82,6 +82,12 @@ class MainActivityViewModel @Inject constructor(
         songRepository.refreshUserRemoteSongs(playerPlaylistRemoteSongs.map(RemoteSong::id))
     }
 
+    fun onLogout() {
+        viewModelScope.launch {
+            loginRepository.logout()
+        }
+    }
+
     val currentSongMediaItems = currentPlaylist.map {
 
     }

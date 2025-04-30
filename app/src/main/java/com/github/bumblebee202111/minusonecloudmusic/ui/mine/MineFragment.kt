@@ -15,15 +15,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.github.bumblebee202111.minusonecloudmusic.MainActivity
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMineBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.mainNavController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.statusBarHeight
-import com.github.bumblebee202111.minusonecloudmusic.ui.main.MainFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineDragonBall.Companion.PINNED_DRAGON_BALLS
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineDragonBall.Companion.TYPE_CLOUD_DISK
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineDragonBall.Companion.TYPE_COLLECTION
@@ -45,7 +45,6 @@ class MineFragment : Fragment() {
     private val mineViewModel: MineViewModel by viewModels()
     private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
 
-    private lateinit var mainFragment: MainFragment
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -57,11 +56,10 @@ class MineFragment : Fragment() {
             mineViewModel = this@MineFragment.mineViewModel
         }
         val root = binding.root
-        mainFragment =
-            ((requireParentFragment() as NavHostFragment).requireParentFragment() as MainFragment)
+
         binding.topAppBar.setNavigationOnClickListener {
-            mainFragment.openDrawerLayout()
-        }
+             (activity as? MainActivity)?.openDrawer()
+       }
         return root
     }
 
@@ -170,7 +168,7 @@ class MineFragment : Fragment() {
 
         val profileOnClickListener = View.OnClickListener {
             if (mainActivityViewModel.loggedInUserId.value == null) {
-                mainFragment.navigateTo(R.id.nav_login)
+                findNavController().navigate(R.id.nav_login)
             } else {
             }
         }

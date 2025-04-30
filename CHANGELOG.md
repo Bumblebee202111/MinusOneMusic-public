@@ -3,6 +3,8 @@ Change Log
 
 ## Version 1.0.0-beta02
 
+## Version 1.0.0-beta01
+
 - Possibly support captcha login
   - Password login does not work and is hidden
 - Improve request headers

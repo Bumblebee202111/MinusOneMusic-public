@@ -2,7 +2,6 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.dailyrecommend
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongsFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
@@ -17,8 +16,7 @@ import javax.inject.Inject
 class DailyRecommendViewModel @Inject constructor(
     loggedInUserDataRepository: LoggedInUserDataRepository,
     playPlaylistUseCase: PlayPlaylistUseCase,
-    mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
-    musicServiceConnection: MusicServiceConnection
+    mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase
 ) :ViewModel() {
 
    private val songs=loggedInUserDataRepository.getDailyRecommendSongs().map { it.data }.stateInUi()
@@ -33,7 +31,6 @@ class DailyRecommendViewModel @Inject constructor(
         loadRemainingSongs = null
     )
 
-    val player = musicServiceConnection.player
     fun onSongItemClick(startIndex: Int) = playbackHandler.onSongItemClick(startIndex)
     fun playAll() = playbackHandler.playAll()
 

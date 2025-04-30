@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentLocalMusicBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
@@ -44,9 +43,7 @@ class LocalMusicFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         uiHelper = PlaylistFragmentUIHelper(
-            fragment = this,
             view = view,
-            navController = findNavController(),
             playAllAction = viewModel::playAll
         )
         adapter = SimpleSongAdapter(viewModel::onSongItemClick)
@@ -71,17 +68,7 @@ class LocalMusicFragment : Fragment() {
             launch {
                 viewModel.songItems.collect(adapter::submitList)
             }
-            launch {
-                viewModel.player.collect {
-                    binding.miniPlayerBar.player = it
-                }
-            }
         }
-    }
-
-    override fun onStop() {
-        uiHelper.onStop()
-        super.onStop()
     }
 
     private fun onPermissionGranted() {

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
@@ -24,12 +23,8 @@ class MyPrivateCloudViewModel @Inject constructor(
     loginRepository: LoginRepository,
     private val loggedInUserDataRepository: LoggedInUserDataRepository,
     private val mapSongPagingDataFlowToUiItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase,
-    musicServiceConnection: MusicServiceConnection,
     playPlaylistUseCase: PlayPlaylistUseCase
 ) : ViewModel() {
-
-    val player = musicServiceConnection.player
-
     private val isLoggedIn = loginRepository.isLoggedIn
 
     private val cloudSongsCountAndPagingData = loggedInUserDataRepository.getCloudSongsPagingData1()

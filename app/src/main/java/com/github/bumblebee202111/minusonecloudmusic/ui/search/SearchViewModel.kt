@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.AppDispatchers
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.Dispatcher
-import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SearchRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongsFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
@@ -27,7 +26,6 @@ class SearchViewModel @Inject constructor(
     private val searchRepository: SearchRepository,
     mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
     private val playPlaylistUseCase: PlayPlaylistUseCase,
-    musicServiceConnection: MusicServiceConnection,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @Dispatcher(AppDispatchers.Main) private val mainDispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -43,7 +41,6 @@ class SearchViewModel @Inject constructor(
         songs
     ).stateInUi()
 
-    val player = musicServiceConnection.player
     fun updateKeyword(newKeyword: String?) {
         keyword.value = newKeyword
     }
