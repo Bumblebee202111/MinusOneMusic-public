@@ -3,6 +3,10 @@ Change Log
 
 ## Version 1.0.0-beta02
 
+- Migrate from Glide to Coil 3
+- Code refactoring & bug fixes
+  - Including fix of login response parsing
+
 ## Version 1.0.0-beta01
 
 - Possibly support captcha login
