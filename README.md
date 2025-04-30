@@ -4,9 +4,9 @@
 
 This project explores building complex apps by implementing core NCM features using modern Android approaches. Focus is on technical implementation rather than creativity.
 
-Note: Early development stage. Current progress by screens:
+Note: Early development stage. Historically, the existing code is not good. Current progress by screens:
 
-- Well Implemented
+- Implemented
 
   - 我的
 
@@ -35,13 +35,10 @@ Note: Early development stage. Current progress by screens:
   - **搜索（“综合”Tab之“单曲”）**
   - **评论（Hottest Page 1）**
 
-> - 所列界面一般不包括二级界面等
+> - 所列界面一般不含二级界面
 > - Other UI elements, pages or functionalities are nowhere near completed although some drafts exist.
 
 **Known issues:**
-
-- Historically, code really badly written
-- Cellphone login broken
 
 ## Features
 
@@ -55,7 +52,7 @@ Provides a 99% pure music experience with basic support of ~~social features~~ (
 
   - Tailored UI content
 
-  - Incredibly small APK size
+  - Small APK size
 
   - Core functionalities and UI retained, but only on a best-effort basis
   - Non-additive or subtractive modifications (some UI/behavior changes will be togglable in Settings)
@@ -74,10 +71,10 @@ Provides a 99% pure music experience with basic support of ~~social features~~ (
 It is strongly encouraged to use the official NCM app. If using this app, you agree to:
 
 - Must coexist with official NCM app
-- Documentation is in broken English
 - **Closed source** (reverse-engineer if needed)
   - Non-NCM code available on request
-  - Future public repo sync planned
+  - However, future selected public repo sync planned
+- Documentation is in broken English
 
 ### Your do's and don'ts
 
@@ -99,13 +96,16 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 - Coil
 - Code optimization
   - Handle common errors gracefully
-
 - Introduce Compose for non-core player UI
   - Also migrate RecyclerView to LazyList
-
-- Observe & remove non EAPI services
-- Dark theme support
-- Basic drawer
+  - Implement official white/black themes
+  - Basic drawer
+- Network: More elegant
+  - Track login stability & remove non EAPI services
+  - My own CookieJar implementation
+  - Custom param annotation
+  - Consider removing the `NetworkDataSource` wrapper
+  - Ktor?
 - Request compressed images
 - Play log (help needed)
 - New screens / major features
@@ -151,25 +151,18 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
   - Discover
   - Mini player bar
   - Player screen
+  - “网易云听劝”
 - Settings
   - About
   - Link of APK of latest NCM
 - Login
   - UI
 - Share
-- Network: More elegant
-  - My own CookieJar implementation
-  - Custom param annotation
-  - Consider removing the `NetworkDataSource` wrapper
-  - Fully deprecate NCMB
 - The UI is generally not interactive enough
 - Rearrange UI for landscape like NCM
 - Download: advanced
 - Login: SMS captcha login
 - Firebase Crashlytics
-- Add 底部导航自定义
-  - Since the official support is back
-- Qualification: Add quiz activity/app based on JetSurvey (?)
 
 ### <span id="intd">Important non-to-dos</span>
 
@@ -199,7 +192,7 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 - Third party and miscellaneous libraries
   - javax.crypto
   - [Retrofit][retrofit]
-  - [Glide][glide]
+  - Coil
   - [Kotlin Coroutines][kotlin-coroutines]
   - Moshi
   - PersistentCookieJar
@@ -220,7 +213,6 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 [layout]: https://developer.android.com/guide/topics/ui/declaring-layout
 [notifications]: https://developer.android.com/develop/ui/views/notifications
 [retrofit]: https://square.github.io/retrofit/
-[glide]: https://bumptech.github.io/glide/
 [kotlin-coroutines]: https://kotlinlang.org/docs/reference/coroutines-overview.html
 
 ## Utilities used
@@ -238,6 +230,10 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
   - uamp-media3
   - horologist/media
   - socialite
+  
+## License
+
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for the full license text.
 
 ## Misc.
 

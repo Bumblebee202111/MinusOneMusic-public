@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+## Version 1.0.0-beta02
+
+- Migrate from Glide to Coil 3
+- Code refactoring & bug fixes
+  - Including fix of login response parsing
+
 ## Version 1.0.0-beta01
 
 - Possibly support captcha login
@@ -10,6 +16,10 @@ Change Log
   - Replace pseudo-random device specs with real ones to standardize api requests
 - Code optimizations (still terrible) & bug fixes
 - Update dependencies
+
+**Known issue:**
+
+- I made a mistake when parsing login response. Will fix it next release.
 
 
 ## Version 1.0.0-dev12 (baseline: NCM 9.1.00)
