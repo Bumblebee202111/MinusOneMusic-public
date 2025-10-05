@@ -1,6 +1,8 @@
 Change Log
 ==========
 
+## Version 1.0.0-beta03
+
 ## Version 1.0.0-beta02
 
 - Migrate from Glide to Coil 3
