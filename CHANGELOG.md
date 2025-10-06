@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+## Version 1.0.0-beta03
+
+- Fixed a crash that occurred when loading tracks from certain artists.
+
 ## Version 1.0.0-beta02
 
 - Migrate from Glide to Coil 3
