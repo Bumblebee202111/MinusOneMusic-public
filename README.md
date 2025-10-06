@@ -1,8 +1,10 @@
 # MinusOne Music
 
-**MinusOne Cloud Music** (减一云音乐, app name: *MinusOne Music*) is a lightweight, third-party NCM client for Android. The project is in a very inactive, though not abandoned, state of early development.
+**MinusOne Cloud Music** (减一云音乐, app name: *MinusOne Music*) is a lightweight, third-party NCM client for Android, currently in an inactive (though not abandoned) state of early development.
 
-This project serves as an exploration of building complex applications by implementing core NCM features with modern Android development practices. The primary focus is on the technical execution rather than innovative design. Please note that the existing codebase is not considered high quality.
+This project was started as a foundational learning experience, and its current codebase is a candid reflection of the developer's skills and architectural understanding at the time.
+
+To align the project with current best practices and showcase significant skill progression, a full migration to **Jetpack Compose** is planned. This strategic refactor will not only modernize the application with a declarative UI but also serve as a practical demonstration of developer growth.
 
 ### Development Progress
 
@@ -58,7 +60,7 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 
 - Users are strongly encouraged to use the official NCM app. By using this application, you agree to the following:
   - It must coexist with the official NCM app.
-  - **Closed source:** You may reverse-engineer if necessary. Non-NCM code is available upon request, with plans for future synchronization with a public repository.
+  - **Source Availability:** The project is primarily closed-source, with a public repository for a curated set of non-sensitive files. The expansion of public code is on hold pending a major cleanup, while a full source release is not planned to avoid potential copyright infringement.
   - Documentation is in broken English.
 
 - ### Usage Guidelines
