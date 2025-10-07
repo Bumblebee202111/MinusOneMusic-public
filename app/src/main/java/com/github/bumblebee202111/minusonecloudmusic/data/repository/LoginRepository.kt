@@ -7,7 +7,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.asEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.network.util.encodedAsBase64String
 import com.github.bumblebee202111.minusonecloudmusic.data.network.util.md5
-import com.github.bumblebee202111.minusonecloudmusic.utils.AppAndDeviceInfoProvider
+import com.github.bumblebee202111.minusonecloudmusic.utils.NcmClientInfoProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -20,13 +20,13 @@ class LoginRepository @Inject constructor(
     private val preferenceStorage: PreferenceStorage,
     private val appDatabase: AppDatabase,
     private val ncmEapiService: NcmEapiService,
-    private val appAndDeviceInfoProvider: AppAndDeviceInfoProvider
+    private val ncmClientInfoProvider: NcmClientInfoProvider
 ) {
     private val userDao = appDatabase.userDao()
 
     fun registerAnonymous(): Flow<Result<Unit?>> {
         val deviceId =
-            appAndDeviceInfoProvider.deviceId
+            ncmClientInfoProvider.deviceId
         val username = createUsername(deviceId)
         return apiResultFlow(
             fetch = { ncmEapiService.registerAnonimous(username) },

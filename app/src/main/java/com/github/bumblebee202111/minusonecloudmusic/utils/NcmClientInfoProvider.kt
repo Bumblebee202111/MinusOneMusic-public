@@ -12,7 +12,7 @@ import javax.inject.Singleton
 import kotlin.random.Random
 
 @Singleton
-class AppAndDeviceInfoProvider @Inject constructor(@ApplicationContext private val context: Context) {
+class NcmClientInfoProvider @Inject constructor(@ApplicationContext private val context: Context) {
 
     val mobilename: String = Build.MODEL ?: UNKNOWN
     val osver: String = Build.VERSION.RELEASE ?: UNKNOWN
