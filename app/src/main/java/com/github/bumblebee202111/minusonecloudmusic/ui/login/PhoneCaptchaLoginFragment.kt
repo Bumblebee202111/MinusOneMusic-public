@@ -156,7 +156,6 @@ class PhoneCaptchaLoginFragment : Fragment() {
         }
 
         binding.moreLoginModes.setOnClickListener {
-            findNavController().navigate(R.id.nav_qrcode_login)
         }
 
     }

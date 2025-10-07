@@ -14,7 +14,6 @@ import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.asExternalModel
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.populate
-import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
 import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractSong
@@ -24,6 +23,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.model.PlaylistDetail
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.SongIdAndVersion
 import com.github.bumblebee202111.minusonecloudmusic.data.model.asEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.combine
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.NetworkBillboardGroup
@@ -40,7 +40,7 @@ import javax.inject.Singleton
 
 @Singleton
 class PlaylistRepository @Inject constructor(
-    private val networkDataSource: NetworkDataSource,
+    private val ncmEapiService: NcmEapiService,
     private val appDatabase: AppDatabase,
     private val preferenceStorage: PreferenceStorage,
     private val moshiAdapter: JsonAdapter<Any>,
@@ -52,8 +52,8 @@ class PlaylistRepository @Inject constructor(
 
     fun getPlaylistDetail(id: Long): Flow<Result<PlaylistDetail?>> = apiResultFlow(
         fetch = {
-            networkDataSource.getPlaylistV4Detail(id).combine {
-                networkDataSource.getPlaylistPrivilege(id)
+            ncmEapiService.getPlaylistV4Detail(id).combine {
+                ncmEapiService.getPlaylistPrivilege(id)
             }
         },
         mapSuccess = {
@@ -62,7 +62,7 @@ class PlaylistRepository @Inject constructor(
     )
 
     fun getMyPlaylistDetail(id: Long): Flow<Result<PlaylistDetail?>> = apiResultFlow(
-        fetch = { networkDataSource.getV6PlaylistDetail(id) },
+        fetch = { ncmEapiService.getV6PlaylistDetail(id) },
         mapSuccess = {
             with(it) {
                 Pair(playlist, privileges).asExternalModel()
@@ -75,8 +75,8 @@ class PlaylistRepository @Inject constructor(
             coroutineScope = coroutineScope,
             getTotalCount = { first.playlist.trackCount + first.playlist.cloudTrackCount },
             initialFetch = {
-                networkDataSource.getPlaylistV4Detail(playlistId).combine {
-                    networkDataSource.getPlaylistPrivilege(playlistId)
+                ncmEapiService.getPlaylistV4Detail(playlistId).combine {
+                    ncmEapiService.getPlaylistPrivilege(playlistId)
 
                 }
             },
@@ -98,7 +98,7 @@ class PlaylistRepository @Inject constructor(
         return apiDetailFlowWithPagingDataFlow(
             coroutineScope = coroutineScope,
             getTotalCount = { playlist.trackCount + playlist.cloudTrackCount },
-            initialFetch = { networkDataSource.getV6PlaylistDetail(playlistId) },
+            initialFetch = { ncmEapiService.getV6PlaylistDetail(playlistId) },
             nonInitialFetch = { limit, offset, precondition ->
                 val songIdsAndVersions = precondition.playlist.trackIds.drop(offset).take(limit)
                     .map { SongIdAndVersion(it.id, 0) }
@@ -117,7 +117,7 @@ class PlaylistRepository @Inject constructor(
     }
 
     private suspend fun fetchPlaylistSongDetailsFromNetwork(songIds: List<SongIdAndVersion>): ApiResult<SongDetailsApiModel> {
-        return networkDataSource.getSongDetails(moshiAdapter.toJson(songIds.map {
+        return ncmEapiService.getSongDetails(moshiAdapter.toJson(songIds.map {
             CParamSongInfo(
                 id = it.songId,
                 version = 0
@@ -128,7 +128,7 @@ class PlaylistRepository @Inject constructor(
     fun getHotTracks() = NotImplementedError()
 
     fun getTopLists(): Flow<Result<List<MainPageBillboardRowGroup>?>> = apiResultFlow(
-        fetch = { networkDataSource.getToplistDetail() }
+        fetch = { ncmEapiService.getTopListDetailsV2() }
     ) { data: List<NetworkBillboardGroup> ->
         data.map(transform = NetworkBillboardGroup::asExternalModel)
     }
@@ -202,7 +202,7 @@ class PlaylistRepository @Inject constructor(
 
     fun playRecords(userId: Long) = apiResultFlow(
         fetch = {
-            networkDataSource.getV1PlayRecords(userId)
+            ncmEapiService.getV1PlayRecords(userId)
         },
         mapSuccess = PlayRecordsApiResult::asExternalModel
     )

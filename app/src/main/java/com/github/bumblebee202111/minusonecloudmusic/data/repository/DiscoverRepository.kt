@@ -1,6 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
-import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
+import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.NetworkDiscoveryBlockCursor
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.NetworkDiscoveryBlockData
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.NetworkDiscoveryBlockData.DiscoveryBlock.Companion.BLOCK_CODE_MGC_PLAYLIST
@@ -14,12 +14,12 @@ import javax.inject.Singleton
 
 @Singleton
 class DiscoverRepository @Inject constructor(
-    private val networkDataSource: NetworkDataSource,
+    private val ncmEapiService: NcmEapiService,
     private val moshiAdapter: JsonAdapter<Any>
 ) {
 
     fun getDiscoverBlocks() = apiResultFlow(fetch = {
-        networkDataSource.getHomeDiscoveryPage(
+        ncmEapiService.getHomepageBlockPage(
             moshiAdapter.toJson(
                 NetworkDiscoveryBlockCursor(
                     blockCodeOrderList = listOf(

@@ -4,22 +4,19 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.github.bumblebee202111.minusonecloudmusic.coroutines.AppDispatchers.IO
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
-import com.github.bumblebee202111.minusonecloudmusic.coroutines.Dispatcher
 import com.github.bumblebee202111.minusonecloudmusic.data.Result
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
-import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.model.DailyRecommendSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.Video
+import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.CloudSongsApiPage
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.DailyPageApiData
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.SearchViewInfo
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.asExternalModel
 import com.github.bumblebee202111.minusonecloudmusic.data.pagingsource.CloudSongsPagingSource
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -31,12 +28,11 @@ import javax.inject.Singleton
 @Singleton
 class LoggedInUserDataRepository @Inject constructor(
     private val appDatabase: AppDatabase,
-    private val networkDataSource: NetworkDataSource,
-    @ApplicationScope private val coroutineScope: CoroutineScope,
-    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
+    private val ncmEapiService: NcmEapiService,
+    @ApplicationScope private val coroutineScope: CoroutineScope
 ) {
     fun getCloudSongs() = apiResultFlow(
-        fetch = { networkDataSource.getCloudSongs(500, 0) },
+        fetch = { ncmEapiService.getV1Cloud(500, 0) },
         mapSuccess = { it.data.map(CloudSongsApiPage.CloudSongData::asExternalModel) }
     )
 
@@ -44,7 +40,7 @@ class LoggedInUserDataRepository @Inject constructor(
         val songs = mutableListOf<CloudSongsApiPage.CloudSongData>()
         var offset = start
         while (true) {
-            val response = networkDataSource.getCloudSongs(500, offset)
+            val response = ncmEapiService.getV1Cloud(500, offset)
             if (response is ApiResult.ApiSuccessResult) {
                 songs += response.data.data
                 offset += 500
@@ -60,7 +56,7 @@ class LoggedInUserDataRepository @Inject constructor(
 
     fun getCloudSongsPagingData(): Pair<Flow<Result<Int>>, Flow<PagingData<RemoteSong>>> {
         val d = coroutineScope.async {
-            networkDataSource.getCloudSongs(
+            ncmEapiService.getV1Cloud(
                 CLOUD_SONG_LIST_PAGE_SIZE, 0
             )
         }
@@ -68,7 +64,7 @@ class LoggedInUserDataRepository @Inject constructor(
             PagingConfig(CLOUD_SONG_LIST_PAGE_SIZE)
         ) {
             CloudSongsPagingSource(d, CLOUD_SONG_LIST_PAGE_SIZE) { offset, limit ->
-                networkDataSource.getCloudSongs(
+                ncmEapiService.getV1Cloud(
                     offset,
                     limit
                 )
@@ -85,14 +81,14 @@ class LoggedInUserDataRepository @Inject constructor(
             coroutineScope = coroutineScope,
             limit = CLOUD_SONG_LIST_PAGE_SIZE,
             initialFetch = { limit ->
-                networkDataSource.getCloudSongs(
+                ncmEapiService.getV1Cloud(
                     limit = limit
                 )
             },
             mapInitialFetchToResult = { this.count },
             getTotalCount = { count },
             nonInitialFetch = { limit, offset, _ ->
-                networkDataSource.getCloudSongs(limit, offset)
+                ncmEapiService.getV1Cloud(limit, offset)
 
             },
             getPageDataFromInitialFetch = { data },
@@ -104,13 +100,13 @@ class LoggedInUserDataRepository @Inject constructor(
 
     fun getDailyRecommendSongs(): Flow<Result<List<DailyRecommendSong>>> =
         apiResultFlow<DailyPageApiData, List<DailyRecommendSong>>(
-            fetch = { networkDataSource.getRecommendSongs() },
+            fetch = { ncmEapiService.getV3DiscoveryRecommendSongs() },
             mapSuccess = DailyPageApiData::asExternalModel
         )
 
     fun getDailyRecommendBanner() = apiResultFlow(
         fetch = {
-            networkDataSource.getResourceExposureConfigs(
+            ncmEapiService.getResourceExposureConfigs(
                 resourcePosition = "DAILY_SONG",
                 resourceId = "1",
                 source = "dailyrecommend"
@@ -123,14 +119,14 @@ class LoggedInUserDataRepository @Inject constructor(
     )
 
     fun getMyAlbums(limit: Int, offset: Int) =
-        apiResultFlow(fetch = { networkDataSource.getAlbumSublist(limit, offset) },
+        apiResultFlow(fetch = { ncmEapiService.getAlbumSublist(limit, offset) },
             mapSuccess = { result ->
                 return@apiResultFlow result.data.map { it.asExternalModel() }
 
             })
 
     fun getMyMvs(limit: Int): Flow<Result<List<Video>?>> =
-        apiResultFlow(fetch = { networkDataSource.getMlogMyCollectByTime(limit) }
+        apiResultFlow(fetch = { ncmEapiService.getMlogMyCollectByTime(limit) }
         ) { data ->
             data.feeds?.map(SearchViewInfo::asExternalModel) ?: emptyList()
 
@@ -139,7 +135,7 @@ class LoggedInUserDataRepository @Inject constructor(
 
     private val myLikedSongs: MutableStateFlow<Set<Long>?> = MutableStateFlow(null)
     suspend fun refreshMyLikedSongs() {
-        val starMusicIds = networkDataSource.getStarMusicIds()
+        val starMusicIds = ncmEapiService.getStarMusicIds()
         if (starMusicIds is ApiResult.ApiSuccessResult) {
             myLikedSongs.value = starMusicIds.data.ids.toMutableSet()
         }
@@ -162,7 +158,7 @@ class LoggedInUserDataRepository @Inject constructor(
     }
 
     fun likeSong(songId: Long, like: Boolean) = apiResultFlow(
-        fetch = { networkDataSource.likeSong(like, songId) },
+        fetch = { ncmEapiService.likeSong(like, songId) },
         mapSuccess = {
             updateSongLiked(songId, like)
             it.playlistId

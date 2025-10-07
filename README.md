@@ -56,8 +56,6 @@ To align the project with current best practices and showcase significant skill 
 
 ## Notices
 
-It is strongly encouraged to use the official NCM app. If using this app, you agree to:
-
 - Users are strongly encouraged to use the official NCM app. By using this application, you agree to the following:
   - It must coexist with the official NCM app.
   - **Source Availability:** The project is primarily closed-source, with a public repository for a curated set of non-sensitive files. The expansion of public code is on hold pending a major cleanup, while a full source release is not planned to avoid potential copyright infringement.
@@ -82,7 +80,7 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 
 - Update base NCM version to 9.2.97
   - Use `x-aeapi` header
-
+- DebugApiSaver
 - Code optimization
   - Handle common errors gracefully
 - Introduce Compose for non-core player UI
@@ -90,10 +88,8 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
   - Implement official white/black themes
   - Basic drawer
 - Network: More elegant
-  - Track login stability & remove non EAPI services
+  - Track login stability
   - My own CookieJar implementation
-  - Custom param annotation
-  - Consider removing the `NetworkDataSource` wrapper
   - Ktor?
 - Request compressed images
 - Play log (help needed)
@@ -146,11 +142,12 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
   - Link of APK of latest NCM
 - Login
   - UI
+  - SMS: Missing submit code button
 - Share
+- Volume balance
 - The UI is generally not interactive enough
 - Rearrange UI for landscape like NCM
 - Download: advanced
-- Login: SMS captcha login
 - Firebase Crashlytics
 
 ### <span id="intd">Important non-to-dos</span>

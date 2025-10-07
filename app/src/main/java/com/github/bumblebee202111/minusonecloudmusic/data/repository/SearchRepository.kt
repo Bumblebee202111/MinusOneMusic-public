@@ -1,6 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
-import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
+import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.search.NetworkSearchComplexSongBlock
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.search.SearchComplexCursorParam
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.search.asExternalModel
@@ -10,12 +10,12 @@ import javax.inject.Singleton
 
 @Singleton
 class SearchRepository @Inject constructor(
-    private val networkDataSource: NetworkDataSource,
+    private val ncmEapiService: NcmEapiService,
     private val moshiAdapter: JsonAdapter<Any>
 ) {
     fun searchComplex(keyword: String) = apiResultFlow(
         fetch = {
-            networkDataSource.searchComplex(
+            ncmEapiService.searchComplex(
                 keyword,
                 moshiAdapter.toJson(SearchComplexCursorParam(0))
             )

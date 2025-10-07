@@ -4,12 +4,12 @@ import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.Result
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.datasource.MediaStoreDataSource
-import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.datasource.SongDownloadDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LyricsEntry
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.SongIdAndVersion
+import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.MusicInfoApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongLyricsApiModel
@@ -30,7 +30,7 @@ import javax.inject.Singleton
 @Singleton
 class SongRepository @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
-    private val networkDataSource: NetworkDataSource,
+    private val ncmEapiService: NcmEapiService,
     private val moshiAdapter: JsonAdapter<Any>,
     private val mediaStoreDataSource: MediaStoreDataSource,
     private val mediaDownloadDataSource: SongDownloadDataSource,
@@ -53,7 +53,7 @@ class SongRepository @Inject constructor(
             }
 
             val cJson = moshiAdapter.toJson(c)
-            networkDataSource.getSongDetails(cJson)
+            ncmEapiService.getSongDetails(cJson)
         },
         mapSuccess = { result ->
             result.songs.zip(result.privileges)
@@ -65,7 +65,7 @@ class SongRepository @Inject constructor(
         val songs = mutableListOf<Pair<MusicInfoApiModel, SongPrivilegeApiModel>>()
         for (chunk in songIds.chunked(1000)) {
             val cParam = moshiAdapter.toJson(chunk.map { CParamSongInfo(it, 0) })
-            val result = networkDataSource.getSongDetails(cParam)
+            val result = ncmEapiService.getSongDetails(cParam)
             if (result is ApiResult.ApiSuccessResult) {
                 songs += result.data.songs.zip(result.data.privileges)
             } else {
@@ -78,7 +78,7 @@ class SongRepository @Inject constructor(
     fun getSongUrls(vararg songIds: Long): Flow<Result<List<SongUrlInfo>?>> {
         val songIdsJson = moshiAdapter.toJson(songIds)
         return apiResultFlow(
-            fetch = { networkDataSource.getSongUrlsV1(songIdsJson) }
+            fetch = { ncmEapiService.getSongUrlsV1(songIdsJson) }
         ) { data ->
             data
         }
@@ -87,7 +87,7 @@ class SongRepository @Inject constructor(
     suspend fun refreshUserRemoteSongs(songIds: List<Long>): kotlin.Result<Unit> {
         for (chunk in songIds.chunked(1000)) {
             val songIdsString = moshiAdapter.toJson(chunk)
-            when (val result = networkDataSource.getSongEnhancePrivilege(songIdsString)) {
+            when (val result = ncmEapiService.getSongEnhancePrivilege(songIdsString)) {
                 is ApiResult.ApiSuccessResult -> {
                     songDao.upsertPrivileges(result.data.map(SongPrivilegeApiModel::toEntity))
                 }
@@ -102,19 +102,19 @@ class SongRepository @Inject constructor(
 
     fun getLyrics(songId: Long) =
         apiResultFlow<SongLyricsApiModel, List<LyricsEntry>>(fetch = {
-            networkDataSource.getSongLyrics(
+            ncmEapiService.getSongLyrics(
                 songId
             )
         }, mapSuccess = SongLyricsApiModel::asExternalModel)
 
     fun getSongLikeCountText(songId: Long) = apiResultFlow(
-        fetch = { networkDataSource.getSongLikeCount(songId) },
+        fetch = { ncmEapiService.getSongRedCount(songId) },
         mapSuccess = { it.countDesc }
     )
 
 
     fun getCommentInfo(songId: Long) = apiResultFlow(
-        fetch = { networkDataSource.getCommentInfoResourceList(moshiAdapter.toJson(listOf(songId))) },
+        fetch = { ncmEapiService.getCommentInfoResourceList(moshiAdapter.toJson(listOf(songId))) },
         mapSuccess = { it[0].asExternalModel() }
     )
 
@@ -124,7 +124,7 @@ class SongRepository @Inject constructor(
 
     fun download(song: RemoteSong) {
         coroutineScope.launch {
-            val apiResult = networkDataSource.songDownloadUrl(song.id)
+            val apiResult = ncmEapiService.getSongEnhanceDownloadUrlV1(id = song.id)
             if (apiResult is ApiResult.ApiSuccessResult) {
                 val url = apiResult.data.asExternalModel()
                 mediaDownloadDataSource.download(song, url)
@@ -134,7 +134,7 @@ class SongRepository @Inject constructor(
 
     fun getComments(threadId: String) = apiResultFlow(
         fetch = {
-            networkDataSource.getV2ResourceComments(threadId)
+            ncmEapiService.getV2ResourceComments(threadId)
         },
         mapSuccess = {
             it.comments.map(NetworkComment::asExternalModel)

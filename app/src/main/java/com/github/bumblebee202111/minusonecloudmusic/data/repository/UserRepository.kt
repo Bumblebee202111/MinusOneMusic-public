@@ -8,10 +8,10 @@ import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.asExternalModel
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.populated.PopulatedMyRecentMusicData
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.populated.asExternalModel
-import com.github.bumblebee202111.minusonecloudmusic.data.datasource.NetworkDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
 import com.github.bumblebee202111.minusonecloudmusic.data.model.FollowedUserProfile
 import com.github.bumblebee202111.minusonecloudmusic.data.model.UserDetail
+import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.combine
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.MusicInfoApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongPrivilegeApiModel
@@ -30,7 +30,7 @@ import javax.inject.Singleton
 class UserRepository @Inject constructor(
     private val preferenceStorage: PreferenceStorage,
     private val appDatabase: AppDatabase,
-    private val networkDataSource: NetworkDataSource,
+    private val ncmEapiService: NcmEapiService,
     private val moshiAdapter: JsonAdapter<Any>
 ) {
 
@@ -44,14 +44,14 @@ class UserRepository @Inject constructor(
 
 
     private fun getApiUserDetail(uid: Long) = apiResultFlow(fetch = {
-        networkDataSource.getUserDetail(uid)
+        ncmEapiService.getV1UserDetail(uid)
     },
         mapSuccess = { result -> UserDetail(result.listenSongs, result.profile.asExternalModel()) })
 
     private fun getOfflineFirstUserDetail(uid: Long) = offlineFirstApiResultFlow(loadFromDb = {
         userDao.observeUserDetail(uid).map { it?.asExternalModel() }
     }, call = {
-        networkDataSource.getUserDetail(uid)
+        ncmEapiService.getV1UserDetail(uid)
     }, saveSuccess = { data ->
         userDao.insertUserProfile(data.profile.asEntity())
         userDao.insertUserDetail(UserDetailEntity(data.profile.userId, data.listenSongs))
@@ -63,7 +63,7 @@ class UserRepository @Inject constructor(
         userDao.observeUserPlaylists(userId)
             .map { it.map { populatedUserPlaylist -> populatedUserPlaylist.playlist.asExternalModel() } }
     },
-        call = { networkDataSource.getUserPlaylists(userId) },
+        call = { ncmEapiService.getUserPlaylists(userId) },
         saveSuccess = { ncmPlaylistsResult ->
             val userPlaylists = ncmPlaylistsResult.playlist.mapIndexed { index, p ->
                 UserPlaylistEntity(
@@ -83,8 +83,8 @@ class UserRepository @Inject constructor(
         recentPlayDao.observeMyRecentPlayMusic()
             .map { it.map(PopulatedMyRecentMusicData::asExternalModel) }
     }, call = {
-        networkDataSource.getMyRecentMusic().combine {
-            networkDataSource.getSongEnhancePrivilege(moshiAdapter.toJson(this.list.map { item ->
+        ncmEapiService.getMyRecentMusic().combine {
+            ncmEapiService.getSongEnhancePrivilege(moshiAdapter.toJson(this.list.map { item ->
                 item.musicInfo.id
             }))
         }
@@ -101,13 +101,13 @@ class UserRepository @Inject constructor(
 
 
     fun getUserFollows(userId: Long, offset: Int = 0, limit: Int = 20): Flow<Result<List<FollowedUserProfile>>> =
-        apiResultFlow(fetch = { networkDataSource.getUserFollows(userId, offset, limit) },
+        apiResultFlow(fetch = { ncmEapiService.getUserFollows(userId, offset, limit) },
             mapSuccess = { result ->
                 return@apiResultFlow result.follow.map { it.asExternalModel() }
             })
 
     fun getUserFans(userId: Long, offset: Int = 0, limit: Int = 20) =
-        apiResultFlow(fetch = { networkDataSource.getUserFolloweds(userId, offset, limit) },
+        apiResultFlow(fetch = { ncmEapiService.getUserFolloweds(userId, offset, limit) },
             mapSuccess = { result ->
                 return@apiResultFlow result.followeds.map { it.asExternalModel() }
             })
