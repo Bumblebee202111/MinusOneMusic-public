@@ -5,6 +5,7 @@ Change Log
 
 - Fixed a crash that occurred when loading tracks from certain artists.
 - Refactored the network layer for improved maintainability and stability.
+- Updated client version constants to match the official NCM app v9.2.97.
 
 ## Version 1.0.0-beta02
 

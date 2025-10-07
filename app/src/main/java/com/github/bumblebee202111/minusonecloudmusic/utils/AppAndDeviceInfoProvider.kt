@@ -69,11 +69,11 @@ class AppAndDeviceInfoProvider @Inject constructor(@ApplicationContext private v
         private const val UNKNOWN = "unknown"
 
         private const val EVNSM = "1.0.0"
-        private const val VERSION_CODE = "9002085"
-        private const val BUILD_VER = "250418220822"
+        private const val VERSION_CODE = "9002097"
+        private const val BUILD_VER = "250506155018"
         private const val OS = "android"
         private const val CHANNEL = "netease"
-        private const val APP_VER = "9.2.85"
+        private const val APP_VER = "9.2.97"
 
         const val COOKIE_NAME_DEVICE_ID = "deviceId"
         const val COOKIE_NAME_OS = "os"

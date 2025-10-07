@@ -78,8 +78,7 @@ To align the project with current best practices and showcase significant skill 
 
 ## To-dos
 
-- Update base NCM version to 9.2.97
-  - Use `x-aeapi` header
+- Use `x-aeapi` header
 - DebugApiSaver
 - Code optimization
   - Handle common errors gracefully
