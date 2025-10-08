@@ -21,7 +21,7 @@ To align the project with current best practices and showcase significant skill 
 
 - Partial Implementation
 
-  - **验证码登录**[prone to failure]/**密码登录**[prone to failure]/**退出登录**
+  - **验证码登录**[prone to failure]/**密码登录**[doesn't work, hidden]/**退出登录**
   - 我的
     - **最近播放—歌曲**
     - **云盘**
@@ -78,13 +78,14 @@ To align the project with current best practices and showcase significant skill 
 
 ## To-dos
 
-- DebugApiSaver
 - Code optimization
   - Handle common errors gracefully
-- Introduce Compose for non-core player UI
-  - Also migrate RecyclerView to LazyList
-  - Implement official white/black themes
-  - Basic drawer
+- Compose
+  - Migrate
+    - RecyclerView to LazyList
+  - Use for all new UI
+    - Implement official white/black themes
+    - Basic drawer
 - Network: More elegant
   - Track login stability
   - My own CookieJar implementation
@@ -127,7 +128,7 @@ To align the project with current best practices and showcase significant skill 
   - Fix top margin of user profile
 - Arch
   - Use `Channel` to manage Toast-s
-  - Sync user data with `WorkManager`
+  - Sync user data with `WorkManager` instead
   - More caching: Playlist, lyrics ...
 - Update UI for latest NCM
   - Discover
@@ -173,12 +174,14 @@ To align the project with current best practices and showcase significant skill 
   - [Notifications][notifications]
   - Media 3
 - Third party and miscellaneous libraries
+  - [Kotlin Coroutines][kotlin-coroutines]
   - javax.crypto
   - [Retrofit][retrofit]
-  - Coil
-  - [Kotlin Coroutines][kotlin-coroutines]
   - Moshi
+  - Coil
+  - Chunker
   - PersistentCookieJar
+
 
 [foundation]: https://developer.android.com/jetpack/components
 [android-ktx]: https://developer.android.com/kotlin/ktx

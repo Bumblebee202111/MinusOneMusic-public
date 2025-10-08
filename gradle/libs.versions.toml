@@ -13,6 +13,7 @@ ksp = "2.2.10-2.0.2"
 # App Dependencies
 activity = "1.10.1"
 appcompat = "1.7.1"
+chucker = "4.2.0"
 coil3 = "3.3.0"
 constraintlayout = "2.2.1"
 coreKtx = "1.16.0"
@@ -90,6 +91,11 @@ retrofit-response-type-keeper = { group = "com.squareup.retrofit2", name = "resp
 # UI
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
+# Debugging
+chucker = { group = "com.github.chuckerteam.chucker", name = "library", version.ref = "chucker" }
+chucker-no-op = { group = "com.github.chuckerteam.chucker", name = "library-no-op", version.ref = "chucker" }
+
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

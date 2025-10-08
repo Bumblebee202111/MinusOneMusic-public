@@ -120,6 +120,8 @@ dependencies {
     kapt(libs.retrofit.response.type.keeper)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.lottie)
+    debugImplementation(libs.chucker)
+    releaseImplementation(libs.chucker.no.op)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
