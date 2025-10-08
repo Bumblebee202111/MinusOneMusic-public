@@ -101,7 +101,6 @@ To align the project with current best practices and showcase significant skill 
   - Mini Player Bar
     - Swipe
     - Hide like `PlayControlView`
-    - Fix top shadow
   - Transition between Mini Player Bar & Now Playing
   - Now Playing
     - Light status bar text
@@ -138,9 +137,9 @@ To align the project with current best practices and showcase significant skill 
 - Settings
   - About
   - Link of APK of latest NCM
-- Login
+- SMS login
   - UI
-  - SMS: Missing submit code button
+  - Fix missing submit code button
 - Share
 - Volume balance
 - The UI is generally not interactive enough
