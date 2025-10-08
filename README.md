@@ -78,7 +78,6 @@ To align the project with current best practices and showcase significant skill 
 
 ## To-dos
 
-- Use `x-aeapi` header
 - DebugApiSaver
 - Code optimization
   - Handle common errors gracefully
