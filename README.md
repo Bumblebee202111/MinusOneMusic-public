@@ -21,7 +21,7 @@ To align the project with current best practices and showcase significant skill 
 
 - Partial Implementation
 
-  - **验证码登录**[prone to failure]/**密码登录**[prone to failure]/**退出登录**
+  - **验证码登录**[prone to failure]/**密码登录**[doesn't work, hidden]/**退出登录**
   - 我的
     - **最近播放—歌曲**
     - **云盘**
@@ -56,11 +56,9 @@ To align the project with current best practices and showcase significant skill 
 
 ## Notices
 
-It is strongly encouraged to use the official NCM app. If using this app, you agree to:
-
 - Users are strongly encouraged to use the official NCM app. By using this application, you agree to the following:
   - It must coexist with the official NCM app.
-  - **Closed source:** You may reverse-engineer if necessary. Non-NCM code is available upon request, with plans for future synchronization with a public repository.
+  - **Source Availability:** The project is primarily closed-source, with a public repository for a curated set of non-sensitive files. The expansion of public code is on hold pending a major cleanup, while a full source release is not planned to avoid potential copyright infringement.
   - Documentation is in broken English.
 
 - ### Usage Guidelines
@@ -74,27 +72,18 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=160 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=400/> <img src="docs\screenshots\Screenshot_comments_landscape.png" alt="Comments (landscape)" width=320 />
 <img src="docs\screenshots\Screenshot_playlist.png" alt="Playlist" width=160 /> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=160 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=240 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="Local music and player playlist dialog" width=240 /> <img src="docs\screenshots\Screenshot_listen_rank.png" alt="Listen rank" width=160 /> <img src="docs\screenshots\Screenshot_search_landscape.png" alt="Search (landscape)" width=320 />
 
-## :coffee:
-
-:heart:
 
 ## To-dos
 
-- Update base NCM version to 9.2.97
-  - Use `x-aeapi` header
-
 - Code optimization
-  - Handle common errors gracefully
-- Introduce Compose for non-core player UI
-  - Also migrate RecyclerView to LazyList
-  - Implement official white/black themes
-  - Basic drawer
-- Network: More elegant
-  - Track login stability & remove non EAPI services
-  - My own CookieJar implementation
-  - Custom param annotation
-  - Consider removing the `NetworkDataSource` wrapper
-  - Ktor?
+  - Refactoring
+  - Display missing error messages
+- Compose
+  - Migrate
+    - RecyclerView to LazyList
+  - Use for all new UI
+    - Implement official white/black themes
+    - Basic drawer
 - Request compressed images
 - Play log (help needed)
 - New screens / major features
@@ -107,10 +96,10 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
   - Mini Player Bar
     - Swipe
     - Hide like `PlayControlView`
-    - Fix top shadow
   - Transition between Mini Player Bar & Now Playing
   - Now Playing
     - Light status bar text
+    - Hide badge when like is null
     - Follow
     - Volume control dialog for legacy systems
     - LinearLayout weight distribution for controls
@@ -134,7 +123,7 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
   - Fix top margin of user profile
 - Arch
   - Use `Channel` to manage Toast-s
-  - Sync user data with `WorkManager`
+  - Sync user data with `WorkManager` instead
   - More caching: Playlist, lyrics ...
 - Update UI for latest NCM
   - Discover
@@ -144,13 +133,16 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 - Settings
   - About
   - Link of APK of latest NCM
-- Login
+- SMS login
   - UI
+  - Fix missing submit code button
+  - Track stability
+- Upgrade persistence layer to DataStore
 - Share
+- Volume balance
 - The UI is generally not interactive enough
 - Rearrange UI for landscape like NCM
 - Download: advanced
-- Login: SMS captcha login
 - Firebase Crashlytics
 
 ### <span id="intd">Important non-to-dos</span>
@@ -175,16 +167,19 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
   - [Animations & Transitions][animation]
   - [Fragment][fragment]
   - [Layout][layout]
+  - Compose
 - Behavior
   - [Notifications][notifications]
   - Media 3
 - Third party and miscellaneous libraries
+  - [Kotlin Coroutines][kotlin-coroutines]
   - javax.crypto
   - [Retrofit][retrofit]
-  - Coil
-  - [Kotlin Coroutines][kotlin-coroutines]
   - Moshi
+  - Coil
+  - Chunker
   - PersistentCookieJar
+
 
 [foundation]: https://developer.android.com/jetpack/components
 [android-ktx]: https://developer.android.com/kotlin/ktx
@@ -220,6 +215,10 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
   - horologist/media
   - socialite
   
+## :coffee:
+
+:heart:  
+
 ## License
 
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for the full license text.
