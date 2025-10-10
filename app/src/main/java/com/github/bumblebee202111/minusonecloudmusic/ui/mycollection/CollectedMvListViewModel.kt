@@ -15,17 +15,16 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class CollectedMvListViewModel  @Inject constructor(
+class CollectedMvListViewModel @Inject constructor(
     loginRepository: LoginRepository,
     private val loggedInUserDataRepository: LoggedInUserDataRepository
-): ViewModel() {
+) : ViewModel() {
 
-    val myMvs=loginRepository.loggedInUserId.flatMapLatest { userId ->
-        if(userId!=null){
+    val myMvs = loginRepository.loggedInUserId.flatMapLatest { userId ->
+        if (userId != null) {
             loggedInUserDataRepository.getMyMvs(20).map { it.data }
-        }
-        else{
-           flowOf(null)
+        } else {
+            flowOf(null)
         }
     }.flowOn(Dispatchers.IO).stateInUi()
 }

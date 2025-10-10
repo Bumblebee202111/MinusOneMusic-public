@@ -8,6 +8,13 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.view.GravityCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.forEach
@@ -23,9 +30,11 @@ import com.github.bumblebee202111.minusonecloudmusic.databinding.ActivityMainBin
 import com.github.bumblebee202111.minusonecloudmusic.service.PlaybackService
 import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.BottomNavigationIconsUtils
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.DolphinToast
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
+import com.github.bumblebee202111.minusonecloudmusic.utils.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.utils.isPackageInstalled
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -69,6 +78,13 @@ class MainActivity : AppCompatActivity() {
     lateinit var  drawerLayout: DrawerLayout
     lateinit var  navView: NavigationView
     lateinit var  miniPlayerBar: MiniPlayerBarView
+
+
+    @Inject
+    lateinit var toastManager: ToastManager
+
+    private val snackbarHostState = SnackbarHostState()
+
     override fun onStart() {
         super.onStart()
         initializeController()
@@ -83,6 +99,30 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        lifecycleScope.launch {
+            toastManager.uiTextEvent.collect { event ->
+                event?.let {
+                    val messageText = it.message.asString(this@MainActivity)
+
+                    val result = snackbarHostState.showSnackbar(messageText)
+
+                    if (result == SnackbarResult.Dismissed || result == SnackbarResult.ActionPerformed) {
+                        toastManager.onMessageShown()
+                    }
+                }
+            }
+        }
+
+        binding.toastHost.setContent {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.statusBarsPadding(),
+                snackbar = { snackbarData ->
+                    DolphinToast(message = snackbarData.visuals.message)
+                }
+            )
+        }
 
         bottomNavView = binding.bottomNavView
         drawerLayout = binding.drawerLayout
@@ -160,7 +200,6 @@ class MainActivity : AppCompatActivity() {
                 binding.miniPlayerBar.player=it
             }
         }
-
     }
 
     override fun onStop() {

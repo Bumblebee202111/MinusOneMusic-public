@@ -3,8 +3,11 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.data.Result
+import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
+import com.github.bumblebee202111.minusonecloudmusic.utils.ToastManager
+import com.github.bumblebee202111.minusonecloudmusic.utils.UiText
+import com.github.bumblebee202111.minusonecloudmusic.utils.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +17,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PhonePasswordLoginViewModel @Inject constructor(private val loginRepository: LoginRepository) :
+class PhonePasswordLoginViewModel @Inject constructor(
+    private val loginRepository: LoginRepository,
+    private val toastManager: ToastManager
+) :
     ViewModel() {
 
     val loginFormState = MutableStateFlow<LoginFormState?>(null)
@@ -25,24 +31,23 @@ class PhonePasswordLoginViewModel @Inject constructor(private val loginRepositor
 
     fun login(phoneNumber: String, password: String) {
         viewModelScope.launch {
-            loginRepository.loginWithPassword(phoneNumber = phoneNumber, password = password).flowOn(Dispatchers.IO)
+            loginRepository.loginWithPassword(phoneNumber = phoneNumber, password = password)
+                .flowOn(Dispatchers.IO)
                 .collect { result ->
                     _phoneLoginResult.value = when (result) {
-                        is Result.Loading -> {
-                            PhoneLoginResult.Loading
-                        }
-
-                        is Result.Success -> {
+                        is AppResult.Loading -> PhoneLoginResult.Loading
+                        is AppResult.Success -> {
+                            toastManager.showMessage(UiText.StringResource(R.string.welcome))
                             PhoneLoginResult.Success
                         }
-
-                        is Result.Error -> {
-                            PhoneLoginResult.Error(R.string.login_failed)
+                        is AppResult.Error -> {
+                            toastManager.showMessage(result.error.toUiText())
+                            PhoneLoginResult.Error
                         }
                     }
                 }
-        }
 
+        }
     }
 
     fun loginDataChanged(phoneNumber: String, password: String) {
@@ -66,7 +71,6 @@ class PhonePasswordLoginViewModel @Inject constructor(private val loginRepositor
         val passwordError: Int? = null,
         val isDataValid: Boolean = false
     )
-
 
 }
 

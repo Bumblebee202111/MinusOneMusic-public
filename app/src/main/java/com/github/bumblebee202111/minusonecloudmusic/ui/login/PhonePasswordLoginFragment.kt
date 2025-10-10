@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -30,10 +29,8 @@ class PhonePasswordLoginFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         binding = FragmentPhonePasswordLoginBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,7 +66,6 @@ class PhonePasswordLoginFragment : Fragment() {
 
                     is PhoneLoginResult.Error -> {
                         loadingProgressBar.isVisible = false
-                        showLoginFailed(loginResult.errorMsgResId)
                     }
 
                     is PhoneLoginResult.Success -> {
@@ -109,20 +105,7 @@ class PhonePasswordLoginFragment : Fragment() {
     }
 
     private fun updateUiWithUser() {
-        val welcome = getString(R.string.welcome)
         findNavController().popBackStack(R.id.nav_login, false)
-        val appContext = context?.applicationContext ?: return
-        Toast.makeText(appContext, welcome, Toast.LENGTH_LONG).show()
-    }
-
-    private fun showLoginFailed(@StringRes errorString: Int) {
-        val appContext = context?.applicationContext ?: return
-        Toast.makeText(appContext, errorString, Toast.LENGTH_LONG).show()
-    }
-
-    private fun showLoginFailed(errorString: String) {
-        val appContext = context?.applicationContext ?: return
-        Toast.makeText(appContext, errorString, Toast.LENGTH_LONG).show()
     }
 
 }

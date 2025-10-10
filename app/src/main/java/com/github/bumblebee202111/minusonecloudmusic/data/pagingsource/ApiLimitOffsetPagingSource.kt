@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import kotlinx.coroutines.Deferred
+import java.io.IOException
 
 class ApiLimitOffsetPagingSource<InitialFetchResultType : Any, NonInitialFetchResultType, Value : Any>(
     private val deferredInitialFetch: Deferred<ApiResult<InitialFetchResultType>>,
@@ -34,7 +35,7 @@ class ApiLimitOffsetPagingSource<InitialFetchResultType : Any, NonInitialFetchRe
     private suspend fun initialLoad(params: LoadParams<Int>): LoadResult<Int, Value> {
         return try {
             when (val response = deferredInitialFetch.await()) {
-                is ApiResult.ApiSuccessResult -> {
+                is ApiResult.Success -> {
                     initialFetchData = response.data
                     totalCount = getTotalCount(initialFetchData)
                     LoadResult.Page(
@@ -44,7 +45,13 @@ class ApiLimitOffsetPagingSource<InitialFetchResultType : Any, NonInitialFetchRe
                     )
                 }
 
-                else -> LoadResult.Invalid()
+                is ApiResult.SuccessEmpty -> {
+                    LoadResult.Error(IOException("API contract violation: Initial fetch for paging returned an empty success response."))
+                }
+
+                is ApiResult.Error -> {
+                    LoadResult.Error(IOException("API Error on initial fetch: ${response.code} - ${response.message}"))
+                }
             }
         } catch (ex: Exception) {
             LoadResult.Error(ex)
@@ -59,7 +66,7 @@ class ApiLimitOffsetPagingSource<InitialFetchResultType : Any, NonInitialFetchRe
         return try {
             when (val response =
                 nonInitialFetch(loadSize, pageIndex * loadSize, initialFetchData)) {
-                is ApiResult.ApiSuccessResult -> {
+                is ApiResult.Success -> {
                     val result = response.data
                     LoadResult.Page(
                         data = mapToNonFirstPageData(result),
@@ -68,7 +75,13 @@ class ApiLimitOffsetPagingSource<InitialFetchResultType : Any, NonInitialFetchRe
                     )
                 }
 
-                else -> LoadResult.Invalid()
+                is ApiResult.SuccessEmpty -> {
+                    LoadResult.Error(IOException("API contract violation: Page fetch for index $pageIndex returned an empty success response."))
+                }
+
+                is ApiResult.Error -> {
+                    LoadResult.Error(IOException("API Error on page $pageIndex: ${response.code} - ${response.message}"))
+                }
             }
         } catch (ex: Exception) {
             LoadResult.Error(ex)

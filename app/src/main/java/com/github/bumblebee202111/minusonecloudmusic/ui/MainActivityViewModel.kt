@@ -2,6 +2,7 @@ package com.github.bumblebee202111.minusonecloudmusic.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
 import com.github.bumblebee202111.minusonecloudmusic.data.model.LoggedInUser
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
@@ -11,7 +12,9 @@ import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginReposi
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.UserRepository
+import com.github.bumblebee202111.minusonecloudmusic.utils.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
+import com.github.bumblebee202111.minusonecloudmusic.utils.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +40,8 @@ class MainActivityViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
     private val playlistRepository: PlaylistRepository,
     private val songRepository: SongRepository,
-    private val loggedInUserDataRepository: LoggedInUserDataRepository
+    private val loggedInUserDataRepository: LoggedInUserDataRepository,
+    private val toastManager: ToastManager
 ) : ViewModel() {
 
     val loggedInUserId = loginRepository.loggedInUserId.onEach {
@@ -64,7 +68,11 @@ class MainActivityViewModel @Inject constructor(
     fun registerAnonymousOrRefreshExisting() {
         viewModelScope.launch(SupervisorJob() + Dispatchers.IO) {
             if (loginRepository.isLoggedIn.first()) {
-                loginRepository.refreshLoginToken()
+                loginRepository.refreshLoginToken().collect { result ->
+                    if (result is AppResult.Error) {
+                        toastManager.showMessage(result.error.toUiText())
+                    }
+                }
             } else if (!loginRepository.isLoggedInAsGuest.first()) {
                 loginRepository.registerAnonymous().collect()
             }
@@ -73,18 +81,27 @@ class MainActivityViewModel @Inject constructor(
 
     private suspend fun refreshDataForLogin(userId: Long?) {
         if (userId != null) {
-            loggedInUserDataRepository.refreshMyLikedSongs()
+            loggedInUserDataRepository.refreshMyLikedSongs().collect {
+
+            }
         } else {
             loggedInUserDataRepository.clearMyLikedSongs()
         }
         val playerPlaylistRemoteSongs =
             playlistRepository.playerPlaylistSongs().filterIsInstance<RemoteSong>()
-        songRepository.refreshUserRemoteSongs(playerPlaylistRemoteSongs.map(RemoteSong::id))
+        val refreshUserRemoteSongsResult=songRepository.refreshUserRemoteSongs(playerPlaylistRemoteSongs.map(RemoteSong::id)).first{it !is AppResult.Loading}
+        if (refreshUserRemoteSongsResult is AppResult.Error){
+            toastManager.showMessage(refreshUserRemoteSongsResult.error.toUiText())
+        }
     }
 
     fun onLogout() {
         viewModelScope.launch {
-            loginRepository.logout()
+            loginRepository.logout().collect { result ->
+                if (result is AppResult.Error) {
+                    toastManager.showMessage(result.error.toUiText())
+                }
+            }
         }
     }
 

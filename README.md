@@ -72,24 +72,18 @@ To align the project with current best practices and showcase significant skill 
 <img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=160 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=400/> <img src="docs\screenshots\Screenshot_comments_landscape.png" alt="Comments (landscape)" width=320 />
 <img src="docs\screenshots\Screenshot_playlist.png" alt="Playlist" width=160 /> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=160 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=240 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="Local music and player playlist dialog" width=240 /> <img src="docs\screenshots\Screenshot_listen_rank.png" alt="Listen rank" width=160 /> <img src="docs\screenshots\Screenshot_search_landscape.png" alt="Search (landscape)" width=320 />
 
-## :coffee:
-
-:heart:
 
 ## To-dos
 
 - Code optimization
-  - Handle common errors gracefully
+  - Refactoring
+  - Display missing error messages
 - Compose
   - Migrate
     - RecyclerView to LazyList
   - Use for all new UI
     - Implement official white/black themes
     - Basic drawer
-- Network: More elegant
-  - Track login stability
-  - My own CookieJar implementation
-  - Ktor?
 - Request compressed images
 - Play log (help needed)
 - New screens / major features
@@ -105,6 +99,7 @@ To align the project with current best practices and showcase significant skill 
   - Transition between Mini Player Bar & Now Playing
   - Now Playing
     - Light status bar text
+    - Hide badge when like is null
     - Follow
     - Volume control dialog for legacy systems
     - LinearLayout weight distribution for controls
@@ -141,6 +136,8 @@ To align the project with current best practices and showcase significant skill 
 - SMS login
   - UI
   - Fix missing submit code button
+  - Track stability
+- Upgrade persistence layer to DataStore
 - Share
 - Volume balance
 - The UI is generally not interactive enough
@@ -170,6 +167,7 @@ To align the project with current best practices and showcase significant skill 
   - [Animations & Transitions][animation]
   - [Fragment][fragment]
   - [Layout][layout]
+  - Compose
 - Behavior
   - [Notifications][notifications]
   - Media 3
@@ -217,6 +215,10 @@ To align the project with current best practices and showcase significant skill 
   - horologist/media
   - socialite
   
+## :coffee:
+
+:heart:  
+
 ## License
 
 This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for the full license text.

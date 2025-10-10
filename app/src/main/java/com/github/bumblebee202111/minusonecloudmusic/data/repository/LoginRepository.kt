@@ -1,6 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
-import com.github.bumblebee202111.minusonecloudmusic.data.Result
+import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
@@ -24,7 +24,7 @@ class LoginRepository @Inject constructor(
 ) {
     private val userDao = appDatabase.userDao()
 
-    fun registerAnonymous(): Flow<Result<Unit?>> {
+    fun registerAnonymous(): Flow<AppResult<Unit?>> {
         val deviceId =
             ncmClientInfoProvider.deviceId
         val username = createUsername(deviceId)
@@ -50,16 +50,21 @@ class LoginRepository @Inject constructor(
 
     val guestUserId = preferenceStorage.currentAnonymousUserId
 
-    suspend fun refreshLoginToken() = ncmEapiService.refreshLoginToken()
+    suspend fun refreshLoginToken() = apiResultFlow(
+        fetch = { ncmEapiService.refreshLoginToken() },
+        mapSuccess = { it }
+    )
 
     val isLoggedIn = loggedInUserId.map { it != null }
 
     val isLoggedInAsGuest = guestUserId.map { it != null }
 
-    suspend fun logout() {
-        ncmEapiService.logout()
-        setLoggedInUserId(null)
-    }
+    fun logout(): Flow<AppResult<Unit>> = apiResultFlow(
+        fetch = { ncmEapiService.logout() },
+        mapSuccess = {
+            setLoggedInUserId(null)
+        }
+    )
 
     fun sendCaptcha(phoneNumber: String) = apiResultFlow(
         fetch = { ncmEapiService.sendSmsCaptcha(phoneNumber) }

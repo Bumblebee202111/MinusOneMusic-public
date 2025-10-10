@@ -5,7 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
-import com.github.bumblebee202111.minusonecloudmusic.data.Result
+import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.model.DailyRecommendSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
@@ -36,25 +36,40 @@ class LoggedInUserDataRepository @Inject constructor(
         mapSuccess = { it.data.map(CloudSongsApiPage.CloudSongData::asExternalModel) }
     )
 
-    suspend fun getAllCloudSongs(start: Int): List<RemoteSong> {
-        val songs = mutableListOf<CloudSongsApiPage.CloudSongData>()
-        var offset = start
-        while (true) {
-            val response = ncmEapiService.getV1Cloud(500, offset)
-            if (response is ApiResult.ApiSuccessResult) {
-                songs += response.data.data
-                offset += 500
-                if (!response.data.hasMore) {
-                    break
-                }
-            } else {
-                break
-            }
-        }
-        return songs.map { it.asExternalModel() }
-    }
+    fun getAllCloudSongs(start: Int): Flow<AppResult<List<RemoteSong>>> = apiResultFlow(
+        fetch = {
+            val allSongs = mutableListOf<CloudSongsApiPage.CloudSongData>()
+            var offset = start
+            var hasMore = true
+            var lastSuccessCode = 200
 
-    fun getCloudSongsPagingData(): Pair<Flow<Result<Int>>, Flow<PagingData<RemoteSong>>> {
+            while (hasMore) {
+                when (val result = ncmEapiService.getV1Cloud(CLOUD_SONG_LIST_PAGE_SIZE, offset)) {
+                    is ApiResult.Success -> {
+                        allSongs.addAll(result.data.data)
+                        offset += CLOUD_SONG_LIST_PAGE_SIZE
+                        hasMore = result.data.hasMore
+                        lastSuccessCode = result.code
+                    }
+
+                    is ApiResult.Error -> {
+                        return@apiResultFlow ApiResult.Error(
+                            result.code,
+                            result.message
+                        )
+                    }
+
+                    is ApiResult.SuccessEmpty -> Unit
+                }
+            }
+            ApiResult.Success(allSongs, code = lastSuccessCode)
+        },
+        mapSuccess = { songDataList ->
+            songDataList.map { it.asExternalModel() }
+        }
+    )
+
+    fun getCloudSongsPagingData(): Pair<Flow<AppResult<Int>>, Flow<PagingData<RemoteSong>>> {
         val d = coroutineScope.async {
             ncmEapiService.getV1Cloud(
                 CLOUD_SONG_LIST_PAGE_SIZE, 0
@@ -70,13 +85,14 @@ class LoggedInUserDataRepository @Inject constructor(
                 )
             }
         }.flow.map { it.map(CloudSongsApiPage.CloudSongData::asExternalModel) }
-        return Pair(apiResultFlow(
+        return Pair(
+            apiResultFlow(
             fetch = { d.await() },
             mapSuccess = { it.count }
         ), pd)
     }
 
-    fun getCloudSongsPagingData1(): Pair<Flow<Result<Int>>, Flow<PagingData<RemoteSong>>> =
+    fun getCloudSongsPagingData1(): Pair<Flow<AppResult<Int>>, Flow<PagingData<RemoteSong>>> =
         apiDetailFlowWithPagingDataFlow(
             coroutineScope = coroutineScope,
             limit = CLOUD_SONG_LIST_PAGE_SIZE,
@@ -98,7 +114,7 @@ class LoggedInUserDataRepository @Inject constructor(
             }
         )
 
-    fun getDailyRecommendSongs(): Flow<Result<List<DailyRecommendSong>>> =
+    fun getDailyRecommendSongs(): Flow<AppResult<List<DailyRecommendSong>>> =
         apiResultFlow<DailyPageApiData, List<DailyRecommendSong>>(
             fetch = { ncmEapiService.getV3DiscoveryRecommendSongs() },
             mapSuccess = DailyPageApiData::asExternalModel
@@ -119,13 +135,14 @@ class LoggedInUserDataRepository @Inject constructor(
     )
 
     fun getMyAlbums(limit: Int, offset: Int) =
-        apiResultFlow(fetch = { ncmEapiService.getAlbumSublist(limit, offset) },
+        apiResultFlow(
+            fetch = { ncmEapiService.getAlbumSublist(limit, offset) },
             mapSuccess = { result ->
                 return@apiResultFlow result.data.map { it.asExternalModel() }
 
             })
 
-    fun getMyMvs(limit: Int): Flow<Result<List<Video>?>> =
+    fun getMyMvs(limit: Int): Flow<AppResult<List<Video>?>> =
         apiResultFlow(fetch = { ncmEapiService.getMlogMyCollectByTime(limit) }
         ) { data ->
             data.feeds?.map(SearchViewInfo::asExternalModel) ?: emptyList()
@@ -134,18 +151,20 @@ class LoggedInUserDataRepository @Inject constructor(
 
 
     private val myLikedSongs: MutableStateFlow<Set<Long>?> = MutableStateFlow(null)
-    suspend fun refreshMyLikedSongs() {
-        val starMusicIds = ncmEapiService.getStarMusicIds()
-        if (starMusicIds is ApiResult.ApiSuccessResult) {
-            myLikedSongs.value = starMusicIds.data.ids.toMutableSet()
+
+    fun refreshMyLikedSongs(): Flow<AppResult<Unit>> = apiResultFlow(
+        fetch = { ncmEapiService.getStarMusicIds() },
+        mapSuccess = { result ->
+            myLikedSongs.value = result.ids.toMutableSet()
         }
-    }
+    )
 
     suspend fun clearMyLikedSongs() {
         myLikedSongs.value = emptySet()
     }
 
     fun observeSongLiked(songId: Long) = myLikedSongs.map { it?.contains(songId) ?: false }
+
     private fun updateSongLiked(songId: Long, like: Boolean) {
         val oldMyLikedSongs = myLikedSongs.value ?: return
         myLikedSongs.value = oldMyLikedSongs.toMutableSet().also {

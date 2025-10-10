@@ -3,8 +3,11 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.data.Result
+import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
+import com.github.bumblebee202111.minusonecloudmusic.utils.ToastManager
+import com.github.bumblebee202111.minusonecloudmusic.utils.UiText
+import com.github.bumblebee202111.minusonecloudmusic.utils.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +17,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PhoneCaptchaLoginViewModel @Inject constructor(private val loginRepository: LoginRepository) : ViewModel() {
+class PhoneCaptchaLoginViewModel @Inject constructor(
+    private val loginRepository: LoginRepository,
+    private val toastManager: ToastManager
+) : ViewModel() {
 
 
     val phoneNumberState = MutableStateFlow<PhoneNumberState?>(null)
@@ -28,11 +34,14 @@ class PhoneCaptchaLoginViewModel @Inject constructor(private val loginRepository
 
     fun sendCaptcha(phoneNumber: String) {
         viewModelScope.launch {
-            loginRepository.sendCaptcha(phoneNumber).flowOn(Dispatchers.IO).collect {
-                sendCaptchaResult.value = when (it) {
-                    is Result.Loading -> SendCaptchaResult.Loading
-                    is Result.Success -> SendCaptchaResult.Success
-                    is Result.Error -> SendCaptchaResult.Error(it.exception.toString())
+            loginRepository.sendCaptcha(phoneNumber).flowOn(Dispatchers.IO).collect { result ->
+                sendCaptchaResult.value = when (result) {
+                    is AppResult.Loading -> SendCaptchaResult.Loading
+                    is AppResult.Success -> SendCaptchaResult.Success
+                    is AppResult.Error -> {
+                        toastManager.showMessage(result.error.toUiText())
+                        SendCaptchaResult.Error
+                    }
                 }
             }
         }
@@ -41,19 +50,20 @@ class PhoneCaptchaLoginViewModel @Inject constructor(private val loginRepository
 
     fun login(phoneNumber: String, captcha: String) {
         viewModelScope.launch {
-            loginRepository.loginWithCaptcha(phoneNumber = phoneNumber, captcha = captcha).flowOn(Dispatchers.IO)
+            loginRepository.loginWithCaptcha(phoneNumber = phoneNumber, captcha = captcha)
+                .flowOn(Dispatchers.IO)
                 .collect { result ->
                     _phoneLoginResult.value = when (result) {
-                        is Result.Loading -> {
-                            PhoneLoginResult.Loading
-                        }
+                        is AppResult.Loading -> PhoneLoginResult.Loading
 
-                        is Result.Success -> {
+                        is AppResult.Success -> {
+                            toastManager.showMessage(UiText.StringResource(R.string.welcome))
                             PhoneLoginResult.Success
                         }
 
-                        is Result.Error -> {
-                            PhoneLoginResult.Error(R.string.login_failed)
+                        is AppResult.Error -> {
+                            toastManager.showMessage(result.error.toUiText())
+                            PhoneLoginResult.Error
                         }
                     }
                 }
@@ -72,17 +82,16 @@ class PhoneCaptchaLoginViewModel @Inject constructor(private val loginRepository
     fun captchaChanged(phoneNumber: String, captcha: String) {
         if (isCaptchaValid(captcha)) {
             viewModelScope.launch {
-                loginRepository.verifyPhoneLoginCaptcha(phoneNumber, captcha).collect {
-                    when (it) {
-                        is Result.Success -> captchaState.value =
+                loginRepository.verifyPhoneLoginCaptcha(phoneNumber, captcha).collect { result ->
+                    when (result) {
+                        is AppResult.Success -> captchaState.value =
                             CaptchaState(isDataValid = true)
 
-                        is Result.Error -> captchaState.value =
-                            CaptchaState(error = it.exception.message)
-
-                        else-> {
-
+                        is AppResult.Error -> {
+                            toastManager.showMessage(result.error.toUiText())
+                            captchaState.value = CaptchaState(isDataValid = false)
                         }
+                        is AppResult.Loading -> {  }
                     }
 
                 }
@@ -113,5 +122,5 @@ class CaptchaState(
 sealed interface SendCaptchaResult {
     object Loading : SendCaptchaResult
     object Success : SendCaptchaResult
-    data class Error(val errorMsg: String) : SendCaptchaResult
+    object Error : SendCaptchaResult
 }

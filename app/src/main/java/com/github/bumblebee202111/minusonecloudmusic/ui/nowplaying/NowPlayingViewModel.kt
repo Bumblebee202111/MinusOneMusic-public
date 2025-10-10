@@ -2,13 +2,16 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
+import com.github.bumblebee202111.minusonecloudmusic.utils.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
+import com.github.bumblebee202111.minusonecloudmusic.utils.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
@@ -25,7 +28,8 @@ class NowPlayingViewModel @Inject constructor(
     private val loggedInUserDataRepository: LoggedInUserDataRepository,
     musicServiceConnection: MusicServiceConnection,
     loginRepository: LoginRepository,
-    private val playlistRepository: PlaylistRepository
+    private val playlistRepository: PlaylistRepository,
+    private val toastManager: ToastManager
 ) : ViewModel() {
 
     private val currentMediaId = musicServiceConnection.currentMediaId
@@ -90,7 +94,13 @@ class NowPlayingViewModel @Inject constructor(
 
     fun onDownloadClick() {
         val song = (currentSong.value as? RemoteSong) ?: return
-        songRepository.download(song)
+        viewModelScope.launch {
+            songRepository.download(song).collect {result ->
+                if(result is AppResult.Error){
+                    toastManager.showMessage(result.error.toUiText())
+                }
+            }
+        }
     }
 
 }

@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 
 
 sealed interface PhoneLoginResult{
-    object Loading:PhoneLoginResult
-    object Success:PhoneLoginResult
-    class Error(@StringRes val errorMsgResId:Int):PhoneLoginResult
+    data object Loading:PhoneLoginResult
+    data object Success:PhoneLoginResult
+    data object Error:PhoneLoginResult
 }

@@ -3,10 +3,13 @@ Change Log
 
 ## Version 1.0.0-beta03
 
-- Fixed a crash that occurred when loading tracks from certain artists.
-- Refactored the network layer for improved maintainability and stability.
-- Updated client version constants to match the official NCM app v9.2.97.
-- Added Chucker for easier API debugging (active in `debug` builds only).
+- **Fixed** a crash that occurred when loading tracks from certain artists.
+- **Refactored** the network layer for improved maintainability and stability.
+- **Updated** client version constants to match the official NCM app v9.2.97.
+- **Added** Chucker for easier API debugging (active in `debug` builds only).
+- **Improved** app stability by preventing crashes from network or API failures.
+- **Introduced** a modern, consistent notification system built using **Jetpack Compose**.
+- **Began** refactoring the app's architecture toward Jetpack Compose.
 
 ## Version 1.0.0-beta02
 

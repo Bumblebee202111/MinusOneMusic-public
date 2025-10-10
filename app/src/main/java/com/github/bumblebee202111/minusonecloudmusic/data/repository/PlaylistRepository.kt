@@ -8,7 +8,7 @@ import androidx.paging.map
 import androidx.room.withTransaction
 import asExternalModel
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
-import com.github.bumblebee202111.minusonecloudmusic.data.Result
+import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.AbstractSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
@@ -50,7 +50,7 @@ class PlaylistRepository @Inject constructor(
     private val playerDao = appDatabase.playerDao()
 
 
-    fun getPlaylistDetail(id: Long): Flow<Result<PlaylistDetail?>> = apiResultFlow(
+    fun getPlaylistDetail(id: Long): Flow<AppResult<PlaylistDetail?>> = apiResultFlow(
         fetch = {
             ncmEapiService.getPlaylistV4Detail(id).combine {
                 ncmEapiService.getPlaylistPrivilege(id)
@@ -61,7 +61,7 @@ class PlaylistRepository @Inject constructor(
         }
     )
 
-    fun getMyPlaylistDetail(id: Long): Flow<Result<PlaylistDetail?>> = apiResultFlow(
+    fun getMyPlaylistDetail(id: Long): Flow<AppResult<PlaylistDetail?>> = apiResultFlow(
         fetch = { ncmEapiService.getV6PlaylistDetail(id) },
         mapSuccess = {
             with(it) {
@@ -70,7 +70,7 @@ class PlaylistRepository @Inject constructor(
         }
     )
 
-    fun getPlaylistDetailAndPagingData(playlistId: Long): Pair<Flow<Result<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
+    fun getPlaylistDetailAndPagingData(playlistId: Long): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
         return apiDetailFlowWithPagingDataFlow(
             coroutineScope = coroutineScope,
             getTotalCount = { first.playlist.trackCount + first.playlist.cloudTrackCount },
@@ -94,7 +94,7 @@ class PlaylistRepository @Inject constructor(
         )
     }
 
-    fun getMyPlaylistDetailAndPagingData(playlistId: Long): Pair<Flow<Result<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
+    fun getMyPlaylistDetailAndPagingData(playlistId: Long): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
         return apiDetailFlowWithPagingDataFlow(
             coroutineScope = coroutineScope,
             getTotalCount = { playlist.trackCount + playlist.cloudTrackCount },
@@ -127,7 +127,7 @@ class PlaylistRepository @Inject constructor(
 
     fun getHotTracks() = NotImplementedError()
 
-    fun getTopLists(): Flow<Result<List<MainPageBillboardRowGroup>?>> = apiResultFlow(
+    fun getTopLists(): Flow<AppResult<List<MainPageBillboardRowGroup>?>> = apiResultFlow(
         fetch = { ncmEapiService.getTopListDetailsV2() }
     ) { data: List<NetworkBillboardGroup> ->
         data.map(transform = NetworkBillboardGroup::asExternalModel)

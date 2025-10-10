@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.navigation.safeargs)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -61,6 +62,7 @@ android {
         viewBinding = true
         dataBinding = true
         buildConfig = true
+        compose = true
     }
     externalNativeBuild {
         cmake {
@@ -82,16 +84,27 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.interpolator)
     implementation(libs.androidx.palette.ktx)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.viewpager2)
     implementation(libs.google.material)
+    implementation(libs.lottie)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.activity.compose)
+    debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.coil.core)
+    implementation(libs.coil.gif)
+    implementation(libs.coil.okhttp)
+    implementation(libs.coil.compose)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
@@ -108,9 +121,6 @@ dependencies {
     implementation(libs.androidx.mediarouter)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    implementation(libs.coil3.core)
-    implementation(libs.coil3.gif)
-    implementation(libs.coil3.okhttp)
     implementation(libs.moshi.kotlin)
     implementation(libs.moshi.adapters)
     implementation(libs.okhttp.logging.interceptor)
@@ -119,7 +129,6 @@ dependencies {
     implementation(libs.retrofit.converter.moshi)
     kapt(libs.retrofit.response.type.keeper)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.lottie)
     debugImplementation(libs.chucker)
     releaseImplementation(libs.chucker.no.op)
     testImplementation(libs.junit)

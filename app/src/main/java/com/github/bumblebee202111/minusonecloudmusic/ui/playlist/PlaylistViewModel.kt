@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.model.PlaylistDetail
 import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.model.SimpleRemoteSong
@@ -19,7 +20,9 @@ import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -84,11 +87,30 @@ class PlaylistViewModel @Inject constructor(
         loadRemainingSongs = {
             val allSongs = playlistDetail.value?.allSongs
             if (allSongs != null) {
-                songRepository.getSongDetails(allSongs.map(SimpleRemoteSong::id))
+                val result =
+                    songRepository.getSongDetails(allSongs.map(SimpleRemoteSong::id)).first {
+                        it !is AppResult.Loading
+                    }
+
+                when (result) {
+                    is AppResult.Success -> {
+                        result.data
+                    }
+
+                    is AppResult.Error -> {
+                        emptyList()
+                    }
+
+                    else -> {
+                        emptyList()
+                    }
+                }
+            } else {
+                emptyList()
             }
-            emptyList()
         }
     )
+
     fun onSongItemClick(startIndex: Int) = playbackHandler.onSongItemClick(startIndex)
     fun playAll() = playbackHandler.playAll()
 }

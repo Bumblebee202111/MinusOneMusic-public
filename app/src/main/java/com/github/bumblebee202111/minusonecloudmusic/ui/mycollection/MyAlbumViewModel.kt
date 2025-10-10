@@ -20,12 +20,11 @@ class MyAlbumViewModel @Inject constructor(
     loginRepository: LoginRepository,
     loggedInUserDataRepository: LoggedInUserDataRepository
 ) : ViewModel() {
-    val myAlbums=loginRepository.loggedInUserId.flatMapLatest { userId ->
-        if(userId!=null){
-            loggedInUserDataRepository.getMyAlbums(20,0).map { it.data }
-        }
-        else{
-           flowOf(null)
+    val myAlbums = loginRepository.loggedInUserId.flatMapLatest { userId ->
+        if (userId != null) {
+            loggedInUserDataRepository.getMyAlbums(20, 0).map { it.data }
+        } else {
+            flowOf(null)
         }
     }.flowOn(Dispatchers.IO).stateInUi()
 }
