@@ -1,6 +1,8 @@
 Change Log
 ==========
 
+## Version 1.0.0-beta04
+
 ## Version 1.0.0-beta03
 
 - **Fixed** a crash that occurred when loading tracks from certain artists.
