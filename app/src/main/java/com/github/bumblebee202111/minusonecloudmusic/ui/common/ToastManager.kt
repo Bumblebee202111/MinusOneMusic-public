@@ -1,4 +1,4 @@
-package com.github.bumblebee202111.minusonecloudmusic.utils
+package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
