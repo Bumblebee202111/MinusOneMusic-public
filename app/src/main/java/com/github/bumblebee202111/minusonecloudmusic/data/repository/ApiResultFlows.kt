@@ -8,7 +8,7 @@ import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.pagingsource.ApiLimitOffsetPagingSource
 import com.github.bumblebee202111.minusonecloudmusic.data.pagingsource.apiPageConfig
-import com.github.bumblebee202111.minusonecloudmusic.utils.toAppError
+import com.github.bumblebee202111.minusonecloudmusic.ui.mapper.toAppError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow

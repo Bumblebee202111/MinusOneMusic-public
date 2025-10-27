@@ -1,7 +1,7 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import androidx.lifecycle.viewModelScope
-import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractSong
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractSong
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

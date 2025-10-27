@@ -3,8 +3,8 @@ package com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.github.bumblebee202111.minusonecloudmusic.data.model.Playlist
-import com.github.bumblebee202111.minusonecloudmusic.data.model.SpecialType
+import com.github.bumblebee202111.minusonecloudmusic.model.Playlist
+import com.github.bumblebee202111.minusonecloudmusic.model.SpecialType
 
 @Entity("playlists")
 data class PlaylistEntity(
@@ -26,10 +26,10 @@ data class PlaylistEntity(
     @ColumnInfo("top_list_type")
     val topListType: String?,
     @ColumnInfo("update_frequency")
-    val updateFrequency:String?
+    val updateFrequency: String?
 )
 
-fun PlaylistEntity.asExternalModel():Playlist = Playlist(
+fun PlaylistEntity.toPlaylist(): Playlist = Playlist(
     id = id,
     name = name,
     creatorId = creatorId,
@@ -37,7 +37,7 @@ fun PlaylistEntity.asExternalModel():Playlist = Playlist(
     isPrivate = isPrivate,
     trackCount = trackCount,
     playCount = playCount,
-    specialType=specialType,
+    specialType = specialType,
     topListType = topListType,
-    updateFrequency=updateFrequency
+    updateFrequency = updateFrequency
 )

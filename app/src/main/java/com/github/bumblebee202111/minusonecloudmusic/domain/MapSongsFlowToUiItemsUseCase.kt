@@ -3,7 +3,7 @@ package com.github.bumblebee202111.minusonecloudmusic.domain
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
-import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractSong
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractSong
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SongItemUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

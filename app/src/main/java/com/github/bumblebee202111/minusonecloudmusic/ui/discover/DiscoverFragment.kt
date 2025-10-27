@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.github.bumblebee202111.minusonecloudmusic.MainActivity
 import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.data.model.DiscoverBlock
+import com.github.bumblebee202111.minusonecloudmusic.model.DiscoverBlock
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDiscoverBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.mainNavController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle

@@ -7,9 +7,9 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
-import com.github.bumblebee202111.minusonecloudmusic.data.model.PlaylistDetail
-import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.SimpleRemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.PlaylistDetail
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.SimpleRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository

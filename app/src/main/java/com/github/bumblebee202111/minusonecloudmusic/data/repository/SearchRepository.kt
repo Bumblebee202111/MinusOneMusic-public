@@ -3,7 +3,7 @@ package com.github.bumblebee202111.minusonecloudmusic.data.repository
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.search.NetworkSearchComplexSongBlock
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.search.SearchComplexCursorParam
-import com.github.bumblebee202111.minusonecloudmusic.data.network.model.search.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.search.toRemoteSong
 import com.squareup.moshi.JsonAdapter
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,7 +22,7 @@ class SearchRepository @Inject constructor(
         },
         mapSuccess = { data ->
             data.blocks.filterIsInstance<NetworkSearchComplexSongBlock>().flatMap(
-                NetworkSearchComplexSongBlock::asExternalModel
+                NetworkSearchComplexSongBlock::toRemoteSong
             )
         }
     )

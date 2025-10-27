@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteAlbum
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteAlbum
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemMyAlbumBinding
 
 class MyAlbumAdapter : ListAdapter<RemoteAlbum, MyAlbumAdapter.ViewHolder>(AlbumDiffUtil) {

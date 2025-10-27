@@ -1,8 +1,8 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.playlist
 
 import androidx.recyclerview.widget.DiffUtil
-import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractAlbum
-import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractSong
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractAlbum
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractSong
 data class SongItemUiModel(
 
     val name: String?,

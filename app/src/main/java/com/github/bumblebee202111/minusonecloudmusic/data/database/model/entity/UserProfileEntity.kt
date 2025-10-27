@@ -3,7 +3,7 @@ package com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.github.bumblebee202111.minusonecloudmusic.data.model.UserProfile
+import com.github.bumblebee202111.minusonecloudmusic.model.UserProfile
 
 @Entity("user_profiles")
 class UserProfileEntity(
@@ -17,4 +17,4 @@ class UserProfileEntity(
     @ColumnInfo("background_url")
     val backgroundUrl:String,
 )
-fun UserProfileEntity.asExternalModel(): UserProfile = UserProfile(userId, displayName, avatarUrl,backgroundUrl)
+fun UserProfileEntity.toUserProfile(): UserProfile = UserProfile(userId, displayName, avatarUrl,backgroundUrl)

@@ -5,10 +5,10 @@ import android.app.DownloadManager
 import android.content.Context
 import android.os.Environment
 import androidx.core.net.toUri
-import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.SongDownloadInfo
-import com.github.bumblebee202111.minusonecloudmusic.data.model.artistsAsPartOfFilename
-import com.github.bumblebee202111.minusonecloudmusic.data.model.nameAsPartOfFilename
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.SongDownloadInfo
+import com.github.bumblebee202111.minusonecloudmusic.model.artistsAsPartOfFilename
+import com.github.bumblebee202111.minusonecloudmusic.model.nameAsPartOfFilename
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton

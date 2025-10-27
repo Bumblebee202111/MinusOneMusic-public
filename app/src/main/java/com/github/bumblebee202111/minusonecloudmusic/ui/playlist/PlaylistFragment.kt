@@ -23,7 +23,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentU
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.applyDominantColor
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.setBackgroundColorAndTopCorner
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.PagedSongWithPositionAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PagedSongWithPositionAdapter
 import com.google.android.material.appbar.MaterialToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest

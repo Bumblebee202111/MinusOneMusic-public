@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.github.bumblebee202111.minusonecloudmusic.data.model.Billboard
+import com.github.bumblebee202111.minusonecloudmusic.model.Billboard
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemBillboardBinding
 
 class BillboardAdapter(private val navigateToPlaylist: (playlistId: Long) -> Unit) :

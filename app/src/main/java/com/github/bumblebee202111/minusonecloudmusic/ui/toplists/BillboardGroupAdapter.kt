@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.data.model.MainPageBillboardRowGroup
+import com.github.bumblebee202111.minusonecloudmusic.model.MainPageBillboardRowGroup
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemBillboardGroupBinding
 import com.google.android.material.divider.MaterialDividerItemDecoration
 

@@ -1,8 +1,10 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity
 
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractSong
+
 sealed interface AbstractSongEntity
 
-fun AbstractSongEntity.asExternalModel() = when (this) {
-    is RemoteSongEntity -> asExternalModel()
-    is LocalSongEntity -> asExternalModel()
+fun AbstractSongEntity.toAbstractSong(): AbstractSong = when (this) {
+    is RemoteSongEntity -> toRemoteSong()
+    is LocalSongEntity -> toLocalSong()
 }

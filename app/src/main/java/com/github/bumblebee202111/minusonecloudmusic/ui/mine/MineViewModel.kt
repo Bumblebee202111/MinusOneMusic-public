@@ -1,7 +1,7 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.mine
 
 import androidx.lifecycle.ViewModel
-import com.github.bumblebee202111.minusonecloudmusic.data.model.SpecialType
+import com.github.bumblebee202111.minusonecloudmusic.model.SpecialType
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.UserRepository
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi

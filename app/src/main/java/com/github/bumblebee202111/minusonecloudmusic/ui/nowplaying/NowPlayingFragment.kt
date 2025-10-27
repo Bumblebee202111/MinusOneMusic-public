@@ -53,7 +53,7 @@ import coil3.request.transformations
 import coil3.transform.CircleCropTransformation
 import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentNowPlayingBinding
 import com.github.bumblebee202111.minusonecloudmusic.player.CountUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleModeUtil
@@ -63,8 +63,8 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
-import com.github.bumblebee202111.minusonecloudmusic.utils.launchRequestPermission
-import com.github.bumblebee202111.minusonecloudmusic.utils.requestPermissionLauncher
+import com.github.bumblebee202111.minusonecloudmusic.system.launchRequestPermission
+import com.github.bumblebee202111.minusonecloudmusic.system.requestPermissionLauncher
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.badge.ExperimentalBadgeUtils

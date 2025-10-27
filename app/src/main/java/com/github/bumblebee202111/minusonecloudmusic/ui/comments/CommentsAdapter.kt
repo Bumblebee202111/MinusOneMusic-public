@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.github.bumblebee202111.minusonecloudmusic.data.model.Comment
+import com.github.bumblebee202111.minusonecloudmusic.model.Comment
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemCommentBinding
 
 class CommentsAdapter : ListAdapter<Comment, CommentsAdapter.ViewHolder>(Comment.DIFF_CALLBACK) {

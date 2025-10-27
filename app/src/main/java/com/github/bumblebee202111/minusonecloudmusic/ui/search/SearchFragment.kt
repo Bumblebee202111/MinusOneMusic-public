@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentSearchBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.hideSoftInput
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.SimpleSongAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.SimpleSongAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

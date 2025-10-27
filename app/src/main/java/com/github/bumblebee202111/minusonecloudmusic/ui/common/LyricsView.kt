@@ -13,7 +13,7 @@ import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Scroller
 import androidx.core.view.isVisible
-import com.github.bumblebee202111.minusonecloudmusic.data.model.LyricsEntry
+import com.github.bumblebee202111.minusonecloudmusic.model.LyricsEntry
 import kotlin.math.roundToInt
 import androidx.core.graphics.toColorInt
 

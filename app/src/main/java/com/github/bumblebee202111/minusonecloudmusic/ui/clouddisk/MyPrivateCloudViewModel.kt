@@ -1,20 +1,19 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.clouddisk
 
-import androidx.compose.ui.semantics.error
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
-import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongPagingDataFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlaybackHandler
-import com.github.bumblebee202111.minusonecloudmusic.utils.ToastManager
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
-import com.github.bumblebee202111.minusonecloudmusic.utils.toUiText
+import com.github.bumblebee202111.minusonecloudmusic.ui.mapper.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow

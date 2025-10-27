@@ -1,4 +1,4 @@
-package com.github.bumblebee202111.minusonecloudmusic.utils
+package com.github.bumblebee202111.minusonecloudmusic.data.network.util
 
 import okhttp3.Cookie
 

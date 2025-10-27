@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.github.bumblebee202111.minusonecloudmusic.data.model.Video
+import com.github.bumblebee202111.minusonecloudmusic.model.Video
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemMyCollectedMvBinding
 
 class MyCollectedMvAdapter: ListAdapter<Video, MyCollectedMvAdapter.ViewHolder>(VideoDiffUtil) {

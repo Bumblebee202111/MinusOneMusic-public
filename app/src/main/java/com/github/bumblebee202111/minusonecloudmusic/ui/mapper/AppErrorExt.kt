@@ -1,8 +1,9 @@
-package com.github.bumblebee202111.minusonecloudmusic.utils
+package com.github.bumblebee202111.minusonecloudmusic.ui.mapper
 
 import android.util.Log
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.data.AppError
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.UiText
 import java.io.IOException
 
 

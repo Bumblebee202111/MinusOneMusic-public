@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.data.model.DiscoverBlock
+import com.github.bumblebee202111.minusonecloudmusic.model.DiscoverBlock
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ItemDiscoverDragonBallBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemDiscoverBlockPlaylistsBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemDiscoverBlockTopListsBinding

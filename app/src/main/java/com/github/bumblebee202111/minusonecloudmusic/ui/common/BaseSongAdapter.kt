@@ -1,4 +1,4 @@
-package com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters
+package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView

@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
-import com.github.bumblebee202111.minusonecloudmusic.utils.ToastManager
-import com.github.bumblebee202111.minusonecloudmusic.utils.UiText
-import com.github.bumblebee202111.minusonecloudmusic.utils.toUiText
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.UiText
+import com.github.bumblebee202111.minusonecloudmusic.ui.mapper.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

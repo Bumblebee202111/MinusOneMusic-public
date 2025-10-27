@@ -4,8 +4,8 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserDetailEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.UserProfileEntity
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.asExternalModel
-import com.github.bumblebee202111.minusonecloudmusic.data.model.UserDetail
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.toUserProfile
+import com.github.bumblebee202111.minusonecloudmusic.model.UserDetail
 
 data class PopulatedUserDetail(
     @Embedded
@@ -17,4 +17,5 @@ data class PopulatedUserDetail(
     val userProfile: UserProfileEntity
 )
 
-fun PopulatedUserDetail.asExternalModel(): UserDetail =UserDetail(entity.listenSongs,userProfile.asExternalModel())
+fun PopulatedUserDetail.toUserDetail(): UserDetail =
+    UserDetail(entity.listenSongs, userProfile.toUserProfile())

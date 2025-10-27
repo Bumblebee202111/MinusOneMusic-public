@@ -1,6 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.toplists
 
-import com.github.bumblebee202111.minusonecloudmusic.data.model.Playlist
+import com.github.bumblebee202111.minusonecloudmusic.model.Playlist
 
 data class BillBoardGroup(
     val isOfficial:Boolean,

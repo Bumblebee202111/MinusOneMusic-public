@@ -4,19 +4,22 @@ import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.datasource.MediaStoreDataSource
 import com.github.bumblebee202111.minusonecloudmusic.data.datasource.SongDownloadDataSource
-import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.LyricsEntry
-import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.SongIdAndVersion
+import com.github.bumblebee202111.minusonecloudmusic.model.LocalSong
+import com.github.bumblebee202111.minusonecloudmusic.model.LyricsEntry
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.SongIdAndVersion
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.MusicInfoApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongLyricsApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongPrivilegeApiModel
-import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.asExternalModel
-import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toSongDownloadInfo
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toLyricsEntries
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toCommentInfo
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toRemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toSongPrivilegePartialEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.resource.NetworkComment
-import com.github.bumblebee202111.minusonecloudmusic.data.network.model.resource.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.resource.toComment
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.SongUrlInfo
 import com.github.bumblebee202111.minusonecloudmusic.data.network.requestparam.CParamSongInfo
 import com.squareup.moshi.JsonAdapter
@@ -53,7 +56,7 @@ class SongRepository @Inject constructor(
         },
         mapSuccess = { result ->
             result.songs.zip(result.privileges)
-                .map(Pair<MusicInfoApiModel, SongPrivilegeApiModel>::asExternalModel)
+                .map(Pair<MusicInfoApiModel, SongPrivilegeApiModel>::toRemoteSong)
         }
     )
 
@@ -82,7 +85,7 @@ class SongRepository @Inject constructor(
             ApiResult.Success(songs, lastSuccessCode)
         },
         mapSuccess = { songPairs ->
-            songPairs.map(Pair<MusicInfoApiModel, SongPrivilegeApiModel>::asExternalModel)
+            songPairs.map(Pair<MusicInfoApiModel, SongPrivilegeApiModel>::toRemoteSong)
         }
     )
 
@@ -117,7 +120,7 @@ class SongRepository @Inject constructor(
             ApiResult.Success(privileges, lastSuccessCode)
         },
         mapSuccess = { privileges ->
-            val privilegeEntities = privileges.map(SongPrivilegeApiModel::toEntity)
+            val privilegeEntities = privileges.map(SongPrivilegeApiModel::toSongPrivilegePartialEntity)
             songDao.upsertPrivileges(privilegeEntities)
         }
     )
@@ -127,7 +130,7 @@ class SongRepository @Inject constructor(
             ncmEapiService.getSongLyrics(
                 songId
             )
-        }, mapSuccess = SongLyricsApiModel::asExternalModel)
+        }, mapSuccess = SongLyricsApiModel::toLyricsEntries)
 
     fun getSongLikeCountText(songId: Long) = apiResultFlow(
         fetch = { ncmEapiService.getSongRedCount(songId) },
@@ -137,7 +140,7 @@ class SongRepository @Inject constructor(
 
     fun getCommentInfo(songId: Long) = apiResultFlow(
         fetch = { ncmEapiService.getCommentInfoResourceList(moshiAdapter.toJson(listOf(songId))) },
-        mapSuccess = { it[0].asExternalModel() }
+        mapSuccess = { it[0].toCommentInfo() }
     )
 
     fun getLocalSongs(): List<LocalSong> {
@@ -147,7 +150,7 @@ class SongRepository @Inject constructor(
     fun download(song: RemoteSong) = apiResultFlow(
         fetch = { ncmEapiService.getSongEnhanceDownloadUrlV1(id = song.id) },
         mapSuccess = { result ->
-            val url = result.asExternalModel()
+            val url = result.toSongDownloadInfo()
             mediaDownloadDataSource.download(song, url) }
     )
 
@@ -156,7 +159,7 @@ class SongRepository @Inject constructor(
             ncmEapiService.getV2ResourceComments(threadId)
         },
         mapSuccess = {
-            it.comments.map(NetworkComment::asExternalModel)
+            it.comments.map(NetworkComment::toComment)
         }
     )
 

@@ -1,4 +1,4 @@
-package com.github.bumblebee202111.minusonecloudmusic.utils
+package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 data class UiTextEvent(
     val message: UiText,

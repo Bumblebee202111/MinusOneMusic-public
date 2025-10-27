@@ -6,29 +6,32 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
-import asExternalModel
+import toPlayRecords
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.AbstractSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.toAbstractSong
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.populate
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
-import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractRemoteSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.MainPageBillboardRowGroup
-import com.github.bumblebee202111.minusonecloudmusic.data.model.PlaylistDetail
-import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.SongIdAndVersion
-import com.github.bumblebee202111.minusonecloudmusic.data.model.asEntity
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractRemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractSong
+import com.github.bumblebee202111.minusonecloudmusic.model.LocalSong
+import com.github.bumblebee202111.minusonecloudmusic.model.MainPageBillboardRowGroup
+import com.github.bumblebee202111.minusonecloudmusic.model.PlaylistDetail
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.SongIdAndVersion
+import com.github.bumblebee202111.minusonecloudmusic.model.toRemoteSongEntity
+import com.github.bumblebee202111.minusonecloudmusic.model.toLocalSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.combine
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.NetworkBillboardGroup
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongDetailsApiModel
-import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toPlaylistDetail
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toMainPageBillboardRowGroup
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.network.requestparam.CParamSongInfo
 import com.github.bumblebee202111.minusonecloudmusic.player.mediaIdToIsLocalAndSongId
 import com.squareup.moshi.JsonAdapter
@@ -57,7 +60,7 @@ class PlaylistRepository @Inject constructor(
             }
         },
         mapSuccess = {
-            Pair(it.first.playlist, it.second).asExternalModel()
+            Pair(it.first.playlist, it.second).toPlaylistDetail()
         }
     )
 
@@ -65,7 +68,7 @@ class PlaylistRepository @Inject constructor(
         fetch = { ncmEapiService.getV6PlaylistDetail(id) },
         mapSuccess = {
             with(it) {
-                Pair(playlist, privileges).asExternalModel()
+                Pair(playlist, privileges).toPlaylistDetail()
             }
         }
     )
@@ -86,11 +89,11 @@ class PlaylistRepository @Inject constructor(
                         .map { SongIdAndVersion(it.id, 0) }
                 fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
             },
-            mapInitialFetchToResult = { Pair(first.playlist, second).asExternalModel() },
+            mapInitialFetchToResult = { Pair(first.playlist, second).toPlaylistDetail() },
             limit = PLAYLIST_PAGE_SIZE,
             getPageDataFromInitialFetch = { first.playlist.tracks.zip(second) },
             getPageDataFromNonInitialFetch = { songs.zip(privileges) },
-            mapPagingValueToResult = { asExternalModel() }
+            mapPagingValueToResult = { toRemoteSong() }
         )
     }
 
@@ -104,7 +107,7 @@ class PlaylistRepository @Inject constructor(
                     .map { SongIdAndVersion(it.id, 0) }
                 fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
             },
-            mapInitialFetchToResult = { asExternalModel() },
+            mapInitialFetchToResult = { toPlaylistDetail() },
             limit = PLAYLIST_PAGE_SIZE,
             getPageDataFromInitialFetch = {
                 with(playlist) {
@@ -112,7 +115,7 @@ class PlaylistRepository @Inject constructor(
                 }
             },
             getPageDataFromNonInitialFetch = { songs.zip(privileges) },
-            mapPagingValueToResult = { asExternalModel() },
+            mapPagingValueToResult = { toRemoteSong() },
         )
     }
 
@@ -130,7 +133,7 @@ class PlaylistRepository @Inject constructor(
     fun getTopLists(): Flow<AppResult<List<MainPageBillboardRowGroup>?>> = apiResultFlow(
         fetch = { ncmEapiService.getTopListDetailsV2() }
     ) { data: List<NetworkBillboardGroup> ->
-        data.map(transform = NetworkBillboardGroup::asExternalModel)
+        data.map(transform = NetworkBillboardGroup::toMainPageBillboardRowGroup)
     }
 
     suspend fun clearPlayerPlaylist() {
@@ -159,8 +162,8 @@ class PlaylistRepository @Inject constructor(
             })
 
             songDao.run {
-                insertLocalSongs(localSongs.map(LocalSong::asEntity))
-                insertRemoteSongs(remoteSongs.map(AbstractRemoteSong::asEntity))
+                insertLocalSongs(localSongs.map(LocalSong::toLocalSongEntity))
+                insertRemoteSongs(remoteSongs.map(AbstractRemoteSong::toRemoteSongEntity))
             }
         }
     }
@@ -172,19 +175,19 @@ class PlaylistRepository @Inject constructor(
         }.flow.map { pagingData ->
             pagingData.map {
                 songDao.run {
-                    it.populate().asExternalModel()
+                    it.populate().toAbstractSong()
                 }
             }
         }
     }
 
     suspend fun playerPlaylistSongs() = songDao.run {
-        playerDao.populatedPlaylistSongs().populate().map(AbstractSongEntity::asExternalModel)
+        playerDao.populatedPlaylistSongs().populate().map(AbstractSongEntity::toAbstractSong)
     }
 
 
     suspend fun playerPlaylistSong(mediaId: String) = songDao.run {
-        playerDao.getPlaylistSong(mediaId).populate().asExternalModel()
+        playerDao.getPlaylistSong(mediaId).populate().toAbstractSong()
     }
 
 
@@ -204,7 +207,7 @@ class PlaylistRepository @Inject constructor(
         fetch = {
             ncmEapiService.getV1PlayRecords(userId)
         },
-        mapSuccess = PlayRecordsApiResult::asExternalModel
+        mapSuccess = PlayRecordsApiResult::toPlayRecords
     )
 
     companion object {

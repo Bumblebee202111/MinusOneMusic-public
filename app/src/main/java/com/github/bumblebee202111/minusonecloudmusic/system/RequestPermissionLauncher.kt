@@ -1,4 +1,4 @@
-package com.github.bumblebee202111.minusonecloudmusic.utils
+package com.github.bumblebee202111.minusonecloudmusic.system
 
 import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResultLauncher

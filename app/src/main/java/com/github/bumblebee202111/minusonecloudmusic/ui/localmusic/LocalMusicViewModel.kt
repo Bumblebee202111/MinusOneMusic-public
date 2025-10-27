@@ -2,7 +2,7 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.localmusic
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
+import com.github.bumblebee202111.minusonecloudmusic.model.LocalSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongsFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase

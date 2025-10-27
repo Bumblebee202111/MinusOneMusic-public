@@ -1,17 +1,17 @@
-package com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters
+package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemNormalSongWithAlbumBinding
+import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemNormalSongSimpleBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SongItemUiModel
-
-class SongWithAlbumAdapter(override val onItemClick: (position: Int) -> Unit) :
-    BaseSongAdapter<SongWithAlbumAdapter.ViewHolder>() {
+class SimpleSongAdapter(override val onItemClick: (position: Int) -> Unit) :
+    BaseSongAdapter<SimpleSongAdapter.ViewHolder>(
+    ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ListItemNormalSongWithAlbumBinding.inflate(
+            ListItemNormalSongSimpleBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -20,16 +20,13 @@ class SongWithAlbumAdapter(override val onItemClick: (position: Int) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val song = getItem(position)
-        holder.bind(song) { onItemClick(position) }
+        val myRecentMusicData = getItem(position)
+        holder.bind(myRecentMusicData) { onItemClick(position) }
     }
 
-    class ViewHolder(private val binding: ListItemNormalSongWithAlbumBinding) :
+    class ViewHolder(private val binding: ListItemNormalSongSimpleBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(
-            song: SongItemUiModel,
-            itemOnClickListener: View.OnClickListener
-        ) {
+        fun bind(song: SongItemUiModel, itemOnClickListener: View.OnClickListener) {
             binding.song = song
             binding.root.setOnClickListener(itemOnClickListener)
             binding.playingMark.apply {
@@ -42,3 +39,4 @@ class SongWithAlbumAdapter(override val onItemClick: (position: Int) -> Unit) :
         }
     }
 }
+

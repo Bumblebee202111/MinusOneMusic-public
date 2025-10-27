@@ -7,7 +7,9 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.NetworkD
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.NetworkDiscoveryBlockData.DiscoveryBlock.Companion.BLOCK_CODE_OLD_DRAGON_BALL
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.NetworkDiscoveryBlockData.DiscoveryBlock.Companion.BLOCK_CODE_PLAYLIST_RCMD
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.NetworkDiscoveryBlockData.DiscoveryBlock.Companion.BLOCK_CODE_TOPLIST
-import com.github.bumblebee202111.minusonecloudmusic.data.network.model.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.toDragonBalls
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.toTopLists
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.toPlaylists
 import com.squareup.moshi.JsonAdapter
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,16 +39,16 @@ class DiscoverRepository @Inject constructor(
             val blocks = blockData.blocks
             blocks.mapNotNull { block ->
                 when (block) {
-                    is NetworkDiscoveryBlockData.DiscoveryBlock.DragonBallBlock -> block.asExternalModel()
+                    is NetworkDiscoveryBlockData.DiscoveryBlock.DragonBallBlock -> block.toDragonBalls()
                     is NetworkDiscoveryBlockData.DiscoveryBlock.PlaylistBlock -> {
                         when (block.blockCode) {
                             BLOCK_CODE_MGC_PLAYLIST -> {
-                                val originalBlock = block.asExternalModel()
+                                val originalBlock = block.toPlaylists()
                                 val mainPrivateRadar =
                                     blocks.filterIsInstance<NetworkDiscoveryBlockData.DiscoveryBlock.PlaylistBlock>()
                                         .firstOrNull {
                                             it.blockCode == BLOCK_CODE_PLAYLIST_RCMD
-                                        }?.asExternalModel()?.playlists?.firstOrNull { playlist ->
+                                        }?.toPlaylists()?.playlists?.firstOrNull { playlist ->
                                             playlist.title.contains(
                                                 NetworkDiscoveryBlockData.DiscoveryBlock.PlaylistBlock.KEYWORD_MAIN_PRIVATE_RADAR
                                             )
@@ -64,7 +66,7 @@ class DiscoverRepository @Inject constructor(
                         }
                     }
 
-                    is NetworkDiscoveryBlockData.DiscoveryBlock.TopListBlock -> block.asExternalModel()
+                    is NetworkDiscoveryBlockData.DiscoveryBlock.TopListBlock -> block.toTopLists()
                     is NetworkDiscoveryBlockData.DiscoveryBlock.UnKnownBlock -> null
                 }
             }

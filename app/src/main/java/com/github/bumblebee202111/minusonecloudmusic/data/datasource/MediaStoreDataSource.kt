@@ -3,8 +3,8 @@ package com.github.bumblebee202111.minusonecloudmusic.data.datasource
 import android.content.Context
 import android.os.Build
 import android.provider.MediaStore
-import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalAlbum
-import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
+import com.github.bumblebee202111.minusonecloudmusic.model.LocalAlbum
+import com.github.bumblebee202111.minusonecloudmusic.model.LocalSong
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -7,16 +7,19 @@ import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
-import com.github.bumblebee202111.minusonecloudmusic.data.model.DailyRecommendSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.RemoteSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.Video
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.CloudSongsApiPage
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.DailyPageApiData
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.SearchViewInfo
-import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.asExternalModel
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.toVideo
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.toDailyRecommendedSongs
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.toRemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.toRemoteAlbum
 import com.github.bumblebee202111.minusonecloudmusic.data.pagingsource.CloudSongsPagingSource
+import com.github.bumblebee202111.minusonecloudmusic.model.DailyRecommendSong
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.Video
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +36,7 @@ class LoggedInUserDataRepository @Inject constructor(
 ) {
     fun getCloudSongs() = apiResultFlow(
         fetch = { ncmEapiService.getV1Cloud(500, 0) },
-        mapSuccess = { it.data.map(CloudSongsApiPage.CloudSongData::asExternalModel) }
+        mapSuccess = { it.data.map(CloudSongsApiPage.CloudSongData::toRemoteSong) }
     )
 
     fun getAllCloudSongs(start: Int): Flow<AppResult<List<RemoteSong>>> = apiResultFlow(
@@ -65,7 +68,7 @@ class LoggedInUserDataRepository @Inject constructor(
             ApiResult.Success(allSongs, code = lastSuccessCode)
         },
         mapSuccess = { songDataList ->
-            songDataList.map { it.asExternalModel() }
+            songDataList.map { it.toRemoteSong() }
         }
     )
 
@@ -84,7 +87,7 @@ class LoggedInUserDataRepository @Inject constructor(
                     limit
                 )
             }
-        }.flow.map { it.map(CloudSongsApiPage.CloudSongData::asExternalModel) }
+        }.flow.map { it.map(CloudSongsApiPage.CloudSongData::toRemoteSong) }
         return Pair(
             apiResultFlow(
             fetch = { d.await() },
@@ -110,14 +113,14 @@ class LoggedInUserDataRepository @Inject constructor(
             getPageDataFromInitialFetch = { data },
             getPageDataFromNonInitialFetch = { data },
             mapPagingValueToResult = {
-                asExternalModel()
+                toRemoteSong()
             }
         )
 
     fun getDailyRecommendSongs(): Flow<AppResult<List<DailyRecommendSong>>> =
         apiResultFlow<DailyPageApiData, List<DailyRecommendSong>>(
             fetch = { ncmEapiService.getV3DiscoveryRecommendSongs() },
-            mapSuccess = DailyPageApiData::asExternalModel
+            mapSuccess = DailyPageApiData::toDailyRecommendedSongs
         )
 
     fun getDailyRecommendBanner() = apiResultFlow(
@@ -138,14 +141,14 @@ class LoggedInUserDataRepository @Inject constructor(
         apiResultFlow(
             fetch = { ncmEapiService.getAlbumSublist(limit, offset) },
             mapSuccess = { result ->
-                return@apiResultFlow result.data.map { it.asExternalModel() }
+                return@apiResultFlow result.data.map { it.toRemoteAlbum() }
 
             })
 
     fun getMyMvs(limit: Int): Flow<AppResult<List<Video>?>> =
         apiResultFlow(fetch = { ncmEapiService.getMlogMyCollectByTime(limit) }
         ) { data ->
-            data.feeds?.map(SearchViewInfo::asExternalModel) ?: emptyList()
+            data.feeds?.map(SearchViewInfo::toVideo) ?: emptyList()
 
         }
 

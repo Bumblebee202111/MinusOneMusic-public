@@ -4,10 +4,10 @@ import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
-import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.asEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.user.toUserProfileEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.network.util.encodedAsBase64String
 import com.github.bumblebee202111.minusonecloudmusic.data.network.util.md5
-import com.github.bumblebee202111.minusonecloudmusic.utils.NcmClientInfoProvider
+import com.github.bumblebee202111.minusonecloudmusic.data.network.util.NcmClientInfoProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -87,7 +87,7 @@ class LoginRepository @Inject constructor(
             mapSuccess = { result ->
                 setLoggedInUserId(result.account.id)
                 setAnonymousUserId(null)
-                userDao.insertUserProfile(result.profile.asEntity())
+                userDao.insertUserProfile(result.profile.toUserProfileEntity())
                 result
             })
 
@@ -102,7 +102,7 @@ class LoginRepository @Inject constructor(
             mapSuccess = { result ->
                 setLoggedInUserId(result.account.id)
                 setAnonymousUserId(null)
-                userDao.insertUserProfile(result.profile.asEntity())
+                userDao.insertUserProfile(result.profile.toUserProfileEntity())
                 result
             })
 

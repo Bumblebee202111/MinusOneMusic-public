@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.github.bumblebee202111.minusonecloudmusic.data.model.DiscoverBlock
+import com.github.bumblebee202111.minusonecloudmusic.model.DiscoverBlock
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemDiscoverBlockPlaylistBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistFragment
 

@@ -3,8 +3,8 @@ package com.github.bumblebee202111.minusonecloudmusic.data.database.model.popula
 import androidx.room.ColumnInfo
 import androidx.room.Relation
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.RemoteSongEntity
-import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.asExternalModel
-import com.github.bumblebee202111.minusonecloudmusic.data.model.MyRecentMusicData
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.toRemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.MyRecentMusicData
 
 data class PopulatedMyRecentMusicData(
     @ColumnInfo("play_time")
@@ -18,4 +18,4 @@ data class PopulatedMyRecentMusicData(
     val musicInfo: RemoteSongEntity
 )
 
-fun PopulatedMyRecentMusicData.asExternalModel(): MyRecentMusicData =MyRecentMusicData(playTime,musicInfo.asExternalModel())
+fun PopulatedMyRecentMusicData.toMyRecentMusicData(): MyRecentMusicData =MyRecentMusicData(playTime,musicInfo.toRemoteSong())

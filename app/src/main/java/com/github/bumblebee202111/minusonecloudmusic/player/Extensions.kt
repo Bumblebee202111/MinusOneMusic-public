@@ -1,7 +1,7 @@
 package com.github.bumblebee202111.minusonecloudmusic.player
 
 import androidx.core.net.toUri
-import com.github.bumblebee202111.minusonecloudmusic.data.model.toAudioId
+import com.github.bumblebee202111.minusonecloudmusic.model.toAudioId
 
 fun String.isLocalSongUri() = this[0] == 'c'
 

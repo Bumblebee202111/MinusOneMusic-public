@@ -5,10 +5,10 @@ import androidx.media3.common.MediaItem
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.AppDispatchers.Main
 import com.github.bumblebee202111.minusonecloudmusic.coroutines.Dispatcher
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
-import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractRemoteSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.AbstractSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.LocalSong
-import com.github.bumblebee202111.minusonecloudmusic.data.model.asMediaItem
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractRemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractSong
+import com.github.bumblebee202111.minusonecloudmusic.model.LocalSong
+import com.github.bumblebee202111.minusonecloudmusic.model.asMediaItem
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

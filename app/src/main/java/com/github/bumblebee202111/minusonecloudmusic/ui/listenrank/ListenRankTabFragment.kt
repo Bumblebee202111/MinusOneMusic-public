@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentListenRankTabBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.songadapters.SongWithPositionAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithPositionAdapter
 import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankFragment.Companion.PLAY_RECORDS_TAB_INDEX_ALL_DATA
 import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankFragment.Companion.PLAY_RECORDS_TAB_INDEX_WEEK_DATA
 import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankFragment.Companion.PlayRecordsTabIndex
