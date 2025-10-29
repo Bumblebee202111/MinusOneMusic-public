@@ -97,7 +97,7 @@ To align the project with current best practices and showcase significant skill 
   - Transition between Mini Player Bar & Now Playing
   - Now Playing
     - Light status bar text
-    - Hide badge when like is null
+    - Fix badge visibility issue
     - Follow
     - Volume control dialog for legacy systems
     - LinearLayout weight distribution for controls

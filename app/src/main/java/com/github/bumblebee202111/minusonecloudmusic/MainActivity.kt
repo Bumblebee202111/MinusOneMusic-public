@@ -57,9 +57,9 @@ class MainActivity : AppCompatActivity() {
         get() = if (mediaControllerFuture.isDone) mediaControllerFuture.get() else null
 
     private val topLevelDestinations = setOf(
-        R.id.nav_mine,
         R.id.nav_wow,
-        R.id.nav_user_track
+        R.id.nav_user_track,
+        R.id.nav_mine,
     )
 
     private val miniPlayerBarDestinations = setOf(
