@@ -74,49 +74,52 @@ class PlaylistRepository @Inject constructor(
     )
 
     fun getPlaylistDetailAndPagingData(playlistId: Long): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
-        return apiDetailFlowWithPagingDataFlow(
-            coroutineScope = coroutineScope,
-            getTotalCount = { first.playlist.trackCount + first.playlist.cloudTrackCount },
+        return apiFlowsOfDetailAndPaging(
+            scope = coroutineScope,
+            limit = PLAYLIST_PAGE_SIZE,
             initialFetch = {
                 ncmEapiService.getPlaylistV4Detail(playlistId).combine {
                     ncmEapiService.getPlaylistPrivilege(playlistId)
 
                 }
             },
-            nonInitialFetch = { limit, offset, precondition ->
+            mapToDetailModel = { result ->
+                Pair(
+                    result.first.playlist,
+                    result.second
+                ).toPlaylistDetail()
+            },
+            getTotalCount = { result -> result.first.playlist.trackCount + result.first.playlist.cloudTrackCount },
+            getInitialPageItems = { first.playlist.tracks.zip(second) },
+            subsequentFetch = { limit, offset, initialResult ->
                 val songIdsAndVersions =
-                    precondition.first.playlist.trackIds.drop(offset).take(limit)
+                    initialResult.first.playlist.trackIds.drop(offset).take(limit)
                         .map { SongIdAndVersion(it.id, 0) }
                 fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
             },
-            mapInitialFetchToResult = { Pair(first.playlist, second).toPlaylistDetail() },
-            limit = PLAYLIST_PAGE_SIZE,
-            getPageDataFromInitialFetch = { first.playlist.tracks.zip(second) },
-            getPageDataFromNonInitialFetch = { songs.zip(privileges) },
-            mapPagingValueToResult = { toRemoteSong() }
-        )
+            getSubsequentPageItems = { result -> result.songs.zip(result.privileges) }
+        ) { item -> item.toRemoteSong() }
     }
 
     fun getMyPlaylistDetailAndPagingData(playlistId: Long): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
-        return apiDetailFlowWithPagingDataFlow(
-            coroutineScope = coroutineScope,
-            getTotalCount = { playlist.trackCount + playlist.cloudTrackCount },
-            initialFetch = { ncmEapiService.getV6PlaylistDetail(playlistId) },
-            nonInitialFetch = { limit, offset, precondition ->
-                val songIdsAndVersions = precondition.playlist.trackIds.drop(offset).take(limit)
-                    .map { SongIdAndVersion(it.id, 0) }
-                fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
-            },
-            mapInitialFetchToResult = { toPlaylistDetail() },
+        return apiFlowsOfDetailAndPaging(
+            scope = coroutineScope,
             limit = PLAYLIST_PAGE_SIZE,
-            getPageDataFromInitialFetch = {
+            initialFetch = { ncmEapiService.getV6PlaylistDetail(playlistId) },
+            mapToDetailModel = { result -> result.toPlaylistDetail() },
+            getTotalCount = { result -> result.playlist.trackCount + result.playlist.cloudTrackCount },
+            getInitialPageItems = {
                 with(playlist) {
                     tracks.zip(privileges)
                 }
             },
-            getPageDataFromNonInitialFetch = { songs.zip(privileges) },
-            mapPagingValueToResult = { toRemoteSong() },
-        )
+            subsequentFetch = { limit, offset, initialResult ->
+                val songIdsAndVersions = initialResult.playlist.trackIds.drop(offset).take(limit)
+                    .map { SongIdAndVersion(it.id, 0) }
+                fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
+            },
+            getSubsequentPageItems = { result -> result.songs.zip(result.privileges) },
+        ) { item -> item.toRemoteSong() }
     }
 
     private suspend fun fetchPlaylistSongDetailsFromNetwork(songIds: List<SongIdAndVersion>): ApiResult<SongDetailsApiModel> {

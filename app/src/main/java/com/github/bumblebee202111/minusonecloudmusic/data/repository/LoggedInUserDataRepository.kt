@@ -96,25 +96,23 @@ class LoggedInUserDataRepository @Inject constructor(
     }
 
     fun getCloudSongsPagingData1(): Pair<Flow<AppResult<Int>>, Flow<PagingData<RemoteSong>>> =
-        apiDetailFlowWithPagingDataFlow(
-            coroutineScope = coroutineScope,
+        apiFlowsOfDetailAndPaging(
+            scope = coroutineScope,
             limit = CLOUD_SONG_LIST_PAGE_SIZE,
             initialFetch = { limit ->
                 ncmEapiService.getV1Cloud(
                     limit = limit
                 )
             },
-            mapInitialFetchToResult = { this.count },
-            getTotalCount = { count },
-            nonInitialFetch = { limit, offset, _ ->
+            mapToDetailModel = { result  -> result .count },
+            getTotalCount = {  result -> result.count },
+            getInitialPageItems = { data },
+            subsequentFetch = { limit, offset, _ ->
                 ncmEapiService.getV1Cloud(limit, offset)
 
             },
-            getPageDataFromInitialFetch = { data },
-            getPageDataFromNonInitialFetch = { data },
-            mapPagingValueToResult = {
-                toRemoteSong()
-            }
+            getSubsequentPageItems = {  result -> result.data },
+            mapToDomainItem = { item -> item.toRemoteSong() }
         )
 
     fun getDailyRecommendSongs(): Flow<AppResult<List<DailyRecommendSong>>> =

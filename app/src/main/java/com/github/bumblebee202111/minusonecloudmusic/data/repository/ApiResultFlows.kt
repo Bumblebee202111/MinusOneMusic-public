@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
-inline fun <ApiResultDataType, reified ResultType : Any> apiResultFlow(
+inline fun <ApiResultDataType:Any, reified ResultType : Any> apiResultFlow(
     crossinline fetch: suspend () -> ApiResult<ApiResultDataType>,
     crossinline mapSuccess: suspend (data: ApiResultDataType) -> ResultType,
 ) = flow {
@@ -34,14 +34,14 @@ inline fun <ApiResultDataType, reified ResultType : Any> apiResultFlow(
             } else {
                 val error = AppError.Unknown(
                     "EmptyResultError",
-                    "API call successful but returned no data where ${ResultType::class.java.simpleName} was expected."
+                    "API returned empty success where ${ResultType::class.java.simpleName} was expected."
                 )
                 emit(AppResult.Error(error))
             }
         }
 
         is ApiResult.Error -> {
-            emit(AppResult.Error(AppError.ApiError(apiResult.code, apiResult.message)))
+            emit(AppResult.Error(AppError.Server(apiResult.code, apiResult.message)))
         }
     }
 }
@@ -71,15 +71,16 @@ inline fun <ApiResultDataType, reified ResultType> offlineFirstApiResultFlow(
                 } else {
                     val error = AppError.Unknown(
                         "EmptyResultError",
-                        "API call successful but returned no data where ${ResultType::class.java.simpleName} was expected."
+                        "API returned empty success where ${ResultType::class.java.simpleName} was expected."
                     )
                     emit(AppResult.Error(error))
                 }
             }
 
             is ApiResult.Error -> {
-                emitAll(dbFlow.map {
-                    AppResult.Error(AppError.ApiError(apiResult.code, apiResult.message))
+                val serverError = AppError.Server(apiResult.code, apiResult.message)
+                emitAll(dbFlow.map { dbData ->
+                    AppResult.Error(serverError, data = dbData)
                 })
             }
         }
@@ -88,38 +89,38 @@ inline fun <ApiResultDataType, reified ResultType> offlineFirstApiResultFlow(
     }
 }
 
-inline fun <InitialFetchResultType : Any, NonInitialFetchResultType : Any, reified ResultType : Any, reified PagingValue : Any, ResultItemType : Any> apiDetailFlowWithPagingDataFlow(
-    coroutineScope: CoroutineScope,
+inline fun <DetailResult : Any, PageResult : Any, reified DetailModel : Any, reified PageItem : Any, DomainItem : Any> apiFlowsOfDetailAndPaging(
+    scope: CoroutineScope,
     limit: Int,
-    noinline initialFetch: suspend (limit: Int) -> ApiResult<InitialFetchResultType>,
-    noinline mapInitialFetchToResult: suspend InitialFetchResultType.() -> ResultType,
-    noinline getTotalCount: suspend InitialFetchResultType.() -> Int,
-    noinline nonInitialFetch: suspend (limit: Int, offset: Int, precondition: InitialFetchResultType) -> ApiResult<NonInitialFetchResultType>,
-    noinline getPageDataFromInitialFetch: suspend InitialFetchResultType.() -> List<PagingValue>,
-    noinline getPageDataFromNonInitialFetch: suspend NonInitialFetchResultType.() -> List<PagingValue>,
-    crossinline mapPagingValueToResult: suspend PagingValue.() -> ResultItemType,
-): Pair<Flow<AppResult<ResultType>>, Flow<PagingData<ResultItemType>>> {
-    val deferredInitialFetch = coroutineScope.async {
+    noinline initialFetch: suspend (limit: Int) -> ApiResult<DetailResult>,
+    noinline mapToDetailModel: suspend (result: DetailResult) -> DetailModel,
+    noinline getTotalCount: suspend (DetailResult) -> Int,
+    noinline getInitialPageItems: suspend DetailResult.() -> List<PageItem>,
+    noinline subsequentFetch: suspend (limit: Int, offset: Int, initialResult: DetailResult) -> ApiResult<PageResult>,
+    noinline getSubsequentPageItems: suspend (result: PageResult) -> List<PageItem>,
+    crossinline mapToDomainItem: suspend (item: PageItem) -> DomainItem,
+): Pair<Flow<AppResult<DetailModel>>, Flow<PagingData<DomainItem>>> {
+    val deferredInitialFetch = scope.async {
         initialFetch(limit)
     }
 
-    val appResult: Flow<AppResult<ResultType>> = apiResultFlow(
+    val appResult: Flow<AppResult<DetailModel>> = apiResultFlow(
         fetch = { deferredInitialFetch.await() },
         mapSuccess = { data ->
-            data.mapInitialFetchToResult()
+            mapToDetailModel(data)
         }
     )
-    val pagingData: Flow<PagingData<ResultItemType>> = Pager(
+    val pagingData: Flow<PagingData<DomainItem>> = Pager(
         apiPageConfig(limit)
     ) {
         ApiLimitOffsetPagingSource(
             deferredInitialFetch = deferredInitialFetch,
-            nonInitialFetch = nonInitialFetch,
             getTotalCount = getTotalCount,
-            mapToFirstPageData = getPageDataFromInitialFetch,
-            mapToNonFirstPageData = getPageDataFromNonInitialFetch
+            getInitialPageItems = getInitialPageItems,
+            subsequentFetch = subsequentFetch,
+            getSubsequentPageItems = getSubsequentPageItems
         )
-    }.flow.map { pagingData -> pagingData.map { mapPagingValueToResult(it) } }
+    }.flow.map { pagingData -> pagingData.map { mapToDomainItem(it) } }
     return Pair(appResult, pagingData)
 }
 

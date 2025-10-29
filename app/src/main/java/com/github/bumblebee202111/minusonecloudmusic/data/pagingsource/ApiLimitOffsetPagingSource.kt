@@ -6,40 +6,41 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResul
 import kotlinx.coroutines.Deferred
 import java.io.IOException
 
-class ApiLimitOffsetPagingSource<InitialFetchResultType : Any, NonInitialFetchResultType, Value : Any>(
-    private val deferredInitialFetch: Deferred<ApiResult<InitialFetchResultType>>,
-    val nonInitialFetch: suspend (limit: Int, offset: Int, precondition: InitialFetchResultType) -> ApiResult<NonInitialFetchResultType>,
-    val getTotalCount: suspend InitialFetchResultType.() -> Int,
-    val mapToFirstPageData: suspend InitialFetchResultType.() -> List<Value>,
-    val mapToNonFirstPageData: suspend NonInitialFetchResultType.() -> List<Value>,
+class ApiLimitOffsetPagingSource<DetailResult : Any, PageResult, PageItem : Any>(
+    private val deferredInitialFetch: Deferred<ApiResult<DetailResult>>,
+    val getTotalCount: suspend (result: DetailResult) -> Int,
+    val getInitialPageItems: suspend (result: DetailResult) -> List<PageItem>,
+    val subsequentFetch: suspend (limit: Int, offset: Int, initialResult: DetailResult) -> ApiResult<PageResult>,
+    val getSubsequentPageItems: suspend (result: PageResult) -> List<PageItem>,
 ) :
-    PagingSource<Int, Value>() {
-    override fun getRefreshKey(state: PagingState<Int, Value>): Int? {
+    PagingSource<Int, PageItem>() {
+    override fun getRefreshKey(state: PagingState<Int, PageItem>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             val anchorPage = state.closestPageToPosition(anchorPosition)
             anchorPage?.nextKey?.minus(1)
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Value> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PageItem> {
         val pageIndex = params.key ?: 0
         return if (pageIndex == 0) {
             initialLoad(params)
         } else {
-            nonInitialLoad(params, pageIndex)
+            subsequentLoad(params, pageIndex)
         }
     }
 
-    private lateinit var initialFetchData: InitialFetchResultType
+    private lateinit var initialFetchData: DetailResult
     private var totalCount: Int = 0
-    private suspend fun initialLoad(params: LoadParams<Int>): LoadResult<Int, Value> {
+
+    private suspend fun initialLoad(params: LoadParams<Int>): LoadResult<Int, PageItem> {
         return try {
             when (val response = deferredInitialFetch.await()) {
                 is ApiResult.Success -> {
                     initialFetchData = response.data
                     totalCount = getTotalCount(initialFetchData)
                     LoadResult.Page(
-                        data = mapToFirstPageData(initialFetchData),
+                        data = getInitialPageItems(initialFetchData),
                         prevKey = null,
                         nextKey = if (totalCount > params.loadSize) 1 else null
                     )
@@ -58,18 +59,18 @@ class ApiLimitOffsetPagingSource<InitialFetchResultType : Any, NonInitialFetchRe
         }
     }
 
-    private suspend fun nonInitialLoad(
+    private suspend fun subsequentLoad(
         params: LoadParams<Int>,
         pageIndex: Int
-    ): LoadResult<Int, Value> {
+    ): LoadResult<Int, PageItem> {
         val loadSize = params.loadSize
         return try {
             when (val response =
-                nonInitialFetch(loadSize, pageIndex * loadSize, initialFetchData)) {
+                subsequentFetch(loadSize, pageIndex * loadSize, initialFetchData)) {
                 is ApiResult.Success -> {
                     val result = response.data
                     LoadResult.Page(
-                        data = mapToNonFirstPageData(result),
+                        data = getSubsequentPageItems(result),
                         prevKey = null,
                         nextKey = if (totalCount > (pageIndex + 1) * loadSize) pageIndex + 1 else null
                     )
