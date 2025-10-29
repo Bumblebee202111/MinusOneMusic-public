@@ -98,13 +98,13 @@ object BottomNavigationIconsUtils {
             activeResId = R.drawable.a5t,
             inactiveResId = R.drawable.a5s
         ),
-        R.id.nav_mine to BottomNavigationStateIconResIds(
-            activeResId = R.drawable.bkf,
-            inactiveResId = R.drawable.bke
-        ),
         R.id.nav_user_track to BottomNavigationStateIconResIds(
             activeResId = R.drawable.aap,
             inactiveResId = R.drawable.aao
+        ),
+        R.id.nav_mine to BottomNavigationStateIconResIds(
+            activeResId = R.drawable.bkf,
+            inactiveResId = R.drawable.bke
         )
     )
 }
