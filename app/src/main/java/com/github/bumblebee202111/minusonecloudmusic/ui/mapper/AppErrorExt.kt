@@ -12,7 +12,7 @@ fun AppError.toUiText(): UiText {
         is AppError.Network -> {
             UiText.StringResource(R.string.error_network_unavailable)
         }
-        is AppError.ApiError -> {
+        is AppError.Server -> {
             val hasMessage = !message.isNullOrBlank()
             val hasCode = code != null
             when {
