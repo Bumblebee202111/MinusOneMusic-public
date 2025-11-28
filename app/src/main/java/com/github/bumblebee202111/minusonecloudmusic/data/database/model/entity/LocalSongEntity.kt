@@ -1,0 +1,24 @@
+package com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.github.bumblebee202111.minusonecloudmusic.model.LocalAlbum
+import com.github.bumblebee202111.minusonecloudmusic.model.LocalSong
+
+@Entity
+data class LocalSongEntity(
+    val name: String?,
+    @PrimaryKey
+    val id: Long,
+    val album: LocalAlbum?,
+    val artists: List<String?>,
+    val available: Boolean,
+) : AbstractSongEntity
+
+fun LocalSongEntity.toLocalSong() = LocalSong(
+    name = name,
+    id = id,
+    album = album,
+    artists = artists,
+    available = available
+)

@@ -3,6 +3,11 @@ Change Log
 
 ## Version 1.0.0-beta04
 
+- **Feat:** Implemented NCM's official **"Dolphin"** theme system (White/Black modes).
+- **Refactor:** Major cleanup of project structure, MainActivity, and data flow builders.
+- **UI:** Polished NowPlaying and MiniPlayerBar components, and aligned bottom navigation with the official layout.
+- **Style:** Fixed status bar appearance for the Player and Daily Recommend screens.
+
 ## Version 1.0.0-beta03
 
 - **Fixed** a crash that occurred when loading tracks from certain artists.

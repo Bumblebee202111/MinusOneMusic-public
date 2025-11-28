@@ -1,0 +1,226 @@
+package com.github.bumblebee202111.minusonecloudmusic.data.repository
+
+import PlayRecordsApiResult
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
+import androidx.room.withTransaction
+import toPlayRecords
+import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
+import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
+import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.AbstractSongEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.toAbstractSong
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.populate
+import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractRemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractSong
+import com.github.bumblebee202111.minusonecloudmusic.model.LocalSong
+import com.github.bumblebee202111.minusonecloudmusic.model.MainPageBillboardRowGroup
+import com.github.bumblebee202111.minusonecloudmusic.model.PlaylistDetail
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.SongIdAndVersion
+import com.github.bumblebee202111.minusonecloudmusic.model.toRemoteSongEntity
+import com.github.bumblebee202111.minusonecloudmusic.model.toLocalSongEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.combine
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.NetworkBillboardGroup
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongDetailsApiModel
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toPlaylistDetail
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toMainPageBillboardRowGroup
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toRemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.data.network.requestparam.CParamSongInfo
+import com.github.bumblebee202111.minusonecloudmusic.player.mediaIdToIsLocalAndSongId
+import com.squareup.moshi.JsonAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class PlaylistRepository @Inject constructor(
+    private val ncmEapiService: NcmEapiService,
+    private val appDatabase: AppDatabase,
+    private val preferenceStorage: PreferenceStorage,
+    private val moshiAdapter: JsonAdapter<Any>,
+    @ApplicationScope private val coroutineScope: CoroutineScope
+) {
+    private val songDao = appDatabase.songDao()
+    private val playerDao = appDatabase.playerDao()
+
+
+    fun getPlaylistDetail(id: Long): Flow<AppResult<PlaylistDetail?>> = apiResultFlow(
+        fetch = {
+            ncmEapiService.getPlaylistV4Detail(id).combine {
+                ncmEapiService.getPlaylistPrivilege(id)
+            }
+        },
+        mapSuccess = {
+            Pair(it.first.playlist, it.second).toPlaylistDetail()
+        }
+    )
+
+    fun getMyPlaylistDetail(id: Long): Flow<AppResult<PlaylistDetail?>> = apiResultFlow(
+        fetch = { ncmEapiService.getV6PlaylistDetail(id) },
+        mapSuccess = {
+            with(it) {
+                Pair(playlist, privileges).toPlaylistDetail()
+            }
+        }
+    )
+
+    fun getPlaylistDetailAndPagingData(playlistId: Long): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
+        return apiFlowsOfDetailAndPaging(
+            scope = coroutineScope,
+            limit = PLAYLIST_PAGE_SIZE,
+            initialFetch = {
+                ncmEapiService.getPlaylistV4Detail(playlistId).combine {
+                    ncmEapiService.getPlaylistPrivilege(playlistId)
+
+                }
+            },
+            mapToDetailModel = { result ->
+                Pair(
+                    result.first.playlist,
+                    result.second
+                ).toPlaylistDetail()
+            },
+            getTotalCount = { result -> result.first.playlist.trackCount + result.first.playlist.cloudTrackCount },
+            getInitialPageItems = { first.playlist.tracks.zip(second) },
+            subsequentFetch = { limit, offset, initialResult ->
+                val songIdsAndVersions =
+                    initialResult.first.playlist.trackIds.drop(offset).take(limit)
+                        .map { SongIdAndVersion(it.id, 0) }
+                fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
+            },
+            getSubsequentPageItems = { result -> result.songs.zip(result.privileges) }
+        ) { item -> item.toRemoteSong() }
+    }
+
+    fun getMyPlaylistDetailAndPagingData(playlistId: Long): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
+        return apiFlowsOfDetailAndPaging(
+            scope = coroutineScope,
+            limit = PLAYLIST_PAGE_SIZE,
+            initialFetch = { ncmEapiService.getV6PlaylistDetail(playlistId) },
+            mapToDetailModel = { result -> result.toPlaylistDetail() },
+            getTotalCount = { result -> result.playlist.trackCount + result.playlist.cloudTrackCount },
+            getInitialPageItems = {
+                with(playlist) {
+                    tracks.zip(privileges)
+                }
+            },
+            subsequentFetch = { limit, offset, initialResult ->
+                val songIdsAndVersions = initialResult.playlist.trackIds.drop(offset).take(limit)
+                    .map { SongIdAndVersion(it.id, 0) }
+                fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
+            },
+            getSubsequentPageItems = { result -> result.songs.zip(result.privileges) },
+        ) { item -> item.toRemoteSong() }
+    }
+
+    private suspend fun fetchPlaylistSongDetailsFromNetwork(songIds: List<SongIdAndVersion>): ApiResult<SongDetailsApiModel> {
+        return ncmEapiService.getSongDetails(moshiAdapter.toJson(songIds.map {
+            CParamSongInfo(
+                id = it.songId,
+                version = 0
+            )
+        }))
+    }
+
+    fun getHotTracks() = NotImplementedError()
+
+    fun getTopLists(): Flow<AppResult<List<MainPageBillboardRowGroup>?>> = apiResultFlow(
+        fetch = { ncmEapiService.getTopListDetailsV2() }
+    ) { data: List<NetworkBillboardGroup> ->
+        data.map(transform = NetworkBillboardGroup::toMainPageBillboardRowGroup)
+    }
+
+    suspend fun clearPlayerPlaylist() {
+        appDatabase.withTransaction {
+            playerDao.deleteAllPlaylistSongs()
+        }
+    }
+
+    suspend fun addSongsToPlayerPlaylist(songs: List<AbstractSong>) {
+        appDatabase.withTransaction {
+            val playlistSize = playerDao.getPlaylistSize()
+            val localSongs = mutableListOf<LocalSong>()
+            val remoteSongs = mutableListOf<AbstractRemoteSong>()
+            playerDao.insertPlaylistSongs(songs.mapIndexed { index, song ->
+                when (song) {
+                    is LocalSong -> localSongs += song
+                    is AbstractRemoteSong -> remoteSongs += song
+                }
+                val mediaId = song.mediaId
+                val (isLocal, songId) = mediaId.mediaIdToIsLocalAndSongId()
+                PlayerPlaylistSongEntity(
+                    position = index + playlistSize,
+                    mediaId = mediaId,
+                    isLocal = isLocal, id = songId
+                )
+            })
+
+            songDao.run {
+                insertLocalSongs(localSongs.map(LocalSong::toLocalSongEntity))
+                insertRemoteSongs(remoteSongs.map(AbstractRemoteSong::toRemoteSongEntity))
+            }
+        }
+    }
+
+    fun getPlayerPlaylistPagingData(): Flow<PagingData<AbstractSong>> {
+        val pagingConfig = PagingConfig(100)
+        return Pager(config = pagingConfig) {
+            playerDao.populatedPlaylistSongsPagingSource()
+        }.flow.map { pagingData ->
+            pagingData.map {
+                songDao.run {
+                    it.populate().toAbstractSong()
+                }
+            }
+        }
+    }
+
+    suspend fun playerPlaylistSongs() = songDao.run {
+        playerDao.populatedPlaylistSongs().populate().map(AbstractSongEntity::toAbstractSong)
+    }
+
+
+    suspend fun playerPlaylistSong(mediaId: String) = songDao.run {
+        playerDao.getPlaylistSong(mediaId).populate().toAbstractSong()
+    }
+
+
+    suspend fun getPlayerPlaylistSongPosition(mediaId: String): Int? {
+        return playerDao.getPlaylistSongPosition(mediaId)
+    }
+
+    fun playerPlaylistCurrentSongPosition() =
+        preferenceStorage.currentSongPosition
+
+
+    suspend fun savePlayerPlaylistCurrentSongPosition(position: Int) {
+        preferenceStorage.setCurrentSongPosition(position)
+    }
+
+    fun playRecords(userId: Long) = apiResultFlow(
+        fetch = {
+            ncmEapiService.getV1PlayRecords(userId)
+        },
+        mapSuccess = PlayRecordsApiResult::toPlayRecords
+    )
+
+    companion object {
+        const val TOP_LIST_ID: Long = 3778678
+        const val PLAYLIST_PAGE_SIZE: Int = 1000
+        private val REMOTE_PLAYLIST_PAGING_CONFIG = PagingConfig(
+            pageSize = PLAYLIST_PAGE_SIZE,
+            prefetchDistance = PLAYLIST_PAGE_SIZE / 10,
+            initialLoadSize = PLAYLIST_PAGE_SIZE
+        )
+    }
+}
+
