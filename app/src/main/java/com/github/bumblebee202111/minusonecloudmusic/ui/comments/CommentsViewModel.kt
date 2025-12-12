@@ -13,7 +13,7 @@ class CommentsViewModel @Inject constructor(
     songRepository: SongRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val threadId = CommentsFragmentArgs.fromSavedStateHandle(savedStateHandle).threadId
+    private val threadId: String = checkNotNull(savedStateHandle["threadId"])
 
     val comments = songRepository.getComments(threadId).map { it.data }.stateInUi()
 }

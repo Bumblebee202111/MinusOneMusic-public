@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.media3.common.util.UnstableApi
-import androidx.navigation.fragment.findNavController
 import coil3.load
 import coil3.request.error
 import coil3.request.placeholder
@@ -24,10 +23,12 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.applyDominantColo
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.setBackgroundColorAndTopCorner
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PagedSongWithPositionAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import com.google.android.material.appbar.MaterialToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -41,6 +42,8 @@ class PlaylistFragment : Fragment() {
     private lateinit var toolbar: MaterialToolbar
     private lateinit var toolbarBackground: View
 
+    @Inject
+    lateinit var navigationManager: NavigationManager
     companion object {
         fun newInstance() = PlaylistFragment()
 
@@ -84,7 +87,7 @@ class PlaylistFragment : Fragment() {
         }
 
         toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            navigationManager.goBack()
         }
 
         playlistActions= view.findViewById(R.id.playlist_actions)

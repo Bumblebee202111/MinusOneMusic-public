@@ -7,11 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMyPlaylistCategoryBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.mainNavController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.ListenRankRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PlaylistRoute
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -22,6 +24,9 @@ class UserPlaylistTabFragment : Fragment() {
     private val mineViewModel: MineViewModel by viewModels( {
         requireParentFragment().requireParentFragment()
     })
+
+    @Inject
+    lateinit var navigationManager: NavigationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,9 +53,9 @@ class UserPlaylistTabFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val playlistAdapter = MyPlaylistAdapter { userPlaylistItem ->
-            val direction = when (userPlaylistItem) {
+            val route = when (userPlaylistItem) {
                 is NormalPlaylistItem -> {
-                    MobileNavigationDirections.actionGlobalNavPlaylist(
+                    PlaylistRoute(
                         playlistId = userPlaylistItem.playlist.id,
                         playlistCreatorId = userPlaylistItem.playlist.creatorId ?: 0,
                         isMyPL = true
@@ -58,10 +63,10 @@ class UserPlaylistTabFragment : Fragment() {
                 }
 
                 is UserChartsItem -> {
-                    MobileNavigationDirections.actionGlobalNavListenRank(userPlaylistItem.userId)
+                    ListenRankRoute(userPlaylistItem.userId)
                 }
             }
-            mainNavController.navigate(direction)
+            navigationManager.navigate(route)
 
         }
         binding.playlists.adapter = playlistAdapter
