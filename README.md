@@ -80,8 +80,9 @@ To align the project with current best practices and showcase significant skill 
 - Compose
   - Migrate
     - RecyclerView to LazyList
-  - Use for all new UI
-    - Basic drawer
+- Nav UI
+  - Drawer
+  - NavigationSuiteScaffold
 - Request compressed images
 - Play log (help needed)
 - New screens / major features
@@ -109,7 +110,6 @@ To align the project with current best practices and showcase significant skill 
     - Lyrics and cover matching
   - On-boarding
   - Show current audio qualities
-
 - Player
   - Continue the work of moving Player to VM
   - Handle fetch error

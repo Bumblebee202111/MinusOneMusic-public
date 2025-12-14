@@ -42,6 +42,7 @@ recyclerview = "1.4.0"
 retrofit = "3.0.0"
 room = "2.8.1"
 viewpager2 = "1.1.0"
+uiViewbinding = "1.10.0"
 
 [libraries]
 # AndroidX
@@ -114,6 +115,7 @@ chucker-no-op = { group = "com.github.chuckerteam.chucker", name = "library-no-o
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitExt" }
+androidx-compose-ui-viewbinding = { group = "androidx.compose.ui", name = "ui-viewbinding", version.ref = "uiViewbinding" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
