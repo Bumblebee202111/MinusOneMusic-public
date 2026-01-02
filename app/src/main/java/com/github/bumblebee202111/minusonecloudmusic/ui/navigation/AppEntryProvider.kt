@@ -41,12 +41,29 @@ val AppEntryProvider = entryProvider {
     entry<PhoneCaptchaLoginRoute> { AndroidFragment<PhoneCaptchaLoginFragment>() }
     entry<PhonePasswordLoginRoute> { AndroidFragment<PhonePasswordLoginFragment>() }
     entry<PlaylistRoute> { route ->
-        val args = Bundle().apply {
-            putLong("playlistId", route.playlistId)
-            putLong("playlistCreatorId", route.playlistCreatorId)
-            putBoolean("isMyPL", route.isMyPL)
-        }
-        AndroidFragment<PlaylistFragment>(arguments = args)
+        AndroidFragment<PlaylistFragment>(
+            arguments = Bundle().apply {
+                putLong("playlistId", route.playlistId)
+                putLong("playlistCreatorId", route.playlistCreatorId)
+                putBoolean("isMyPL", route.isMyPL)
+            }
+        )
+    }
+    entry<PlaylistV4Route> { route ->
+        AndroidFragment<PlaylistFragment>(
+            arguments = Bundle().apply {
+                putLong("playlistId", route.id)
+                putBoolean("isV6", false)
+            }
+        )
+    }
+    entry<V6PlaylistRoute> { route ->
+        AndroidFragment<PlaylistFragment>(
+            arguments = Bundle().apply {
+                putLong("playlistId", route.id)
+                putBoolean("isV6", true)
+            }
+        )
     }
     entry<CommentsRoute> { route ->
         val args = Bundle().apply {

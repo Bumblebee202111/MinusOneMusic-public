@@ -18,12 +18,21 @@ import kotlinx.serialization.Serializable
 @Serializable data object MyCollectionRoute : NavKey
 @Serializable data object SettingsRoute : NavKey
 @Serializable data object SearchRoute : NavKey
-
 @Serializable
 data class PlaylistRoute(
     val playlistId: Long,
-    val playlistCreatorId: Long,
+    val playlistCreatorId: Long = 0L,
     val isMyPL: Boolean = false
+) : NavKey
+
+@Serializable
+data class PlaylistV4Route(
+    val id: Long
+) : NavKey
+
+@Serializable
+data class V6PlaylistRoute(
+    val id: Long
 ) : NavKey
 
 @Serializable
@@ -36,4 +45,7 @@ data class ListenRankRoute(val userId: Long) : NavKey
 @Serializable data object PhonePasswordLoginRoute : NavKey
 
 const val DEEP_LINK_SCHEME = "orpheus"
-const val URL_NOW_PLAYING = "$DEEP_LINK_SCHEME:
+const val URL_PLAYER = "$DEEP_LINK_SCHEME:
+const val URL_SONG_RCMD = "$DEEP_LINK_SCHEME:
+const val URL_PLAYLIST = "$DEEP_LINK_SCHEME:
+const val URL_NM_PLAYLIST = "$DEEP_LINK_SCHEME:
