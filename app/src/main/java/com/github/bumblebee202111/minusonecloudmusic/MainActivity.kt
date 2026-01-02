@@ -38,7 +38,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.toColorInt
-import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.core.view.forEach
 import androidx.drawerlayout.widget.DrawerLayout
@@ -48,10 +47,6 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
-import com.example.nav3recipes.deeplink.basic.util.DeepLinkMatcher
-import com.example.nav3recipes.deeplink.basic.util.DeepLinkPattern
-import com.example.nav3recipes.deeplink.basic.util.DeepLinkRequest
-import com.example.nav3recipes.deeplink.basic.util.KeyDecoder
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.service.PlaybackService
 import com.github.bumblebee202111.minusonecloudmusic.system.isPackageInstalled
@@ -64,6 +59,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.UiText
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.AppEntryProvider
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DailyRecommendRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DeepLinkRegistry
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DiscoverRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.FriendTracksRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.ListenRankRoute
@@ -76,7 +72,6 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.Navigator
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NowPlayingRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PlaylistRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.SearchRoute
-import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.URL_NOW_PLAYING
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.rememberNavigationState
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.toEntries
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
@@ -127,10 +122,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var navigationManager: NavigationManager
 
-    internal val deepLinkPatterns: List<DeepLinkPattern<out NavKey>> = listOf(
-        DeepLinkPattern(NowPlayingRoute.serializer(), URL_NOW_PLAYING.toUri()),
-    )
-
     override fun onStart() {
         super.onStart()
         initializeController()
@@ -143,15 +134,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        val deepLinkKey: NavKey? = intent.data?.let { uri ->
-            val request = DeepLinkRequest(uri)
-            val match = deepLinkPatterns.firstNotNullOfOrNull { pattern ->
-                DeepLinkMatcher(request, pattern).match()
-            }
-            match?.let {
-                KeyDecoder(match.args).decodeSerializableValue(match.serializer)
-            }
-        }
+        val deepLinkKey: NavKey? = DeepLinkRegistry.resolve(intent.data?.toString())
 
         lifecycleScope.launch {
             toastManager.uiTextEvent.collect { event ->
@@ -411,18 +394,9 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         this.intent = intent
 
-        intent.data?.let { uri ->
-            val request = DeepLinkRequest(uri)
-            val match = deepLinkPatterns.firstNotNullOfOrNull { pattern ->
-                DeepLinkMatcher(request, pattern).match()
-            }
-            val key = match?.let {
-                KeyDecoder(match.args).decodeSerializableValue(match.serializer)
-            }
-
-            if (key != null) {
-                navigationManager.navigate(key)
-            }
+        val key = DeepLinkRegistry.resolve(intent.data?.toString())
+        if (key != null) {
+            navigationManager.navigate(key)
         }
     }
 

@@ -39,8 +39,10 @@ class PlaylistViewModel @Inject constructor(
     ViewModel() {
 
     private val playlistId: Long = checkNotNull(savedStateHandle["playlistId"])
-    private val creatorId = checkNotNull(savedStateHandle["playlistCreatorId"])
-    private val isMyPL: Boolean = savedStateHandle["isMyPL"] ?: false
+    private val creatorId:Long? = savedStateHandle["playlistCreatorId"]
+    private val isMyPL: Boolean? = savedStateHandle["isMyPL"]
+
+    private val isV6: Boolean? = savedStateHandle["isV6"]
 
     private val _playlistDetail = MutableStateFlow<PlaylistDetail?>(null)
     val playlistDetail get() = _playlistDetail.stateInUi()
@@ -54,10 +56,18 @@ class PlaylistViewModel @Inject constructor(
         viewModelScope.launch {
             loginRepository.loggedInUserId.collect { loggedInUserId ->
                 val (playlistDetailResultFlow, pagingDataFlow) =
-                    if (isMyPL || loggedInUserId == creatorId)
-                        playlistRepository.getMyPlaylistDetailAndPagingData(playlistId)
-                    else
-                        playlistRepository.getPlaylistDetailAndPagingData(playlistId)
+                    when(isV6){
+                        true -> playlistRepository.getMyPlaylistDetailAndPagingData(playlistId)
+                        false -> playlistRepository.getPlaylistDetailAndPagingData(playlistId)
+                        else->{
+                            if (isMyPL==true || loggedInUserId == creatorId)
+                                playlistRepository.getMyPlaylistDetailAndPagingData(playlistId)
+                            else
+                                playlistRepository.getPlaylistDetailAndPagingData(playlistId)
+                        }
+                    }
+
+
                 loadedSongs.clear()
                 playlistDetailResultFlow.collect {
                     _playlistDetail.value = it.data
