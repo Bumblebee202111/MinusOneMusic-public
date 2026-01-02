@@ -4,25 +4,45 @@ import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import androidx.activity.OnBackPressedCallback
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.graphics.toColorInt
 import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.forEach
-import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -33,20 +53,19 @@ import com.example.nav3recipes.deeplink.basic.util.DeepLinkPattern
 import com.example.nav3recipes.deeplink.basic.util.DeepLinkRequest
 import com.example.nav3recipes.deeplink.basic.util.KeyDecoder
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
-import com.github.bumblebee202111.minusonecloudmusic.databinding.ActivityMainBinding
 import com.github.bumblebee202111.minusonecloudmusic.service.PlaybackService
 import com.github.bumblebee202111.minusonecloudmusic.system.isPackageInstalled
 import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.BottomNavigationIconsUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.DolphinToast
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.MainDrawerContent
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.UiText
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.AppEntryProvider
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DailyRecommendRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DiscoverRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.FriendTracksRoute
-import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.InboxRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.ListenRankRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.LocalMusicRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MineRoute
@@ -62,6 +81,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.rememberNavig
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.toEntries
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,8 +92,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityMainBinding
 
     @Inject
     lateinit var musicServiceConnection: MusicServiceConnection
@@ -89,7 +107,7 @@ class MainActivity : AppCompatActivity() {
         R.id.nav_user_track to FriendTracksRoute,
         R.id.nav_mine to MineRoute
     )
-    private val nonTopLevelMusicRoutes = setOf(
+    private val nonTopLevelMiniBarRoutes = setOf(
         DailyRecommendRoute::class,
         ListenRankRoute::class,
         LocalMusicRoute::class,
@@ -135,9 +153,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
         lifecycleScope.launch {
             toastManager.uiTextEvent.collect { event ->
                 event?.let {
@@ -152,85 +167,42 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        binding.toastHost.setContent {
+        setContent {
+            val player by musicServiceConnection.player.collectAsStateWithLifecycle()
             DolphinTheme {
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                    modifier = Modifier.statusBarsPadding(),
-                    snackbar = { snackbarData ->
-                        DolphinToast(message = snackbarData.visuals.message)
-                    }
-                )
-            }
-        }
+                val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+                val scope = rememberCoroutineScope()
 
-        binding.root.doOnApplyWindowInsets { _, insets, _ ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            binding.bottomNavView.run {
-                layoutParams.height =
-                    resources.getDimensionPixelSize(R.dimen.bottom_nav_view_height) + systemBars.bottom
-                requestLayout()
-            }
-        }
-
-        binding.mainNavHost.setContent {
-            DolphinTheme {
                 val topLevelRoutes = setOf(DiscoverRoute, FriendTracksRoute, MineRoute)
 
-                val navigationState = rememberNavigationState(
+                val state = rememberNavigationState(
                     startRoute = DiscoverRoute,
                     topLevelRoutes = topLevelRoutes
                 )
-                val navigator = remember { Navigator(navigationState) }
+                val navigator = remember { Navigator(state) }
 
+                LaunchedEffect(Unit) {
+                    navigationManager.drawerEvents.collect { drawerState.open() }
+                }
                 LaunchedEffect(deepLinkKey) {
                     if (deepLinkKey != null) {
                         navigator.navigate(deepLinkKey)
                     }
                 }
 
-                val currentTopLevel = navigationState.topLevelRoute
-                val currentStack = navigationState.backStacks[currentTopLevel]
-                val currentKey = currentStack?.lastOrNull() ?: currentTopLevel
-
-                LaunchedEffect(currentKey) {
-                    val selectedMenuId = bottomNavMap.entries.find { it.value == currentKey }?.key
-                    if (selectedMenuId != null && binding.bottomNavView.selectedItemId != selectedMenuId) {
-                        binding.bottomNavView.selectedItemId = selectedMenuId
-                    }
-                    val isTopLevel = currentKey in topLevelRoutes
-                    val isMiniBar = currentKey::class in nonTopLevelMusicRoutes || currentKey is PlaylistRoute
-                    binding.bottomNavView.isVisible = isTopLevel
-                    binding.divider.isVisible = isTopLevel
-                    binding.miniPlayerBar.isVisible = isTopLevel || isMiniBar
-
-                    binding.drawerLayout.setDrawerLockMode(
-                        if (isTopLevel) DrawerLayout.LOCK_MODE_UNLOCKED else DrawerLayout.LOCK_MODE_LOCKED_CLOSED
-                    )
-                }
-
-                DisposableEffect(Unit) {
-                    binding.bottomNavView.setOnItemSelectedListener { menuItem ->
-                        val route = bottomNavMap[menuItem.itemId]
-                        if (route != null) {
-                            navigator.navigate(route)
-                            true
-                        } else {
-                            false
-                        }
-                    }
-                    onDispose {
-                        binding.bottomNavView.setOnItemSelectedListener(null)
+                val currentKey by remember {
+                    derivedStateOf {
+                        val currentTopLevel = state.topLevelRoute
+                        val currentStack = state.backStacks[currentTopLevel]
+                        currentStack?.lastOrNull() ?: currentTopLevel
                     }
                 }
-
-                SideEffect {
-                    val bottomNavigationIcons =
-                        BottomNavigationIconsUtils.getBottomNavigationIcons(this@MainActivity)
-                    binding.bottomNavView.menu.forEach { menuItem ->
-                        bottomNavigationIcons[menuItem.itemId]?.let { icon ->
-                            menuItem.icon = icon
-                        }
+                val isTopLevel by remember {
+                    derivedStateOf { currentKey in topLevelRoutes }
+                }
+                val isMiniBarVisible by remember {
+                    derivedStateOf {
+                        isTopLevel || currentKey::class in nonTopLevelMiniBarRoutes
                     }
                 }
 
@@ -247,58 +219,183 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
+                val drawerLayoutRef = remember { mutableStateOf<DrawerLayout?>(null) }
+                var isDrawerOpen by remember { mutableStateOf(false) }
 
-                NavDisplay(
-                    entries = navigationState.toEntries(AppEntryProvider),
-                    onBack = { navigator.goBack() }
+                BackHandler(enabled = isDrawerOpen) {
+                    drawerLayoutRef.value?.closeDrawer(GravityCompat.START)
+                }
+
+                LaunchedEffect(Unit) {
+                    navigationManager.drawerEvents.collect {
+                        drawerLayoutRef.value?.openDrawer(GravityCompat.START)
+                    }
+                }
+
+                AndroidView(
+                    factory = { context ->
+                        DrawerLayout(context).apply {
+                            id = View.generateViewId()
+                            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+
+                            addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+                                override fun onDrawerOpened(drawerView: View) {
+                                    isDrawerOpen = true
+                                }
+
+                                override fun onDrawerClosed(drawerView: View) {
+                                    isDrawerOpen = false
+                                }
+
+                                override fun onDrawerStateChanged(newState: Int) {
+                                    isDrawerOpen = isDrawerOpen(GravityCompat.START)
+                                }
+                            })
+
+                            val contentView = ComposeView(context).apply {
+                                layoutParams = DrawerLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+                                setContent {
+                                    Box(modifier = Modifier.fillMaxSize()) {
+                                        Column(modifier = Modifier.fillMaxSize()) {
+
+                                            NavDisplay(
+                                                entries = state.toEntries(AppEntryProvider),
+                                                onBack = { navigator.goBack() },
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .fillMaxWidth()
+                                            )
+                                            if (isMiniBarVisible) {
+                                                AndroidView(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    factory = { context ->
+                                                        MiniPlayerBarView(context).apply {
+                                                            setOnClickListener {
+                                                                navigationManager.navigate(
+                                                                    NowPlayingRoute
+                                                                )
+                                                            }
+                                                            setPlaylistButtonListener {
+                                                                PlayerHistoryDialogFragment().show(
+                                                                    supportFragmentManager,
+                                                                    PlayerHistoryDialogFragment.TAG
+                                                                )
+                                                            }
+                                                        }
+                                                    },
+                                                    update = { view ->
+                                                        view.player = player
+                                                    }
+                                                )
+                                            }
+
+                                            if (isTopLevel) {
+                                                HorizontalDivider(color = DolphinTheme.colors.text7)
+
+                                                AndroidView(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .navigationBarsPadding(),
+                                                    factory = { context ->
+                                                        BottomNavigationView(context).apply {
+                                                            layoutParams = ViewGroup.LayoutParams(
+                                                                MATCH_PARENT,
+                                                                resources.getDimensionPixelSize(R.dimen.bottom_nav_view_height)
+                                                            )
+                                                            background =
+                                                                "#fcfdff".toColorInt()
+                                                                    .toDrawable()
+                                                            elevation = 0f
+                                                            inflateMenu(R.menu.menu_bottom_nav)
+                                                            itemIconTintList =
+                                                                ContextCompat.getColorStateList(
+                                                                    context,
+                                                                    R.color.bnv_icon_tint
+                                                                )
+                                                            itemTextColor =
+                                                                ContextCompat.getColorStateList(
+                                                                    context,
+                                                                    R.color.bnv_title_color
+                                                                )
+                                                            val icons =
+                                                                BottomNavigationIconsUtils.getBottomNavigationIcons(
+                                                                    context
+                                                                )
+                                                            menu.forEach { item ->
+                                                                icons[item.itemId]?.let { icon ->
+                                                                    item.icon = icon
+                                                                }
+                                                            }
+
+                                                            setOnItemSelectedListener { menuItem ->
+                                                                val route =
+                                                                    bottomNavMap[menuItem.itemId]
+                                                                if (route != null) {
+                                                                    navigator.navigate(route)
+                                                                    true
+                                                                } else {
+                                                                    false
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    update = { view ->
+                                                        val selectedMenuId =
+                                                            bottomNavMap.entries.find { it.value == currentKey }?.key
+                                                        if (selectedMenuId != null && view.selectedItemId != selectedMenuId) {
+                                                            view.selectedItemId = selectedMenuId
+                                                        }
+                                                    }
+                                                )
+                                            }
+                                        }
+
+                                        SnackbarHost(
+                                            hostState = snackbarHostState,
+                                            modifier = Modifier
+                                                .align(Alignment.TopCenter)
+                                                .statusBarsPadding(),
+                                            snackbar = { data -> DolphinToast(data.visuals.message) }
+                                        )
+                                    }
+                                }
+                            }
+                            addView(contentView)
+
+                            val drawerView = ComposeView(context).apply {
+                                layoutParams = DrawerLayout.LayoutParams(
+                                    (context.resources.displayMetrics.widthPixels * 0.84).toInt(),
+                                    MATCH_PARENT
+                                ).apply {
+                                    gravity = GravityCompat.START
+                                }
+                                setContent {
+                                    MainDrawerContent(
+                                        onNavigate = { route ->
+                                            scope.launch { drawerState.close() }
+                                            navigator.navigate(route)
+                                        },
+                                        onLogout = {
+                                            scope.launch { drawerState.close() }
+                                            mainActivityViewModel.onLogout()
+                                        }
+                                    )
+                                }
+                            }
+                            addView(drawerView)
+
+                            drawerLayoutRef.value = this
+                        }
+                    },
+                    update = { view ->
+                        val lockMode = if (isTopLevel) {
+                            DrawerLayout.LOCK_MODE_UNLOCKED
+                        } else {
+                            DrawerLayout.LOCK_MODE_LOCKED_CLOSED
+                        }
+                        view.setDrawerLockMode(lockMode)
+                    }
                 )
-
-            }
-        }
-
-        binding.navView.setNavigationItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.nav_inbox -> {
-                    navigationManager.navigate(InboxRoute)
-                }
-
-                R.id.logout -> {
-                    mainActivityViewModel.onLogout()
-                }
-            }
-
-            menuItem.isChecked = true
-            binding.drawerLayout.close()
-            true
-        }
-
-        mainActivityViewModel.registerAnonymousOrRefreshExisting()
-
-        binding.miniPlayerBar.setOnClickListener {
-            navigationManager.navigate(NowPlayingRoute)
-        }
-        binding.miniPlayerBar.setPlaylistButtonListener {
-            PlayerHistoryDialogFragment().show(
-                supportFragmentManager,
-                PlayerHistoryDialogFragment.TAG
-            )
-        }
-
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    binding.drawerLayout.closeDrawer(GravityCompat.START)
-                } else {
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
-                    isEnabled = true
-                }
-            }
-        })
-
-        lifecycleScope.launch {
-            musicServiceConnection.player.collect {
-                binding.miniPlayerBar.player = it
             }
         }
     }
@@ -326,10 +423,6 @@ class MainActivity : AppCompatActivity() {
                 navigationManager.navigate(key)
             }
         }
-    }
-
-    fun openDrawer() {
-        binding.drawerLayout.open()
     }
 
     private fun initializeController() {

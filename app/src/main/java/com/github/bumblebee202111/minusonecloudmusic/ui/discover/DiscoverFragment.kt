@@ -48,7 +48,7 @@ class DiscoverFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.apply {
             setNavigationOnClickListener {
-                (activity as? MainActivity)?.openDrawer()
+                navigationManager.openDrawer()
             }
             setOnMenuItemClickListener {
                 navigationManager.navigate(SearchRoute)

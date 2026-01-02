@@ -14,11 +14,18 @@ class NavigationManager @Inject constructor() {
     private val _backActions = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val backActions = _backActions.asSharedFlow()
 
+    private val _drawerEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val drawerEvents = _drawerEvents.asSharedFlow()
+
     fun navigate(route: NavKey) {
         _navActions.tryEmit(route)
     }
 
     fun goBack() {
         _backActions.tryEmit(Unit)
+    }
+
+    fun openDrawer() {
+        _drawerEvents.tryEmit(Unit)
     }
 }
