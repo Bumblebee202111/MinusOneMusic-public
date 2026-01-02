@@ -1,29 +1,27 @@
 # MinusOne Music
 
-**MinusOne Cloud Music** (减一云音乐, app name _MinusOne Music_) is a lite, third-party NCM app for Android.
+**MinusOne Cloud Music** (减一云音乐, app name: *MinusOne Music*) is a lightweight, third-party NCM client for Android, currently in an inactive (though not abandoned) state of early development.
 
-This project explores building complex apps by implementing core NCM features using modern Android approaches. Focus is on technical implementation rather than creativity.
+This project was started as a foundational learning experience, and its current codebase is a candid reflection of the developer's skills and architectural understanding at the time.
 
-Note: Early development stage. Historically, the existing code is not good. Current progress by screens:
+To align the project with current best practices and showcase significant skill progression, a full migration to **Jetpack Compose** is planned. This strategic refactor will not only modernize the application with a declarative UI but also serve as a practical demonstration of developer growth.
+
+### Development Progress
 
 - Implemented
 
   - 我的
-
     - **我的—音乐**
-
   - 播放
-
     - **迷你播放器**
     - **播放页**
     - **播放列表（即歌单）**
-
   - 发现
     - **每日推荐**
 
 - Partial Implementation
 
-  - **验证码登录**/**密码登录**[broken]/**退出登录**
+  - **验证码登录**[prone to failure]/**密码登录**[prone to failure]/**退出登录**
   - 我的
     - **最近播放—歌曲**
     - **云盘**
@@ -35,51 +33,40 @@ Note: Early development stage. Historically, the existing code is not good. Curr
   - **搜索（“综合”Tab之“单曲”）**
   - **评论（Hottest Page 1）**
 
-> - 所列界面一般不含二级界面
-> - Other UI elements, pages or functionalities are nowhere near completed although some drafts exist.
+  > Note: 所列界面一般不含二级界面. Other UI elements and functionalities are far from complete, although some drafts exist.
 
-**Known issues:**
 
 ## Features
 
-Provides a 99% pure music experience with basic support of ~~social features~~ (not implemented yet).
-
-- **-1 (jiǎn yī)!** 
-
-  - No ads/podcasts/square
-
-  - Minimal VIP UI elements
-
-  - Tailored UI content
-
-  - Small APK size
-
-  - Core functionalities and UI retained, but only on a best-effort basis
-  - Non-additive or subtractive modifications (some UI/behavior changes will be togglable in Settings)
-  - No extra features
-> [Here](#intd) are important non-to-dos
-
-- Music playback
-- Tablet/landscape support without special adaptations
-- Direct NCM API integration (new undiscovered endpoints)
-- `View`-based system & Single Activity architecture
-- **NOT** modified from the decompiled official app (despite visual similarities)
-- Does NOT hack music resources
+- The app aims to provide a 99% pure music experience with basic support for social features (which are not yet implemented).
+  - **-1 (jiǎn yī)!**
+    - No ads, podcasts, or social squares
+    - Minimal VIP UI elements
+    - Tailored UI content
+    - Small APK size
+    - Core functionalities and UI are retained on a best-effort basis
+    - Non-additive or subtractive modifications (some UI/behavioral changes will be configurable in Settings)
+    - No extra features
+  - Music playback
+  - Tablet/landscape support without special adaptations
+- Direct NCM API integration (utilizing endpoints not publicly documented)
+- View-based system & Single Activity architecture
+- **NOT** a modification of the decompiled official app, despite visual similarities
+- Does **NOT** hack music resources
 
 ## Notices
 
 It is strongly encouraged to use the official NCM app. If using this app, you agree to:
 
-- Must coexist with official NCM app
-- **Closed source** (reverse-engineer if needed)
-  - Non-NCM code available on request
-  - However, future selected public repo sync planned
-- Documentation is in broken English
+- Users are strongly encouraged to use the official NCM app. By using this application, you agree to the following:
+  - It must coexist with the official NCM app.
+  - **Closed source:** You may reverse-engineer if necessary. Non-NCM code is available upon request, with plans for future synchronization with a public repository.
+  - Documentation is in broken English.
 
-### Your do's and don'ts
+- ### Usage Guidelines
 
-- Use only for personal learning purposes
-- Do not share without permission
+  - For personal learning purposes only.
+  - Do not share without permission.
 
 ## Screenshots
 
@@ -93,7 +80,9 @@ It is strongly encouraged to use the official NCM app. If using this app, you ag
 
 ## To-dos
 
-- Coil
+- Update base NCM version to 9.2.97
+  - Use `x-aeapi` header
+
 - Code optimization
   - Handle common errors gracefully
 - Introduce Compose for non-core player UI
@@ -238,11 +227,11 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 ## Misc.
 
 <details>
-    <summary>Misc.</summary>
+<summary>Misc.</summary>
 <p>
-    - Initially, I named it as 'NaCl'. Letters extracted from that of the official NCM app, it indicated that this third-party variant would be a lite alternative to the official one, due to technical skill limitations and omission of useless features. However, I found that Salt Music, another existing well-designed music app had a similar name. Now my app has been renamed to MinusOne Cloud Music, matching both of the '-1' slogan and the name format of NCM. 
-    </p>
+- **On the project's name:** The project was initially named 'NaCl,' derived from the letters in the official NCM app's name. This was intended to signify its role as a "lite" alternative, reflecting both the developer's technical limitations and the intentional omission of non-essential features. However, the name was changed to avoid confusion with 'Salt Music,' another existing music app. The current name, MinusOne Cloud Music, was chosen to align with both the official NCM app's '-1' slogan and its naming format.
+</p>
 <p>
-    - Security and cryptography. We do use the very basic of NDK, which is apparently redundant in non-toy apps but worth for learning purposes.
-    </p>
+- **On security and cryptography:** The project includes a very basic NDK implementation. While arguably redundant for an application of this scale, it was incorporated primarily as a valuable learning exercise.
+</p>
 </details>
