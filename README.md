@@ -1,6 +1,6 @@
 # MinusOne Music
 
-**MinusOne Cloud Music** (减一云音乐, app name: *MinusOne Music*) is a lightweight, third-party NCM client for Android, currently in an inactive (though not abandoned) state of early development.
+**MinusOne Cloud Music** (减一云音乐, app name: *MinusOne Music*) is a lightweight, third-party NetEase Cloud Music (NCM) client for Android, currently in an inactive (though not abandoned) state of early development.
 
 This project was started as a foundational learning experience, and its current codebase is a candid reflection of the developer's skills and architectural understanding at the time.
 
