@@ -67,7 +67,7 @@ class MineFragment : Fragment() {
         val root = binding.root
 
         binding.topAppBar.setNavigationOnClickListener {
-             (activity as? MainActivity)?.openDrawer()
+             navigationManager.openDrawer()
        }
         return root
     }
