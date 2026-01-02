@@ -14,15 +14,9 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.DrawableRes
 import androidx.annotation.OptIn
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -37,7 +31,6 @@ import androidx.media3.common.util.Assertions
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.common.util.Util.getDrawable
-import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.TimeBar
 import androidx.mediarouter.app.SystemOutputSwitcherDialogController
@@ -53,21 +46,20 @@ import coil3.request.transformations
 import coil3.transform.CircleCropTransformation
 import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentNowPlayingBinding
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.player.CountUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleModeUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleToggleMode
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.LyricsView
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
 import com.github.bumblebee202111.minusonecloudmusic.system.launchRequestPermission
 import com.github.bumblebee202111.minusonecloudmusic.system.requestPermissionLauncher
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.attachBadge
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.setStatusBarContentColor
+import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
 import com.google.android.material.badge.BadgeDrawable
-import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.badge.ExperimentalBadgeUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -510,9 +502,14 @@ class NowPlayingFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        setStatusBarContentColor(isDarkIcons = false)
+    }
 
     override fun onStop() {
         super.onStop()
+        setStatusBarContentColor(isDarkIcons = true)
         player = null
     }
 

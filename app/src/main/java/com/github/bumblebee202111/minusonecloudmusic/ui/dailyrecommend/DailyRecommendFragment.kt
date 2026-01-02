@@ -16,6 +16,7 @@ import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDailyRe
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithAlbumAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.setStatusBarContentColor
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -69,6 +70,16 @@ class DailyRecommendFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setStatusBarContentColor(isDarkIcons = false)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        setStatusBarContentColor(isDarkIcons = true)
     }
 
 }

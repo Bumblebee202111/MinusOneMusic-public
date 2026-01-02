@@ -1,14 +1,17 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.PaintDrawable
 import android.view.View
+import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.ColorRes
 import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
@@ -97,6 +100,22 @@ data class ViewPaddingState(
     val start: Int,
     val end: Int
 )
+
+
+fun Fragment.setStatusBarContentColor(isDarkIcons: Boolean) {
+    activity?.window?.let { window ->
+        setWindowStatusBarColor(window, isDarkIcons)
+    }
+}
+
+fun Activity.setStatusBarContentColor(isDarkIcons: Boolean) {
+    setWindowStatusBarColor(window, isDarkIcons)
+}
+
+private fun setWindowStatusBarColor(window: Window, isDarkIcons: Boolean) {
+    val controller = WindowCompat.getInsetsController(window, window.decorView)
+    controller.isAppearanceLightStatusBars = isDarkIcons
+}
 
 fun View.setBackgroundColorAndTopCorner(@ColorRes color: Int, radius: Float) {
     val background =
