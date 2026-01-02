@@ -96,7 +96,6 @@ To align the project with current best practices and showcase significant skill 
     - Hide like `PlayControlView`
   - Transition between Mini Player Bar & Now Playing
   - Now Playing
-    - Light status bar text
     - Fix badge visibility issue
     - Follow
     - Volume control dialog for legacy systems
