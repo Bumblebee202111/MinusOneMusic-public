@@ -65,6 +65,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLif
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
 import com.github.bumblebee202111.minusonecloudmusic.system.launchRequestPermission
 import com.github.bumblebee202111.minusonecloudmusic.system.requestPermissionLauncher
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.attachBadge
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.badge.ExperimentalBadgeUtils
@@ -81,42 +82,61 @@ class NowPlayingFragment : Fragment() {
     lateinit var binding: FragmentNowPlayingBinding
     private val nowPlayingViewModel: NowPlayingViewModel by viewModels()
 
-    private lateinit var playerListener: PlayerListener
-    private lateinit var artworkView: ImageView
-    private lateinit var toolbar: Toolbar
-    private lateinit var songActionsTitleView: TextView
-    private lateinit var songActionsArtistView: TextView
-    private lateinit var previousButton: View
-    private lateinit var nextButton: View
-    private lateinit var playPauseButton: ImageButton
-    private lateinit var repeatShuffleToggleButton: ImageButton
+    private var playerListener = object : Player.Listener {
+        override fun onEvents(player: Player, events: Player.Events) {
+            if (events.containsAny(
+                    Player.EVENT_PLAYBACK_STATE_CHANGED,
+                    Player.EVENT_PLAY_WHEN_READY_CHANGED,
+                    Player.EVENT_IS_PLAYING_CHANGED,
+                    Player.EVENT_AVAILABLE_COMMANDS_CHANGED
+                )
+            ) {
+                updateProgress()
+                updateLyrics()
+            }
+            if (events.containsAny(
+                    Player.EVENT_PLAYBACK_STATE_CHANGED,
+                    Player.EVENT_PLAY_WHEN_READY_CHANGED,
+                    Player.EVENT_AVAILABLE_COMMANDS_CHANGED
+                )
+            ) {
+                updatePlayPauseButton()
+            }
 
+            if (events.containsAny(
+                    Player.EVENT_REPEAT_MODE_CHANGED,
+                    Player.EVENT_SHUFFLE_MODE_ENABLED_CHANGED,
+                    Player.EVENT_AVAILABLE_COMMANDS_CHANGED
+                )
+            ) {
+                updateRepeatShuffleModeButton()
+            }
 
-    private lateinit var durationView: TextView
-    private lateinit var positionView: TextView
-    private lateinit var timeBar: DefaultTimeBar
+            if (events.containsAny(
+                    Player.EVENT_POSITION_DISCONTINUITY,
+                    Player.EVENT_TIMELINE_CHANGED,
+                    Player.EVENT_AVAILABLE_COMMANDS_CHANGED
+                )
+            ) {
+                updateTimeline()
+            }
 
-    
-    private lateinit var playlistButton: ImageView
-    private lateinit var playBottomContainer: ConstraintLayout
-    private lateinit var deviceButton: ImageView
-    private lateinit var downloadButton: ImageView
-    private lateinit var moreButton: ImageView
-    private lateinit var likeButton: ImageButton
-    private lateinit var commentButton: ImageButton
-    private lateinit var lyricsView: LyricsView
-    private lateinit var lyricsModeLikeButton: ImageButton
+            if (events.containsAny(
+                    Player.EVENT_PLAY_WHEN_READY_CHANGED,
+                    Player.EVENT_MEDIA_METADATA_CHANGED,
+                    Player.EVENT_MEDIA_ITEM_TRANSITION
+                )
+            )
+                updateMediaMetadata()
+        }
 
-    private lateinit var albumLayout: ViewGroup
-    private lateinit var songActionsLayout: ViewGroup
-    private lateinit var lyricsLayout: ViewGroup
-
+    }
     private lateinit var formatBuilder: StringBuilder
     private lateinit var formatter: Formatter
     private lateinit var period: Timeline.Period
     private lateinit var window: Timeline.Window
-    private lateinit var updateProgressAction: Runnable
-    private lateinit var updateLyricsAction: Runnable
+    private val updateProgressAction = Runnable(::updateProgress)
+    private val updateLyricsAction = Runnable(::updateLyrics)
 
     private lateinit var repeatAllShuffleOffButtonDrawable: Drawable
     private lateinit var repeatAllShuffleOnButtonDrawable: Drawable
@@ -186,47 +206,42 @@ class NowPlayingFragment : Fragment() {
         repeatToggleModes = RepeatShuffleToggleMode.REPEAT_SHUFFLE_MODE_ALL_OFF
         timeBarMinUpdateIntervalMs = TIME_BAR_MIN_UPDATE_INTERVAL_MS
         defaultArtworkId = R.drawable.h_7
-        artworkView = binding.smallAlbumCover0
+
         defaultArtwork = ContextCompat.getDrawable(context, defaultArtworkId)!!
 
-        lyricsView = binding.lyrics.apply {
+        binding.lyrics.apply {
             setOnClickListener {
                 isLyricsMode = !isLyricsMode
                 updateUiMode()
             }
         }
 
-        songActionsLayout = binding.songActionsLayout
-        albumLayout = binding.artistImageContainer.apply {
+        binding.artistImageContainer.apply {
             visibility = View.VISIBLE
             setOnClickListener {
                 isLyricsMode = !isLyricsMode
                 updateUiMode()
             }
         }
-        lyricsLayout = binding.modeLyricsLayout.apply {
+        binding.modeLyricsLayout.apply {
             visibility = View.GONE
 
         }
-
-        playerListener = PlayerListener()
 
         period = Timeline.Period()
         window = Timeline.Window()
         formatBuilder = StringBuilder()
         formatter = Formatter(formatBuilder, Locale.getDefault())
         scrubbing = false
-        updateProgressAction = Runnable { updateProgress() }
-        updateLyricsAction = Runnable { updateLyrics() }
 
-        playPauseButton = binding.playerPlayPause.apply {
+        binding.playerPlayPause.apply {
             setOnClickListener {
                 val player = player ?: return@setOnClickListener
                 Util.handlePlayPauseButtonAction(player)
             }
         }
 
-        nextButton = binding.playerNext.apply {
+        binding.playerNext.apply {
             setOnClickListener {
                 val player = player ?: return@setOnClickListener
                 if (player.isCommandAvailable(Player.COMMAND_SEEK_TO_NEXT)) {
@@ -235,7 +250,7 @@ class NowPlayingFragment : Fragment() {
                 }
             }
         }
-        previousButton = binding.playerPrev.apply {
+        binding.playerPrev.apply {
             setOnClickListener {
                 val player = player ?: return@setOnClickListener
                 if (player.isCommandAvailable(Player.COMMAND_SEEK_TO_NEXT)) {
@@ -245,7 +260,7 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        playlistButton = binding.openPlaylist.apply {
+        binding.openPlaylist.apply {
             setOnClickListener {
                 PlayerHistoryDialogFragment().show(
                     parentFragmentManager,
@@ -281,9 +296,7 @@ class NowPlayingFragment : Fragment() {
             }
         }, handler)
 
-        playBottomContainer = binding.playBottomContainer
-
-        deviceButton = binding.deviceBtnStyle1.apply {
+        binding.deviceBtnStyle1.apply {
             setOnClickListener {
                 if (!SystemOutputSwitcherDialogController.showDialog(context)) {
                     audioManager.adjustStreamVolume(
@@ -295,7 +308,7 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        downloadButton = binding.downloadButton.apply {
+        binding.downloadButton.apply {
             setOnClickListener {
                 requestPermissionLauncher?.apply {
                     launchRequestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
@@ -305,19 +318,19 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        moreButton = binding.moreButton
+        binding.moreButton.apply { }
 
         val likeClickListener = View.OnClickListener { nowPlayingViewModel.onLikeClicked() }
 
         val likeBadge = createBadgeDrawable(context)
-        likeButton = binding.likeButton.apply {
-            addBadge(likeBadge)
+        binding.likeButton.apply {
+            attachBadge(likeBadge)
             setOnClickListener(likeClickListener)
         }
 
         val commentBadge = createBadgeDrawable(context)
-        commentButton = binding.commentButton.apply {
-            addBadge(commentBadge)
+        binding.commentButton.apply {
+            attachBadge(commentBadge)
             setOnClickListener {
                 val threadId =
                     nowPlayingViewModel.commentInfo.value?.threadId ?: return@setOnClickListener
@@ -329,12 +342,11 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        lyricsModeLikeButton = binding.lyricLikeBtn.apply {
+        binding.lyricLikeBtn.apply {
             setOnClickListener(likeClickListener)
         }
 
-        repeatShuffleToggleButton = binding.playerShuffleRepeat
-        repeatShuffleToggleButton.setOnClickListener {
+        binding.playerShuffleRepeat.setOnClickListener {
             val player = player ?: return@setOnClickListener
             if (player.isCommandAvailable(Player.COMMAND_SET_REPEAT_MODE) && player.isCommandAvailable(
                     Player.COMMAND_SET_SHUFFLE_MODE
@@ -375,21 +387,18 @@ class NowPlayingFragment : Fragment() {
         likedWithoutCountDrawable = getDrawable(context, resources, R.drawable.hcx)
         likedWithCountDrawable = getDrawable(context, resources, R.drawable.hcv)
 
-        durationView = binding.duration
-        positionView = binding.position
-
-
-        timeBar = binding.timeBar.apply {
+        binding.timeBar.apply {
             addListener(object : TimeBar.OnScrubListener {
                 override fun onScrubStart(timeBar: TimeBar, position: Long) {
                     scrubbing = true
-                    positionView.text =
+                    binding.position.text =
                         Util.getStringForTime(formatBuilder, formatter, position)
 
                 }
 
                 override fun onScrubMove(timeBar: TimeBar, position: Long) {
-                    positionView.text = Util.getStringForTime(formatBuilder, formatter, position)
+                    binding.position.text =
+                        Util.getStringForTime(formatBuilder, formatter, position)
                 }
 
                 override fun onScrubStop(timeBar: TimeBar, position: Long, canceled: Boolean) {
@@ -403,7 +412,7 @@ class NowPlayingFragment : Fragment() {
             })
         }
 
-        toolbar = binding.toolbar.apply {
+        binding.toolbar.apply {
             setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
@@ -418,11 +427,6 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-
-        songActionsTitleView = binding.songActionsTitle
-        songActionsArtistView = binding.songActionsArtistName
-        repeatShuffleToggleButton = binding.playerShuffleRepeat
-
         if (savedInstanceState != null) {
             isLyricsMode = savedInstanceState.getBoolean(IS_LYRICS_MODE_KEY)
             updateUiMode()
@@ -434,9 +438,9 @@ class NowPlayingFragment : Fragment() {
             launch {
                 nowPlayingViewModel.currentSong.collect {
                     val downloadable = (it as? RemoteSong?)?.isDownloadable == true
-                    downloadButton.isVisible = downloadable
+                    binding.downloadButton.isVisible = downloadable
                     ConstraintSet().apply {
-                        clone(playBottomContainer)
+                        clone(binding.playBottomContainer)
                         if (downloadable) {
                             setHorizontalBias(R.id.deviceBtnStyle1, 1 / 6f)
                             setHorizontalBias(R.id.more_button, 5 / 6f)
@@ -444,13 +448,15 @@ class NowPlayingFragment : Fragment() {
                             setHorizontalBias(R.id.deviceBtnStyle1, 1 / 4f)
                             setHorizontalBias(R.id.more_button, 3 / 4f)
                         }
-                        applyTo(playBottomContainer)
+                        applyTo(binding.playBottomContainer)
                     }
                 }
             }
 
             launch {
-                nowPlayingViewModel.lyrics.collect(lyricsView::setLyrics)
+                nowPlayingViewModel.lyrics.collect {
+                    binding.lyrics.setLyrics(it)
+                }
             }
 
             launch {
@@ -465,19 +471,19 @@ class NowPlayingFragment : Fragment() {
                         likeBadge.text = likeCountDisplayText
                         if (like == true) {
                             if (likeCountDisplayText != null) {
-                                likeButton.setImageDrawable(likedWithCountDrawable)
+                                binding.likeButton.setImageDrawable(likedWithCountDrawable)
                             } else {
-                                likeButton.setImageDrawable(likedWithoutCountDrawable)
+                                binding.likeButton.setImageDrawable(likedWithoutCountDrawable)
                             }
 
-                            lyricsModeLikeButton.setImageResource(lyricsModeLiked)
+                            binding.lyricLikeBtn.setImageResource(lyricsModeLiked)
                         } else {
                             if (likeCountDisplayText != null) {
-                                likeButton.setImageDrawable(notLikedWithCountDrawable)
+                                binding.likeButton.setImageDrawable(notLikedWithCountDrawable)
                             } else {
-                                likeButton.setImageDrawable(notLikedWithoutCountDrawable)
+                                binding.likeButton.setImageDrawable(notLikedWithoutCountDrawable)
                             }
-                            lyricsModeLikeButton.setImageResource(lyricsModeNotLiked)
+                            binding.lyricLikeBtn.setImageResource(lyricsModeNotLiked)
                         }
                     }
                 }
@@ -488,17 +494,17 @@ class NowPlayingFragment : Fragment() {
                         commentInfo?.commentCount?.let(CountUtil::getAbbreviatedCommentCount)
                             ?: ""
                     if (commentInfo != null) {
-                        commentButton.setImageDrawable(commentWithCountDrawable)
+                        binding.commentButton.setImageDrawable(commentWithCountDrawable)
                     } else {
-                        commentButton.setImageDrawable(commentWithoutCountDrawable)
+                        binding.commentButton.setImageDrawable(commentWithoutCountDrawable)
                     }
                 }
 
             }
             launch {
                 nowPlayingViewModel.isLoggedIn.collect {
-                    likeButton.isEnabled = it == true
-                    lyricsModeLikeButton.isEnabled = it == true
+                    binding.likeButton.isEnabled = it == true
+                    binding.lyricLikeBtn.isEnabled = it == true
                 }
             }
         }
@@ -524,13 +530,16 @@ class NowPlayingFragment : Fragment() {
         songArtist = mediaMetadata.artist?.toString()
         updateUiMode()
 
-        songActionsTitleView.text = mediaMetadata.title
-        songActionsArtistView.text = mediaMetadata.artist
+        binding.songActionsTitle.text = mediaMetadata.title
+        binding.songActionsArtistName.text = mediaMetadata.artist
 
         val defaultBgColor =
-            ContextCompat.getColor(artworkView.context, R.color.default_player_background)
+            ContextCompat.getColor(
+                binding.smallAlbumCover0.context,
+                R.color.default_player_background
+            )
 
-        artworkView.load(mediaMetadata.artworkUri ?: mediaMetadata.artworkData) {
+        binding.smallAlbumCover0.load(mediaMetadata.artworkUri ?: mediaMetadata.artworkData) {
             placeholder(defaultArtwork)
             error(defaultArtwork)
             transformations(CircleCropTransformation())
@@ -538,11 +547,11 @@ class NowPlayingFragment : Fragment() {
 
             target(
                 onError = { error ->
-                    artworkView.setImageDrawable(error?.asDrawable(resources))
+                    binding.smallAlbumCover0.setImageDrawable(error?.asDrawable(resources))
                     binding.bigAlbumCover.setBackgroundColor(defaultBgColor)
                 },
                 onSuccess = { result ->
-                    artworkView.setImageDrawable(result.asDrawable(resources))
+                    binding.smallAlbumCover0.setImageDrawable(result.asDrawable(resources))
 
                     if (result is BitmapImage) {
                         val bitmap = result.bitmap
@@ -577,9 +586,9 @@ class NowPlayingFragment : Fragment() {
         val shouldShowPlayButton = Util.shouldShowPlayButton(player)
         @DrawableRes val drawableRes: Int =
             if (shouldShowPlayButton) R.drawable.ic_full_screen_player_play else R.drawable.ic_full_screen_player_pause
-        playPauseButton.setImageResource(drawableRes)
+        binding.playerPlayPause.setImageResource(drawableRes)
         val enablePlayPause: Boolean = shouldEnablePlayPauseButton()
-        updateButton(enablePlayPause, playPauseButton)
+        updateButton(enablePlayPause, binding.playerPlayPause)
     }
 
     private fun updateButton(enabled: Boolean, view: View?) {
@@ -606,21 +615,21 @@ class NowPlayingFragment : Fragment() {
                 Player.COMMAND_SET_SHUFFLE_MODE
             )
         ) {
-            updateButton( false, repeatShuffleToggleButton)
+            updateButton( false, binding.playerShuffleRepeat)
             return
         }
 
-        updateButton( true, repeatShuffleToggleButton)
+        updateButton( true, binding.playerShuffleRepeat)
         when (player.repeatMode) {
             Player.REPEAT_MODE_ONE -> {
-                repeatShuffleToggleButton.setImageDrawable(repeatOneButtonDrawable)
+                binding.playerShuffleRepeat.setImageDrawable(repeatOneButtonDrawable)
             }
 
             Player.REPEAT_MODE_ALL -> {
                 if (player.shuffleModeEnabled)
-                    repeatShuffleToggleButton.setImageDrawable(repeatAllShuffleOnButtonDrawable)
+                    binding.playerShuffleRepeat.setImageDrawable(repeatAllShuffleOnButtonDrawable)
                 else
-                    repeatShuffleToggleButton.setImageDrawable(repeatAllShuffleOffButtonDrawable)
+                    binding.playerShuffleRepeat.setImageDrawable(repeatAllShuffleOffButtonDrawable)
             }
 
             else -> {
@@ -641,7 +650,7 @@ class NowPlayingFragment : Fragment() {
             position = player.contentPosition
         }
 
-        lyricsView.setPosition(position)
+        binding.lyrics.setPosition(position)
         handler.removeCallbacks(updateLyricsAction)
         val playbackState = player?.playbackState ?: Player.STATE_IDLE
         if (player != null && player.isPlaying) {
@@ -652,7 +661,7 @@ class NowPlayingFragment : Fragment() {
     }
 
     fun updateProgress() {
-        if (!isVisible) {
+        if (!isResumed) {
             return
         }
         val player = this.player
@@ -665,17 +674,17 @@ class NowPlayingFragment : Fragment() {
         }
 
         if (!scrubbing) {
-            positionView.text = Util.getStringForTime(formatBuilder, formatter, position)
+            binding.position.text = Util.getStringForTime(formatBuilder, formatter, position)
         }
 
-        timeBar.run {
+        binding.timeBar.run {
             setPosition(position)
             setBufferedPosition(bufferedPosition)
         }
         handler.removeCallbacks(updateProgressAction)
         val playbackState = player?.playbackState ?: Player.STATE_IDLE
         if (player != null && player.isPlaying) {
-            var mediaTimeDelayMs = timeBar.preferredUpdateDelay
+            var mediaTimeDelayMs = binding.timeBar.preferredUpdateDelay
             val mediaTimeUntilNextFullSecondMs = 1000 - position % 1000
             mediaTimeDelayMs = mediaTimeDelayMs.coerceAtMost(mediaTimeUntilNextFullSecondMs)
             val playbackSpeed = player.playbackParameters.speed
@@ -712,8 +721,8 @@ class NowPlayingFragment : Fragment() {
             }
         }
         val durationMs = Util.usToMs(durationUs)
-        durationView.text = Util.getStringForTime(formatBuilder, formatter, durationMs)
-        timeBar.setDuration(durationMs)
+        binding.duration.text = Util.getStringForTime(formatBuilder, formatter, durationMs)
+        binding.timeBar.setDuration(durationMs)
         updateProgress()
         updateLyrics()
     }
@@ -728,67 +737,17 @@ class NowPlayingFragment : Fragment() {
     }
 
     private fun updateUiMode() {
-        albumLayout.isVisible = !isLyricsMode
-        songActionsLayout.isVisible = !isLyricsMode
-        lyricsLayout.isVisible = isLyricsMode
+        binding.artistImageContainer.isVisible = !isLyricsMode
+        binding.songActionsLayout.isVisible = !isLyricsMode
+        binding.modeLyricsLayout.isVisible = isLyricsMode
         if (isLyricsMode) {
-            toolbar.title = songTitle ?: ""
-            toolbar.subtitle = songArtist ?: ""
+            binding.toolbar.title = songTitle.orEmpty()
+            binding.toolbar.subtitle = songArtist.orEmpty()
             updateLyrics()
         } else {
-            toolbar.title = null
-            toolbar.subtitle = playlistName ?: ""
+            binding.toolbar.title = null
+            binding.toolbar.subtitle = playlistName.orEmpty()
         }
-    }
-
-    inner class PlayerListener : Player.Listener {
-        override fun onEvents(player: Player, events: Player.Events) {
-            if (events.containsAny(
-                    Player.EVENT_PLAYBACK_STATE_CHANGED,
-                    Player.EVENT_PLAY_WHEN_READY_CHANGED,
-                    Player.EVENT_IS_PLAYING_CHANGED,
-                    Player.EVENT_AVAILABLE_COMMANDS_CHANGED
-                )
-            ) {
-                updateProgress()
-                updateLyrics()
-            }
-            if (events.containsAny(
-                    Player.EVENT_PLAYBACK_STATE_CHANGED,
-                    Player.EVENT_PLAY_WHEN_READY_CHANGED,
-                    Player.EVENT_AVAILABLE_COMMANDS_CHANGED
-                )
-            ) {
-                updatePlayPauseButton()
-            }
-
-            if (events.containsAny(
-                    Player.EVENT_REPEAT_MODE_CHANGED,
-                    Player.EVENT_SHUFFLE_MODE_ENABLED_CHANGED,
-                    Player.EVENT_AVAILABLE_COMMANDS_CHANGED
-                )
-            ) {
-                updateRepeatShuffleModeButton()
-            }
-
-            if (events.containsAny(
-                    Player.EVENT_POSITION_DISCONTINUITY,
-                    Player.EVENT_TIMELINE_CHANGED,
-                    Player.EVENT_AVAILABLE_COMMANDS_CHANGED
-                )
-            ) {
-                updateTimeline()
-            }
-
-            if (events.containsAny(
-                    Player.EVENT_PLAY_WHEN_READY_CHANGED,
-                    Player.EVENT_MEDIA_METADATA_CHANGED,
-                    Player.EVENT_MEDIA_ITEM_TRANSITION
-                )
-            )
-                updateMediaMetadata()
-        }
-
     }
 
     private fun createBadgeDrawable(context: Context): BadgeDrawable =
@@ -799,18 +758,6 @@ class NowPlayingFragment : Fragment() {
             verticalOffset = ViewUtils.dpToPx(requireContext(), 11).toInt()
             backgroundColor = Color.TRANSPARENT
         }
-
-
-    private fun ImageView.addBadge(badgeDrawable: BadgeDrawable) {
-        viewTreeObserver.addOnGlobalLayoutListener(
-            object : ViewTreeObserver.OnGlobalLayoutListener {
-                @ExperimentalBadgeUtils
-                override fun onGlobalLayout() {
-                    BadgeUtils.attachBadgeDrawable(badgeDrawable, this@addBadge)
-                    viewTreeObserver.removeOnGlobalLayoutListener(this)
-                }
-            })
-    }
 
     private fun onDownloadClick() {
         nowPlayingViewModel.onDownloadClick()

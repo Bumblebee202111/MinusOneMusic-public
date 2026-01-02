@@ -32,24 +32,25 @@ class NowPlayingViewModel @Inject constructor(
     private val toastManager: ToastManager
 ) : ViewModel() {
 
+    val player = musicServiceConnection.player
+
     private val currentMediaId = musicServiceConnection.currentMediaId
 
-    val currentSong = currentMediaId.map {
-        if (it != null) {
-            playlistRepository.playerPlaylistSong(it)
+    val currentSong = currentMediaId.map { mediaId ->
+        if (mediaId != null) {
+            playlistRepository.playerPlaylistSong(mediaId)
         } else {
             null
         }
     }.stateInUi()
-    private val currentRemoteSongId = currentSong.map { currentMediaId ->
-        (currentMediaId as? RemoteSong)?.id
+
+    private val currentRemoteSongId = currentSong.map { song ->
+        (song as? RemoteSong)?.id
     }.stateInUi()
 
     val lyrics = currentRemoteSongId.flatMapLatest { songId ->
-        if (songId != null) songRepository.getLyrics(songId).map { it.data } else flowOf(null)
+        if (songId != null) songRepository.getLyrics(songId).map { result -> result.data } else flowOf(null)
     }.stateInUi()
-
-    val player = musicServiceConnection.player
 
     private val _liked = currentRemoteSongId.flatMapLatest { songId ->
         if (songId != null) {
@@ -61,7 +62,7 @@ class NowPlayingViewModel @Inject constructor(
     private val _likeCountText = currentRemoteSongId.flatMapLatest { songId ->
         if (songId != null) {
             songRepository.getSongLikeCountText(songId)
-                .map { it.data }
+                .map { result -> result.data }
         } else {
             flowOf(null)
         }
@@ -69,14 +70,12 @@ class NowPlayingViewModel @Inject constructor(
 
     val likeState = _liked.combine(_likeCountText) { like, likeCountText ->
         LikeState(like, likeCountText)
-    }.stateInUi(LikeState(false, null))
+    }.stateInUi(LikeState(like = false, likeCountDisplayText = null))
 
     val commentInfo = currentRemoteSongId.flatMapLatest { songId ->
         if (songId != null) {
             songRepository.getCommentInfo(songId)
-                .map { commentCount ->
-                    commentCount.data
-                }
+                .map { result -> result.data }
 
         } else {
             flowOf(null)
@@ -87,8 +86,13 @@ class NowPlayingViewModel @Inject constructor(
     fun onLikeClicked() {
         val songId = currentRemoteSongId.value ?: return
         viewModelScope.launch {
-            val like = _liked.first()?.not() ?: return@launch
-            loggedInUserDataRepository.likeSong(songId = songId, like = like).collect {}
+            val isCurrentlyLiked = _liked.first() ?: false
+            val newLikeState = !isCurrentlyLiked
+            loggedInUserDataRepository.likeSong(songId = songId, like = newLikeState).collect { result ->
+                if (result is AppResult.Error) {
+                    toastManager.showMessage(result.error.toUiText())
+                }
+            }
         }
     }
 
