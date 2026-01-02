@@ -15,5 +15,5 @@ import javax.inject.Inject
 class DiscoverViewModel @Inject constructor(
     discoverRepository: DiscoverRepository
 ) : ViewModel() {
-    val blocks = discoverRepository.getDiscoverBlocks().map { it.data }.stateInUi()
+    val blocks = discoverRepository.getDiscoverBlocks().map { it.data }.stateInUi(emptyList())
 }
