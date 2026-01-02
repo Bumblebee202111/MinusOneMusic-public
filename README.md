@@ -33,7 +33,7 @@ To align the project with current best practices and showcase significant skill 
   - **搜索（“综合”Tab之“单曲”）**
   - **评论（Hottest Page 1）**
 
-  > Note: 所列界面一般不含二级界面. Other UI elements and functionalities are far from complete, although some drafts exist.
+  > Note: The interfaces listed generally do not include secondary screens or dialogs. Other UI elements and functionalities are in very early stages, though some initial drafts exist.
 
 
 ## Features
@@ -59,8 +59,7 @@ To align the project with current best practices and showcase significant skill 
 - Users are strongly encouraged to use the official NCM app. By using this application, you agree to the following:
   - It must coexist with the official NCM app.
   - **Source Availability:** The project is primarily closed-source, with a public repository for a curated set of non-sensitive files. The expansion of public code is on hold pending a major cleanup, while a full source release is not planned to avoid potential copyright infringement.
-  - Documentation is in broken English.
-
+  
 - ### Usage Guidelines
 
   - For personal learning purposes only.
@@ -121,7 +120,6 @@ To align the project with current best practices and showcase significant skill 
   - Top crop profile background
   - Fix top margin of user profile
 - Arch
-  - Use `Channel` to manage Toast-s
   - Sync user data with `WorkManager` instead
   - More caching: Playlist, lyrics ...
 - Update UI for latest NCM

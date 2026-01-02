@@ -8,13 +8,11 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.core.view.GravityCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.forEach
@@ -35,8 +33,8 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
-import com.github.bumblebee202111.minusonecloudmusic.utils.ToastManager
-import com.github.bumblebee202111.minusonecloudmusic.utils.isPackageInstalled
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
+import com.github.bumblebee202111.minusonecloudmusic.system.isPackageInstalled
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.common.util.concurrent.ListenableFuture

@@ -466,7 +466,7 @@ val blackDolphinColors = DolphinColors(
     textOnimage10 = dolphinColorTextOnimage10Black,
 )
 
-val lightDolphinShadows = DolphinShadows(
+val whiteDolphinShadows = DolphinShadows(
     bubble = dolphinShadowBubbleWhite,
     dark = dolphinShadowDarkWhite,
     gray = dolphinShadowGrayWhite,
@@ -476,7 +476,7 @@ val lightDolphinShadows = DolphinShadows(
     toast = dolphinShadowToastWhite
 )
 
-val darkDolphinShadows = DolphinShadows(
+val blackDolphinShadows = DolphinShadows(
     bubble = dolphinShadowBubbleBlack,
     dark = dolphinShadowDarkBlack,
     gray = dolphinShadowGrayBlack,
@@ -500,7 +500,7 @@ fun DolphinTheme(
     val materialColors = if (darkTheme) darkMaterialColorScheme else lightMaterialColorScheme
     val dolphinColors = if (darkTheme) blackDolphinColors else whiteDolphinColors
 
-    val dolphinShadows = if (darkTheme) darkDolphinShadows else lightDolphinShadows
+    val dolphinShadows = if (darkTheme) blackDolphinShadows else whiteDolphinShadows
 
     CompositionLocalProvider(
         LocalDolphinColors provides dolphinColors,

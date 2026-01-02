@@ -1,4 +1,4 @@
-package com.github.bumblebee202111.minusonecloudmusic.utils
+package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import android.content.Context
 import androidx.annotation.StringRes
