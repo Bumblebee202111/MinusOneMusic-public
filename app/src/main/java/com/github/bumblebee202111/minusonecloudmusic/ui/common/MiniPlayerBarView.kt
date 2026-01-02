@@ -1,20 +1,18 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
 import android.content.Context
-import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.annotation.OptIn
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
-import androidx.media3.common.util.Assertions
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import coil3.load
 import com.github.bumblebee202111.minusonecloudmusic.R
+import com.github.bumblebee202111.minusonecloudmusic.databinding.MiniPlayerBarBinding
 
 
 
@@ -26,31 +24,22 @@ class MiniPlayerBarView @JvmOverloads constructor(
     playbackAttrs: AttributeSet? = null
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    private val binding: MiniPlayerBarBinding
+
     private val playerListener: PlayerListener
 
     var player: Player? = null
         set(value) {
-            Assertions.checkState(Looper.myLooper() == Looper.getMainLooper())
-            Assertions.checkArgument(
-                value == null || value.applicationLooper == Looper.getMainLooper()
-            )
             if (field === value) {
                 return
             }
             field?.removeListener(playerListener)
             field = value
-            updateForCurrentTrackSelections( true)
-
-            value?.addListener(playerListener)
             updateAll()
+            value?.addListener(playerListener)
         }
 
     private var isAttachedToWindow: Boolean = false
-
-    private var playPauseButton: MiniPlayPauseButton? = null
-    private var artworkView: ImageView? = null
-    private var titleAndArtistView: MiniBarTextView? = null
-    private var playlistButton: ImageView? = null
 
     private val period: Timeline.Period
     private val window: Timeline.Window
@@ -81,18 +70,6 @@ class MiniPlayerBarView @JvmOverloads constructor(
             }
             if (events.containsAny(
                     Player.EVENT_REPEAT_MODE_CHANGED,
-                    Player.EVENT_AVAILABLE_COMMANDS_CHANGED
-                )
-            ) {
-            }
-            if (events.containsAny(
-                    Player.EVENT_SHUFFLE_MODE_ENABLED_CHANGED,
-                    Player.EVENT_AVAILABLE_COMMANDS_CHANGED
-                )
-            ) {
-            }
-            if (events.containsAny(
-                    Player.EVENT_REPEAT_MODE_CHANGED,
                     Player.EVENT_SHUFFLE_MODE_ENABLED_CHANGED,
                     Player.EVENT_POSITION_DISCONTINUITY,
                     Player.EVENT_TIMELINE_CHANGED,
@@ -111,17 +88,11 @@ class MiniPlayerBarView @JvmOverloads constructor(
                 updatePlayPauseButtonTimeline()
             }
             if (events.containsAny(
-                    Player.EVENT_PLAYBACK_PARAMETERS_CHANGED,
-                    Player.EVENT_AVAILABLE_COMMANDS_CHANGED
-                )
-            ) {
-            }
-            if (events.containsAny(
                     Player.EVENT_TRACKS_CHANGED,
                     Player.EVENT_AVAILABLE_COMMANDS_CHANGED
                 )
             ) {
-                updateForCurrentTrackSelections(true)
+                updateForCurrentTrackSelections()
             }
         }
     }
@@ -147,32 +118,27 @@ class MiniPlayerBarView @JvmOverloads constructor(
 
         }
 
-        LayoutInflater.from(context).inflate(layoutId,  this)
+        binding = MiniPlayerBarBinding.inflate(LayoutInflater.from(context), this)
         orientation = VERTICAL
-        val v = findViewById<View>(R.id.v3ShadowView).apply {
-        }
 
         playerListener = PlayerListener()
         period = Timeline.Period()
         window = Timeline.Window()
         updateProgressAction = Runnable { updateProgress() }
 
-        playPauseButton = findViewById(R.id.play_pause_button)
-        playPauseButton?.setOnClickListener {
+        binding.playPauseButton.setOnClickListener {
             Util.handlePlayPauseButtonAction(player, showPlayButtonIfSuppressed)
         }
-
-        artworkView = findViewById(R.id.cover)
-        titleAndArtistView = findViewById(R.id.tv_music)
-        playlistButton = findViewById(R.id.playlist_button)
     }
 
     private fun updateAll() {
         updatePlayPauseButtonPlayPause()
         updatePlayPauseButtonTimeline()
+        updateProgress()
+        updateForCurrentTrackSelections()
     }
 
-    fun updateForCurrentTrackSelections(isNewPlayer: Boolean) {
+    fun updateForCurrentTrackSelections() {
         val player = player ?: return
         if (!player.isCommandAvailable(Player.COMMAND_GET_TRACKS)
         ) {
@@ -181,9 +147,9 @@ class MiniPlayerBarView @JvmOverloads constructor(
 
         val mediaMetadata = player.mediaMetadata
 
-        artworkView?.load(mediaMetadata.artworkUri ?: mediaMetadata.artworkData)
+        binding.songInfoLayout.cover.load(mediaMetadata.artworkUri ?: mediaMetadata.artworkData)
 
-        titleAndArtistView?.setTitleAndArtist(
+        binding.songInfoLayout.tvMusic.setTitleAndArtist(
             mediaMetadata.title.toString(),
             mediaMetadata.artist.toString()
         )
@@ -194,12 +160,11 @@ class MiniPlayerBarView @JvmOverloads constructor(
         if (!isVisible() || !isAttachedToWindow) {
             return
         }
-        playPauseButton?.let { playPauseButton ->
-            val shouldShowPlayButton = Util.shouldShowPlayButton(player, showPlayButtonIfSuppressed)
-            playPauseButton.isPlaying = !shouldShowPlayButton
-            val enablePlayPause: Boolean = shouldEnablePlayPauseButton()
-            updateButton(enablePlayPause, playPauseButton)
-        }
+
+        val shouldShowPlayButton = Util.shouldShowPlayButton(player, showPlayButtonIfSuppressed)
+        binding.playPauseButton.isPlaying = !shouldShowPlayButton
+        val enablePlayPause: Boolean = shouldEnablePlayPauseButton()
+        updateButton(enablePlayPause, binding.playPauseButton)
     }
 
     private fun updatePlayPauseButtonTimeline() {
@@ -214,7 +179,7 @@ class MiniPlayerBarView @JvmOverloads constructor(
             durationUs += window.durationUs
         }
         val durationMs = Util.usToMs(durationUs)
-        playPauseButton?.max = durationMs.toInt()
+        binding.playPauseButton.max = durationMs.toInt()
         updateProgress()
     }
 
@@ -228,7 +193,7 @@ class MiniPlayerBarView @JvmOverloads constructor(
             position = player.contentPosition
         }
 
-        playPauseButton?.setProgress(position.toInt())
+        binding.playPauseButton.setProgress(position.toInt())
         removeCallbacks(updateProgressAction)
         val playbackState = player?.playbackState ?: Player.STATE_IDLE
         if (player != null && player.isPlaying) {
@@ -255,7 +220,7 @@ class MiniPlayerBarView @JvmOverloads constructor(
     }
 
     fun setPlaylistButtonListener(onClickListener: OnClickListener?) {
-        playlistButton?.apply {
+        binding.playlistButton.apply {
             setOnClickListener(onClickListener)
             updateButton(onClickListener != null, this)
         }
