@@ -34,7 +34,6 @@ import androidx.media3.common.util.Util.getDrawable
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.TimeBar
 import androidx.mediarouter.app.SystemOutputSwitcherDialogController
-import androidx.navigation.findNavController
 import androidx.palette.graphics.Palette
 import coil3.BitmapImage
 import coil3.asDrawable
@@ -44,7 +43,6 @@ import coil3.request.error
 import coil3.request.placeholder
 import coil3.request.transformations
 import coil3.transform.CircleCropTransformation
-import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentNowPlayingBinding
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
@@ -58,6 +56,8 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.attachBadge
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.setStatusBarContentColor
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.CommentsRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.ExperimentalBadgeUtils
@@ -65,6 +65,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Formatter
 import java.util.Locale
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -177,6 +178,9 @@ class NowPlayingFragment : Fragment() {
     private lateinit var defaultArtwork: Drawable
     private var defaultArtworkId = 0
     private var requestPermissionLauncher: ActivityResultLauncher<String>? = null
+
+    @Inject
+    lateinit var navigationManager: NavigationManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -326,11 +330,7 @@ class NowPlayingFragment : Fragment() {
             setOnClickListener {
                 val threadId =
                     nowPlayingViewModel.commentInfo.value?.threadId ?: return@setOnClickListener
-                findNavController().navigate(
-                    MobileNavigationDirections.actionGlobalNavComments(
-                        threadId
-                    )
-                )
+                navigationManager.navigate(CommentsRoute(threadId))
             }
         }
 
@@ -406,7 +406,7 @@ class NowPlayingFragment : Fragment() {
 
         binding.toolbar.apply {
             setNavigationOnClickListener {
-                findNavController().navigateUp()
+                navigationManager.goBack()
             }
         }
 

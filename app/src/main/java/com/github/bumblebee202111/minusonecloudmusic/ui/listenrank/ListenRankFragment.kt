@@ -7,11 +7,12 @@ import android.view.ViewGroup
 import androidx.annotation.IntDef
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentListenRankBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 @AndroidEntryPoint
 class ListenRankFragment : Fragment() {
 
@@ -30,6 +31,9 @@ class ListenRankFragment : Fragment() {
     lateinit var binding: FragmentListenRankBinding
     private val viewModel: ListenRankViewModel by viewModels()
 
+    @Inject
+    lateinit var navigationManager: NavigationManager
+    
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,7 +46,7 @@ class ListenRankFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.apply {
             toolbar.setNavigationOnClickListener {
-                findNavController().navigateUp()
+                navigationManager.goBack()
             }
 
             pager.adapter = PlayRecordsPagerAdapter()

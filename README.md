@@ -91,6 +91,7 @@ To align the project with current best practices and showcase significant skill 
   - Playlist Square (uncertain if it's necessary)
   - Statusbar lyrics
 - Player & playlist UI
+  - Fix progress visual sync
   - Mini Player Bar
     - Swipe
     - Hide like `PlayControlView`
@@ -108,6 +109,7 @@ To align the project with current best practices and showcase significant skill 
     - Lyrics and cover matching
   - On-boarding
   - Show current audio qualities
+
 - Player
   - Continue the work of moving Player to VM
   - Handle fetch error
@@ -153,7 +155,7 @@ To align the project with current best practices and showcase significant skill 
 - [Architecture][arch]
   - [Data Binding][data-binding]
   - [Lifecycles][lifecycle]
-  - [Navigation][navigation]
+  - [Navigation 3][navigation-3]
   - [Paging][paging]
   - [Room][room]
   - [ViewModel][viewmodel]
@@ -182,7 +184,7 @@ To align the project with current best practices and showcase significant skill 
 [arch]: https://developer.android.com/jetpack/arch/
 [data-binding]: https://developer.android.com/topic/libraries/data-binding/
 [lifecycle]: https://developer.android.com/topic/libraries/architecture/lifecycle
-[navigation]: https://developer.android.com/topic/libraries/architecture/navigation/
+[navigation-3]: https://developer.android.com/guide/navigation/navigation-3
 [paging]: https://developer.android.com/topic/libraries/architecture/paging/v3-overview
 [room]: https://developer.android.com/topic/libraries/architecture/room
 [viewmodel]: https://developer.android.com/topic/libraries/architecture/viewmodel

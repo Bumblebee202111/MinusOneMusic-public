@@ -11,14 +11,15 @@ import androidx.annotation.OptIn
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.media3.common.util.UnstableApi
-import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDailyRecommendBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithAlbumAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.setStatusBarContentColor
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -31,6 +32,9 @@ class DailyRecommendFragment : Fragment() {
     private lateinit var binding: FragmentDailyRecommendBinding
     val viewModel: DailyRecommendViewModel by viewModels()
     private lateinit var uiHelper: PlaylistFragmentUIHelper
+
+    @Inject
+    lateinit var navigationManager: NavigationManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,7 +56,7 @@ class DailyRecommendFragment : Fragment() {
         )
 
         binding.toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            navigationManager.goBack()
         }
 
         val dailyRecommendList = binding.dailyRecommendList

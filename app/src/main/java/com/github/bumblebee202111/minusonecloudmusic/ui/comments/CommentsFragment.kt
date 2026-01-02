@@ -6,13 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentCommentsBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CommentsFragment : Fragment() {
@@ -25,6 +26,9 @@ class CommentsFragment : Fragment() {
 
     private val viewModel: CommentsViewModel by viewModels()
 
+    @Inject
+    lateinit var navigationManager: NavigationManager
+    
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,7 +40,7 @@ class CommentsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
+            navigationManager.goBack()
         }
 
         val adapter = CommentsAdapter()

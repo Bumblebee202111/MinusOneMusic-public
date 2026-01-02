@@ -21,7 +21,7 @@ class ListenRankViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val userId = ListenRankFragmentArgs.fromSavedStateHandle(savedStateHandle).userId
+    private val userId: Long = checkNotNull(savedStateHandle["userId"])
 
     private val playRecords = playlistRepository.playRecords(userId).map { it.data }.stateInUi()
 

@@ -15,14 +15,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.github.bumblebee202111.minusonecloudmusic.MainActivity
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMineBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.mainNavController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.statusBarHeight
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineDragonBall.Companion.PINNED_DRAGON_BALLS
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineDragonBall.Companion.TYPE_CLOUD_DISK
@@ -30,9 +28,17 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineDragonBall.Comp
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineDragonBall.Companion.TYPE_FOLLOW
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineDragonBall.Companion.TYPE_LOCAL_MUSIC
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineDragonBall.Companion.TYPE_RECENT_PLAY
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.LocalMusicRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyCollectionRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyFriendRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyPrivateCloudRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyRecentPlayRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PhoneCaptchaLoginRoute
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -45,6 +51,9 @@ class MineFragment : Fragment() {
     private val mineViewModel: MineViewModel by viewModels()
     private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
 
+    @Inject
+    lateinit var navigationManager: NavigationManager
+    
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -79,23 +88,23 @@ class MineFragment : Fragment() {
         val dragonBallAdapter = DragonBallAdapter(PINNED_DRAGON_BALLS) { myMusicDragonBall ->
             when (myMusicDragonBall.code) {
                 TYPE_LOCAL_MUSIC -> {
-                    mainNavController.navigate(R.id.nav_local_music)
+                    navigationManager.navigate(LocalMusicRoute)
                 }
 
                 TYPE_CLOUD_DISK -> {
-                    mainNavController.navigate(R.id.nav_my_private_cloud)
+                    navigationManager.navigate(MyPrivateCloudRoute)
                 }
 
                 TYPE_RECENT_PLAY -> {
-                    mainNavController.navigate(R.id.nav_my_recent_play)
+                    navigationManager.navigate(MyRecentPlayRoute)
                 }
 
                 TYPE_FOLLOW -> {
-                    mainNavController.navigate(R.id.nav_friend)
+                    navigationManager.navigate(MyFriendRoute)
                 }
 
                 TYPE_COLLECTION -> {
-                    mainNavController.navigate(R.id.nav_my_collection)
+                    navigationManager.navigate(MyCollectionRoute)
                 }
             }
         }
@@ -168,7 +177,7 @@ class MineFragment : Fragment() {
 
         val profileOnClickListener = View.OnClickListener {
             if (mainActivityViewModel.loggedInUserId.value == null) {
-                findNavController().navigate(R.id.nav_login)
+                navigationManager.navigate(PhoneCaptchaLoginRoute)
             } else {
             }
         }

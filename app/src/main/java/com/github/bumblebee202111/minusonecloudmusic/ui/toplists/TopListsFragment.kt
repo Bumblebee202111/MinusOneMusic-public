@@ -6,14 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentTopListsBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.mainNavController
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PlaylistRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class TopListsFragment : Fragment() {
@@ -25,6 +25,9 @@ class TopListsFragment : Fragment() {
     private val viewModel: TopListsViewModel by viewModels()
     private lateinit var binding: FragmentTopListsBinding
 
+    @Inject
+    lateinit var navigationManager: NavigationManager
+    
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,12 +40,12 @@ class TopListsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            navigationManager.goBack()
         }
 
         val adapter = BillboardGroupAdapter { playlistId ->
-            mainNavController.navigate(
-                MobileNavigationDirections.actionGlobalNavPlaylist(
+            navigationManager.navigate(
+                PlaylistRoute(
                     playlistId = playlistId,
                     playlistCreatorId = PlaylistFragment.ARG_VALUE_PLAYLIST_CREATOR_ID_UNKNOWN
                 )
