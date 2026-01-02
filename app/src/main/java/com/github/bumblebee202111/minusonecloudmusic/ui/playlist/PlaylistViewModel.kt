@@ -7,20 +7,19 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
-import com.github.bumblebee202111.minusonecloudmusic.model.PlaylistDetail
-import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
-import com.github.bumblebee202111.minusonecloudmusic.model.SimpleRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongPagingDataFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
+import com.github.bumblebee202111.minusonecloudmusic.model.PlaylistDetail
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.model.SimpleRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlaybackHandler
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -39,11 +38,9 @@ class PlaylistViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-
-    private val args = PlaylistFragmentArgs.fromSavedStateHandle(savedStateHandle)
-    private val playlistId = args.playlistId
-    private val creatorId = args.playlistCreatorId
-    private val isMyPL = args.isMyPL
+    private val playlistId: Long = checkNotNull(savedStateHandle["playlistId"])
+    private val creatorId = checkNotNull(savedStateHandle["playlistCreatorId"])
+    private val isMyPL: Boolean = savedStateHandle["isMyPL"] ?: false
 
     private val _playlistDetail = MutableStateFlow<PlaylistDetail?>(null)
     val playlistDetail get() = _playlistDetail.stateInUi()

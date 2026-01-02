@@ -8,14 +8,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.github.bumblebee202111.minusonecloudmusic.MainActivity
-import com.github.bumblebee202111.minusonecloudmusic.MobileNavigationDirections
-import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.model.DiscoverBlock
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDiscoverBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.mainNavController
+import com.github.bumblebee202111.minusonecloudmusic.model.DiscoverBlock
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DailyRecommendRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PlaylistRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.SearchRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.TopListsRoute
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -27,6 +30,9 @@ class DiscoverFragment : Fragment() {
 
     private lateinit var binding: FragmentDiscoverBinding
     val viewModel: DiscoverViewModel by viewModels()
+
+    @Inject
+    lateinit var navigationManager: NavigationManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,26 +53,25 @@ class DiscoverFragment : Fragment() {
                 (activity as? MainActivity)?.openDrawer()
             }
             setOnMenuItemClickListener {
-                mainNavController.navigate(R.id.nav_search)
+                navigationManager.navigate(SearchRoute)
                 true
             }
         }
 
         val discoverBlockAdapter = DiscoverBlockAdapter(
             onDragonBallClick = { type ->
-                val navController = mainNavController
                 when (type) {
                     DiscoverBlock.DragonBalls.DragonBall.Type.SONG_RCMD -> {
-                        navController.navigate(R.id.nav_dailyrecommend)
+                        navigationManager.navigate(DailyRecommendRoute)
                     }
 
                     DiscoverBlock.DragonBalls.DragonBall.Type.RANK_LIST -> {
-                        navController.navigate(R.id.nav_top_lists)
-                }
+                        navigationManager.navigate(TopListsRoute)
+                    }
 
                     DiscoverBlock.DragonBalls.DragonBall.Type.PRIVATE_FM -> {
 
-                }
+                    }
 
                     DiscoverBlock.DragonBalls.DragonBall.Type.PLAYLIST_COLLECTION -> {
 
@@ -97,8 +102,8 @@ class DiscoverFragment : Fragment() {
     }
 
     private fun navigateToPlaylist(playlistId: Long, playlistCreatorId: Long, isMyPL: Boolean) {
-        mainNavController.navigate(
-            MobileNavigationDirections.actionGlobalNavPlaylist(
+        navigationManager.navigate(
+            PlaylistRoute(
                 playlistId = playlistId,
                 playlistCreatorId = playlistCreatorId,
                 isMyPL = isMyPL

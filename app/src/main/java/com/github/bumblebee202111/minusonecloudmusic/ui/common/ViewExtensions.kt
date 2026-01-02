@@ -18,9 +18,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.findNavController
-import com.github.bumblebee202111.minusonecloudmusic.R
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.badge.ExperimentalBadgeUtils
@@ -39,8 +36,6 @@ val Fragment.statusBarHeight: Int
         }
         return result
     }
-val Fragment.mainNavController: NavController
-    get() = requireActivity().findNavController(R.id.nav_host_fragment)
 
 
 

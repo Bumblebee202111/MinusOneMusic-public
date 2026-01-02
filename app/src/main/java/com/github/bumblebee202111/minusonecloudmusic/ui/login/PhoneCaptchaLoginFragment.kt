@@ -5,24 +5,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentPhoneCaptchaLoginBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.hideSoftInput
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PhoneCaptchaLoginFragment : Fragment() {
 
     private val phoneCaptchaLoginViewModel: PhoneCaptchaLoginViewModel by viewModels()
     private lateinit var binding: FragmentPhoneCaptchaLoginBinding
+
+    @Inject
+    lateinit var navigationManager: NavigationManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -161,7 +163,7 @@ class PhoneCaptchaLoginFragment : Fragment() {
     }
 
     private fun updateUiWithUser() {
-        findNavController().popBackStack(R.id.nav_login, false)
+        navigationManager.goBack()
     }
 
 }
