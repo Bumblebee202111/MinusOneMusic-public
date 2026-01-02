@@ -1,11 +1,14 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.discover
 
+import DiscoverList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.github.bumblebee202111.minusonecloudmusic.MainActivity
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDiscoverBinding
@@ -56,44 +59,31 @@ class DiscoverFragment : Fragment() {
             }
         }
 
-        val discoverBlockAdapter = DiscoverBlockAdapter(
-            onDragonBallClick = { type ->
-                when (type) {
-                    DiscoverBlock.DragonBalls.DragonBall.Type.SONG_RCMD -> {
-                        navigationManager.navigate(DailyRecommendRoute)
-                    }
+        binding.blockList.setContent {
+            val blocks by viewModel.blocks.collectAsStateWithLifecycle()
 
-                    DiscoverBlock.DragonBalls.DragonBall.Type.RANK_LIST -> {
-                        navigationManager.navigate(TopListsRoute)
-                    }
+            blocks?.let {
+                DiscoverList(
+                    blocks = it,
+                    onDragonBallClick = { type ->
+                        when (type) {
+                            DiscoverBlock.DragonBalls.DragonBall.Type.SONG_RCMD -> navigationManager.navigate(
+                                DailyRecommendRoute
+                            )
 
-                    DiscoverBlock.DragonBalls.DragonBall.Type.PRIVATE_FM -> {
+                            DiscoverBlock.DragonBalls.DragonBall.Type.RANK_LIST -> navigationManager.navigate(
+                                TopListsRoute
+                            )
 
-                    }
+                            DiscoverBlock.DragonBalls.DragonBall.Type.PRIVATE_FM -> { 
+                            }
 
-                    DiscoverBlock.DragonBalls.DragonBall.Type.PLAYLIST_COLLECTION -> {
-
-                    }
-                }
-
-            },
-            onPlaylistClick = ::navigateToPlaylist
-        )
-        binding.blockList.apply {
-            adapter = discoverBlockAdapter
-            addItemDecoration(
-                DiscoverDividerItemDecoration(
-                    requireContext(),
-                    DividerItemDecoration.VERTICAL
+                            DiscoverBlock.DragonBalls.DragonBall.Type.PLAYLIST_COLLECTION -> { 
+                            }
+                        }
+                    },
+                    onPlaylistClick = ::navigateToPlaylist
                 )
-            )
-        }
-
-        repeatWithViewLifecycle {
-            launch {
-                viewModel.blocks.collect {
-                    discoverBlockAdapter.submitList(it)
-                }
             }
         }
     }
