@@ -82,7 +82,6 @@ To align the project with current best practices and showcase significant skill 
   - Migrate
     - RecyclerView to LazyList
   - Use for all new UI
-    - Implement official white/black themes
     - Basic drawer
 - Request compressed images
 - Play log (help needed)

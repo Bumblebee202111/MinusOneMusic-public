@@ -34,6 +34,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.DolphinToast
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 import com.github.bumblebee202111.minusonecloudmusic.utils.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.utils.isPackageInstalled
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -115,13 +116,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.toastHost.setContent {
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier.statusBarsPadding(),
-                snackbar = { snackbarData ->
-                    DolphinToast(message = snackbarData.visuals.message)
-                }
-            )
+            DolphinTheme {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.statusBarsPadding(),
+                    snackbar = { snackbarData ->
+                        DolphinToast(message = snackbarData.visuals.message)
+                    }
+                )
+            }
         }
 
         bottomNavView = binding.bottomNavView
