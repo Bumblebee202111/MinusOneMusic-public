@@ -94,17 +94,17 @@ object BottomNavigationIconsUtils {
     }
 
     private val destinationIconResIdsMap = mapOf(
-        R.id.nav_wow to BottomNavigationStateIconResIds(
-            activeResId = R.drawable.a5t,
-            inactiveResId = R.drawable.a5s
+        R.id.nav_main to BottomNavigationStateIconResIds(
+            activeResId = R.drawable.au8,
+            inactiveResId = R.drawable.au9
         ),
-        R.id.nav_user_track to BottomNavigationStateIconResIds(
-            activeResId = R.drawable.aap,
-            inactiveResId = R.drawable.aao
+        R.id.nav_track to BottomNavigationStateIconResIds(
+            activeResId = R.drawable.au4,
+            inactiveResId = R.drawable.au3
         ),
         R.id.nav_mine to BottomNavigationStateIconResIds(
-            activeResId = R.drawable.bkf,
-            inactiveResId = R.drawable.bke
+            activeResId = R.drawable.aua,
+            inactiveResId = R.drawable.au_
         )
     )
 }
