@@ -98,8 +98,8 @@ class MainActivity : AppCompatActivity() {
         get() = if (mediaControllerFuture.isDone) mediaControllerFuture.get() else null
 
     private val bottomNavMap = mapOf(
-        R.id.nav_wow to DiscoverRoute,
-        R.id.nav_user_track to FriendTracksRoute,
+        R.id.nav_main to DiscoverRoute,
+        R.id.nav_track to FriendTracksRoute,
         R.id.nav_mine to MineRoute
     )
     private val nonTopLevelMiniBarRoutes = setOf(
