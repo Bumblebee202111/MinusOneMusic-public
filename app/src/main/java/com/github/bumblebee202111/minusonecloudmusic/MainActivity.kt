@@ -57,7 +57,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.MainDrawerContent
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.UiText
-import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.AppEntryProvider
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.createAppEntryProvider
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DailyRecommendRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DeepLinkRegistry
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DiscoverRoute
@@ -242,7 +242,7 @@ class MainActivity : AppCompatActivity() {
                                         Column(modifier = Modifier.fillMaxSize()) {
 
                                             NavDisplay(
-                                                entries = state.toEntries(AppEntryProvider),
+                                                entries = state.toEntries(createAppEntryProvider(navigationManager)),
                                                 onBack = { navigator.goBack() },
                                                 modifier = Modifier
                                                     .weight(1f)

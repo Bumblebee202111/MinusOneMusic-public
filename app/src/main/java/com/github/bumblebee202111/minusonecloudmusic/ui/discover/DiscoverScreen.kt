@@ -9,12 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
-
 @Composable
 fun DiscoverScreen(
-    viewModel: DiscoverViewModel,
+    viewModel: DiscoverViewModel = hiltViewModel<DiscoverViewModel>(),
     onMenuClick: () -> Unit,
     onSearchClick: () -> Unit
 ) {
