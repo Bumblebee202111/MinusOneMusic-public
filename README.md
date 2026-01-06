@@ -81,7 +81,6 @@ To align the project with current best practices and showcase significant skill 
   - Migrate
     - RecyclerView to LazyList
 - Nav UI
-  - Drawer
   - NavigationSuiteScaffold
 - Request compressed images
 - Play log (help needed)

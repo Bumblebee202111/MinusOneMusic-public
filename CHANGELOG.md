@@ -3,6 +3,10 @@ Change Log
 
 ## Version 1.0.0-beta05
 
+- **UI Overhaul:** Fully modernized the **Discover** screen and **Side Drawer** using Jetpack Compose.
+- **Navigation:** Major architectural upgrade to **Navigation 3** for better stability and performance.
+- **Polish:** Updated bottom navigation icons and fixed logout reliability.
+
 ## Version 1.0.0-beta04
 
 - **Feat:** Implemented NCM's official **"Dolphin"** theme system (White mode).
