@@ -4,9 +4,9 @@ import androidx.fragment.app.Fragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MyFeedTabFragment:Fragment() {
+class MyFeedTabFragment : Fragment() {
 
-    companion object{
-        fun newInstance()=MyFeedTabFragment()
-        }
+    companion object {
+        fun newInstance() = MyFeedTabFragment()
+    }
 }

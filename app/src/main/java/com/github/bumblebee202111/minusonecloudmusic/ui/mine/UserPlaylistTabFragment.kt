@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMyPlaylistCategoryBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.ListenRankRoute
@@ -21,9 +21,7 @@ class UserPlaylistTabFragment : Fragment() {
 
     private lateinit var category: UserPlaylistTab
     private lateinit var binding: FragmentMyPlaylistCategoryBinding
-    private val mineViewModel: MineViewModel by viewModels( {
-        requireParentFragment().requireParentFragment()
-    })
+    private val mineViewModel: MineViewModel by activityViewModels()
 
     @Inject
     lateinit var navigationManager: NavigationManager

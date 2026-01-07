@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMyMusicTabBinding
@@ -22,9 +22,7 @@ class MyMusicTabFragment : Fragment() {
 
 
     private lateinit var binding: FragmentMyMusicTabBinding
-    private val mineViewModel: MineViewModel by viewModels({
-        requireParentFragment()
-    })
+    private val mineViewModel: MineViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
