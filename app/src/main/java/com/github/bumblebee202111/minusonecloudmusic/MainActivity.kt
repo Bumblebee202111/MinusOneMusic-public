@@ -71,7 +71,9 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationMan
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.Navigator
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NowPlayingRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PlaylistRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PlaylistV4Route
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.SearchRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.V6PlaylistRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.rememberNavigationState
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.toEntries
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
@@ -109,6 +111,8 @@ class MainActivity : AppCompatActivity() {
         MyPrivateCloudRoute::class,
         MyRecentPlayRoute::class,
         PlaylistRoute::class,
+        PlaylistV4Route::class,
+        V6PlaylistRoute::class,
         SearchRoute::class
     )
 
