@@ -8,7 +8,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.comments.CommentsFragmen
 import com.github.bumblebee202111.minusonecloudmusic.ui.dailyrecommend.DailyRecommendFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.discover.DiscoverScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.friend.MyFriendFragment
-import com.github.bumblebee202111.minusonecloudmusic.ui.inbox.InboxFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.inbox.InboxScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.localmusic.LocalMusicFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhoneCaptchaLoginFragment
@@ -19,19 +19,19 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying.NowPlayingFra
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.recentplay.MyRecentPlayFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.search.SearchFragment
-import com.github.bumblebee202111.minusonecloudmusic.ui.settings.SettingsFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.settings.SettingsScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.toplists.TopListsFragment
-import com.github.bumblebee202111.minusonecloudmusic.ui.usertrack.FriendTracksFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.usertrack.FriendTracksScreen
 
 fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider {
     entry<DiscoverRoute> { DiscoverScreen(
         onMenuClick = { navigationManager.openDrawer() },
         onSearchClick = { navigationManager.navigate(SearchRoute) }
     ) }
-    entry<FriendTracksRoute> { AndroidFragment<FriendTracksFragment>() }
+    entry<FriendTracksRoute> { FriendTracksScreen() }
     entry<MineRoute> { AndroidFragment<MineFragment>() }
     entry<NowPlayingRoute> { AndroidFragment<NowPlayingFragment>() }
-    entry<InboxRoute> { AndroidFragment<InboxFragment>() }
+    entry<InboxRoute> { InboxScreen() }
     entry<DailyRecommendRoute> { AndroidFragment<DailyRecommendFragment>() }
     entry<TopListsRoute> { AndroidFragment<TopListsFragment>() }
     entry<MyPrivateCloudRoute> { AndroidFragment<MyPrivateCloudFragment>() }
@@ -39,7 +39,7 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
     entry<MyRecentPlayRoute> { AndroidFragment<MyRecentPlayFragment>() }
     entry<MyFriendRoute> { AndroidFragment<MyFriendFragment>() }
     entry<MyCollectionRoute> { AndroidFragment<MyCollectionFragment>() }
-    entry<SettingsRoute> { AndroidFragment<SettingsFragment>() }
+    entry<SettingsRoute> { SettingsScreen() }
     entry<SearchRoute> { AndroidFragment<SearchFragment>() }
     entry<PhoneCaptchaLoginRoute> { AndroidFragment<PhoneCaptchaLoginFragment>() }
     entry<PhonePasswordLoginRoute> { AndroidFragment<PhonePasswordLoginFragment>() }

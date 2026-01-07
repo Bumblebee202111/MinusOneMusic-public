@@ -8,9 +8,4 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InboxViewModel @Inject constructor(): ViewModel() {
-
-    private val _text = MutableStateFlow(
-        value = "This is Inbox Fragment"
-    )
-    val text: StateFlow<String> = _text
 }
