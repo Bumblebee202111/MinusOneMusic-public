@@ -13,7 +13,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankFra
 import com.github.bumblebee202111.minusonecloudmusic.ui.localmusic.LocalMusicFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhoneCaptchaLoginFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhonePasswordLoginFragment
-import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.mycollection.MyCollectionFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying.NowPlayingFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistFragment
@@ -24,12 +24,20 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.toplists.TopListsFragmen
 import com.github.bumblebee202111.minusonecloudmusic.ui.usertrack.FriendTracksScreen
 
 fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider {
-    entry<DiscoverRoute> { DiscoverScreen(
-        onMenuClick = { navigationManager.openDrawer() },
-        onSearchClick = { navigationManager.navigate(SearchRoute) }
-    ) }
+    entry<DiscoverRoute> {
+        DiscoverScreen(
+            onMenuClick = { navigationManager.openDrawer() },
+            onSearchClick = { navigationManager.navigate(SearchRoute) }
+        )
+    }
     entry<FriendTracksRoute> { FriendTracksScreen() }
-    entry<MineRoute> { AndroidFragment<MineFragment>() }
+    entry<MineRoute> {
+        MineScreen(
+            onOpenDrawer = { navigationManager.openDrawer() },
+            onNavigate = { route ->
+                navigationManager.navigate(route)
+            })
+    }
     entry<NowPlayingRoute> { AndroidFragment<NowPlayingFragment>() }
     entry<InboxRoute> { InboxScreen() }
     entry<DailyRecommendRoute> { AndroidFragment<DailyRecommendFragment>() }

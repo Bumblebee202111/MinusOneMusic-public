@@ -23,16 +23,6 @@ import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.badge.ExperimentalBadgeUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-val Fragment.statusBarHeight: Int
-    @SuppressLint("DiscouragedApi", "InternalInsetResource")
-    get() {
-        var result = 0
-        val resourceId: Int = resources.getIdentifier("status_bar_height", "dimen", "android")
-        if (resourceId > 0) {
-            result = resources.getDimensionPixelSize(resourceId)
-        }
-        return result
-    }
 
 inline fun Fragment.repeatWithViewLifecycle(
     minState: Lifecycle.State = Lifecycle.State.STARTED,
