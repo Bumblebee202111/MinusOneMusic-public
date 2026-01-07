@@ -1,6 +1,8 @@
 Change Log
 ==========
 
+## Version 1.0.0-beta06
+
 ## Version 1.0.0-beta05
 
 - **UI Overhaul:** Fully modernized the **Discover** screen and **Side Drawer** using Jetpack Compose.

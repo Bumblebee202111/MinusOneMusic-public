@@ -123,7 +123,6 @@ To align the project with current best practices and showcase significant skill 
   - Sync user data with `WorkManager` instead
   - More caching: Playlist, lyrics ...
 - Update UI for latest NCM
-  - Discover
   - Mini player bar
   - Player screen
   - “网易云听劝”
