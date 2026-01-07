@@ -19,8 +19,8 @@ android {
         applicationId = "com.github.bumblebee202111.minusonecloudmusic"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1000004
-        versionName = "1.0.0-beta05"
+        versionCode = 1000005
+        versionName = "1.0.0-beta06"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
