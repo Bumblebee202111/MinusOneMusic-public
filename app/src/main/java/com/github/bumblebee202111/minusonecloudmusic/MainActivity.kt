@@ -33,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -250,7 +251,7 @@ class MainActivity : AppCompatActivity() {
                                                 onBack = { navigator.goBack() },
                                                 modifier = Modifier
                                                     .weight(1f)
-                                                    .fillMaxWidth()
+                                                    .fillMaxWidth().clipToBounds()
                                             )
                                             if (isMiniBarVisible) {
                                                 AndroidView(
