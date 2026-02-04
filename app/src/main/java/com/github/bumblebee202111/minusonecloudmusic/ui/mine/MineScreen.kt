@@ -26,7 +26,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation3.runtime.NavKey
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMineBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
@@ -36,7 +35,6 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyFriendRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyPrivateCloudRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyRecentPlayRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PhoneCaptchaLoginRoute
-import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -74,25 +72,19 @@ fun MineScreen(
             WindowInsetsCompat.CONSUMED
         }
 
-        val dragonBallAdapter = DragonBallAdapter(MineDragonBall.PINNED_DRAGON_BALLS) { ball ->
-            when (ball.code) {
-                MineDragonBall.TYPE_LOCAL_MUSIC -> onNavigate(LocalMusicRoute)
-                MineDragonBall.TYPE_CLOUD_DISK -> onNavigate(MyPrivateCloudRoute)
-                MineDragonBall.TYPE_RECENT_PLAY -> onNavigate(MyRecentPlayRoute)
-                MineDragonBall.TYPE_FOLLOW -> onNavigate(MyFriendRoute)
-                MineDragonBall.TYPE_COLLECTION -> onNavigate(MyCollectionRoute)
-            }
-        }
-
-        dragonBallArea.rvDragonBalls.apply {
-            adapter = dragonBallAdapter
-            addItemDecoration(
-                MaterialDividerItemDecoration(context, DividerItemDecoration.HORIZONTAL).apply {
-                    setDividerThicknessResource(context, R.dimen.dragon_ball_spacing)
-                    isLastItemDecorated = false
+        dragonBallArea.rvDragonBalls.setContent {
+            DragonBallRow(
+                dragonBalls = MineDragonBall.PINNED_DRAGON_BALLS,
+                onItemClick = { ball ->
+                    when (ball.code) {
+                        MineDragonBall.TYPE_LOCAL_MUSIC -> onNavigate(LocalMusicRoute)
+                        MineDragonBall.TYPE_CLOUD_DISK -> onNavigate(MyPrivateCloudRoute)
+                        MineDragonBall.TYPE_RECENT_PLAY -> onNavigate(MyRecentPlayRoute)
+                        MineDragonBall.TYPE_FOLLOW -> onNavigate(MyFriendRoute)
+                        MineDragonBall.TYPE_COLLECTION -> onNavigate(MyCollectionRoute)
+                    }
                 }
             )
-            setHasFixedSize(true)
         }
 
         val tabBgDrawable = GradientDrawable().apply {
