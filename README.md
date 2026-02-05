@@ -21,7 +21,7 @@ To align the project with current best practices and showcase significant skill 
 
 - Partial Implementation
 
-  - **验证码登录**[prone to failure]/**密码登录**[doesn't work, hidden]/**退出登录**
+  - **验证码登录** [prone to failure] / **密码登录** [doesn't work, hidden] / **退出登录**
   - 我的
     - **最近播放—歌曲**
     - **云盘**
@@ -67,10 +67,17 @@ To align the project with current best practices and showcase significant skill 
 
 ## Screenshots
 
-<img src="docs\screenshots\Screenshot_main.png" alt="Main" width=160 /><img src="docs\screenshots\Screenshot_discover.png" alt="Discover" width=160 /> <img src="docs\screenshots\Screenshot_top_lists.png" alt="Top lists" width=160 />
-<img src="docs\screenshots\Screenshot_now_playing_main.png" alt="Now playing (main)" width=160 /> <img src="docs\screenshots\Screenshot_now_playing_lyrics.png" alt="Now playing (lyrics)" width=400/> <img src="docs\screenshots\Screenshot_comments_landscape.png" alt="Comments (landscape)" width=320 />
-<img src="docs\screenshots\Screenshot_playlist.png" alt="Playlist" width=160 /> <img src="docs\screenshots\Screenshot_daily_recommend.png" alt="Daily recommend" width=160 /><img src="docs\screenshots\Screenshot_cloud_disk_and_player_playlist_dialog.png" alt="Cloud disk and player playlist dialog" width=240 /> <img src="docs\screenshots\Screenshot_local_music_and_player_playlist_dialog.png" alt="Local music and player playlist dialog" width=240 /> <img src="docs\screenshots\Screenshot_listen_rank.png" alt="Listen rank" width=160 /> <img src="docs\screenshots\Screenshot_search_landscape.png" alt="Search (landscape)" width=320 />
+|                                            My Music                                             |                                       Discover                                       |
+|:-----------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------:|
+|        <img src="docs/screenshots/Screenshot_mine.png" alt="My Music screen" width=270>         | <img src="docs/screenshots/Screenshot_discover.png" alt="Discover screen" width=270> |
+|                                         **Now Playing**                                         |                                     **Playlist**                                     |
+| <img src="docs/screenshots/Screenshot_now_playing_main.png" alt="Now Playing screen" width=270> | <img src="docs/screenshots/Screenshot_playlist.png" alt="Playlist screen" width=270> |
 
+### Large Screen / Landscape
+
+<img src="docs/screenshots/Screenshot_now_playing_lyrics_tablet.png" alt="Lyrics on a tablet in landscape mode" width=500/>
+
+<img src="docs/screenshots/Screenshot_search_landscape.png" alt="Search results in landscape mode" width=500 />
 
 ## To-dos
 
@@ -115,7 +122,6 @@ To align the project with current best practices and showcase significant skill 
 - Search
   - Hint
 - Mine
-  - Optimize dragonballs
   - Add shadow for profile background
   - Top crop profile background
   - Fix top margin of user profile
@@ -152,13 +158,13 @@ To align the project with current best practices and showcase significant skill 
 - [Foundation][foundation]: [Android KTX][android-ktx]
 - [Architecture][arch]
   - [Data Binding][data-binding]
-  - [Lifecycles][lifecycle]
+  - [Lifecycle][lifecycle]
   - [Navigation 3][navigation-3]
   - [Paging][paging]
   - [Room][room]
   - [ViewModel][viewmodel]
-  - [WorkManager][workmanager] \(TODO\)
-  - Data store & SP
+  - [WorkManager][workmanager] (TODO)
+  - DataStore & SharedPreferences
 - [UI][ui]
   - [Animations & Transitions][animation]
   - [Fragment][fragment]
@@ -166,14 +172,14 @@ To align the project with current best practices and showcase significant skill 
   - Compose
 - Behavior
   - [Notifications][notifications]
-  - Media 3
+  - Media3
 - Third party and miscellaneous libraries
   - [Kotlin Coroutines][kotlin-coroutines]
-  - javax.crypto
+  - `javax.crypto`
   - [Retrofit][retrofit]
   - Moshi
-  - Coil
-  - Chunker
+  - Coil 3
+  - Chucker
   - PersistentCookieJar
 
 
@@ -198,9 +204,7 @@ To align the project with current best practices and showcase significant skill 
 ## Utilities used
 
 - jadx-gui
-
 - HTTPCanary
-
 - Crypto tools
 
 ## References
