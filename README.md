@@ -206,6 +206,7 @@ To align the project with current best practices and showcase significant skill 
 - jadx-gui
 - HTTPCanary
 - Crypto tools
+- Copybara
 
 ## References
 
