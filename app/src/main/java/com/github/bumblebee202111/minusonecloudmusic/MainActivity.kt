@@ -7,6 +7,7 @@ import android.os.Handler
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -24,6 +25,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -185,6 +187,21 @@ class MainActivity : AppCompatActivity() {
                         currentStack?.lastOrNull() ?: currentTopLevel
                     }
                 }
+
+                DisposableEffect(currentKey) {
+                    this@MainActivity.enableEdgeToEdge(
+                        statusBarStyle = if (currentKey == NowPlayingRoute || currentKey == DailyRecommendRoute) {
+                            SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                        } else {
+                            SystemBarStyle.auto(
+                                android.graphics.Color.TRANSPARENT,
+                                android.graphics.Color.TRANSPARENT
+                            )
+                        }
+                    )
+                    onDispose {}
+                }
+
                 val isTopLevel by remember {
                     derivedStateOf { currentKey in topLevelRoutes }
                 }

@@ -55,7 +55,6 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.attachBadge
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.setStatusBarContentColor
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.CommentsRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
@@ -502,14 +501,8 @@ class NowPlayingFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        setStatusBarContentColor(isDarkIcons = false)
-    }
-
     override fun onStop() {
         super.onStop()
-        setStatusBarContentColor(isDarkIcons = true)
         player = null
     }
 
