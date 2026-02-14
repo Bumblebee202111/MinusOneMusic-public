@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMyRecentPlayMusicBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.SimpleSongAdapter
-import kotlinx.coroutines.launch
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.SimpleSongList
 
 class MyRecentPlayMusicFragment : Fragment() {
 
@@ -34,17 +34,13 @@ class MyRecentPlayMusicFragment : Fragment() {
             view = view,
             playAllAction = viewModel::playAll
         )
-        val adapter = SimpleSongAdapter {
-            viewModel.onSongItemClick(it)
-        }
-        binding.list.adapter = adapter
-
-        repeatWithViewLifecycle {
-            launch {
-                viewModel.recentPlaySongUiList.collect {
-                    adapter.submitList(it)
-                }
-            }
+        
+        binding.list.setContent {
+            val songs by viewModel.recentPlaySongUiList.collectAsStateWithLifecycle(initialValue = emptyList())
+            SimpleSongList(
+                songs = songs ?: emptyList(),
+                onItemClick = viewModel::onSongItemClick
+            )
         }
     }
 

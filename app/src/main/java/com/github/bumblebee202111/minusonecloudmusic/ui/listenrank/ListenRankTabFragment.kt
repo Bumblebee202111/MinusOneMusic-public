@@ -4,15 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentListenRankTabBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithPositionAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithPositionList
 import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankFragment.Companion.PLAY_RECORDS_TAB_INDEX_ALL_DATA
 import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankFragment.Companion.PLAY_RECORDS_TAB_INDEX_WEEK_DATA
 import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankFragment.Companion.PlayRecordsTabIndex
-import kotlinx.coroutines.launch
 
 class ListenRankTabFragment : Fragment() {
     companion object {
@@ -50,17 +51,6 @@ class ListenRankTabFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val adapter = SongWithPositionAdapter {
-            when (tabIndex) {
-                PLAY_RECORDS_TAB_INDEX_WEEK_DATA -> {
-                    viewModel.onWeekRecordClick(it)
-                }
-
-                PLAY_RECORDS_TAB_INDEX_ALL_DATA -> {
-                    viewModel.onAllRecordClick(it)
-                }
-            }
-        }
         binding.apply {
             playlistActions.setOnClickListener {
                 when (tabIndex) {
@@ -74,24 +64,35 @@ class ListenRankTabFragment : Fragment() {
                 }
             }
 
-            list.adapter = adapter
-
             val playRecordsFlow = when (tabIndex) {
                 PLAY_RECORDS_TAB_INDEX_WEEK_DATA -> viewModel.weekRecordsUiState
                 PLAY_RECORDS_TAB_INDEX_ALL_DATA -> viewModel.allRecordsUiState
                 else -> throw IllegalArgumentException()
             }
-            repeatWithViewLifecycle {
-                launch {
-                    playRecordsFlow.collect { playRecords ->
-                        setPlayRecords(playRecords)
-                        adapter.submitList(playRecords)
-                    }
+
+            list.setContent {
+                val playRecords by playRecordsFlow.collectAsStateWithLifecycle(initialValue = emptyList())
+                
+                LaunchedEffect(playRecords) {
+                    setPlayRecords(playRecords)
                 }
+
+                SongWithPositionList(
+                    songs = playRecords ?: emptyList(),
+                    onItemClick = { position ->
+                        when (tabIndex) {
+                            PLAY_RECORDS_TAB_INDEX_WEEK_DATA -> {
+                                viewModel.onWeekRecordClick(position)
+                            }
+
+                            PLAY_RECORDS_TAB_INDEX_ALL_DATA -> {
+                                viewModel.onAllRecordClick(position)
+                            }
+                        }
+                    }
+                )
             }
         }
-
-
     }
 
 }

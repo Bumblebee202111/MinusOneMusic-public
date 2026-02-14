@@ -8,16 +8,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.OptIn
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDailyRecommendBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithAlbumAdapter
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithAlbumList
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -58,20 +58,16 @@ class DailyRecommendFragment : Fragment() {
             navigationManager.goBack()
         }
 
-        val dailyRecommendList = binding.dailyRecommendList
-        val adapter = SongWithAlbumAdapter(viewModel::onSongItemClick)
-        dailyRecommendList.adapter = adapter
+        binding.dailyRecommendList.setContent {
+            val songs by viewModel.songItems.collectAsStateWithLifecycle(initialValue = emptyList())
+            SongWithAlbumList(
+                songs = songs ?: emptyList(),
+                onItemClick = viewModel::onSongItemClick
+            )
+        }
 
         val typeface = Typeface.createFromAsset(requireContext().assets, "bamboo.ttf")
         binding.tvPendantDayRecommendDateInfo.typeface = typeface
         binding.tvPendantMonthText.typeface = typeface
-
-        repeatWithViewLifecycle {
-            launch {
-                viewModel.songItems.collect {
-                    adapter.submitList(it)
-                }
-            }
-        }
     }
 }

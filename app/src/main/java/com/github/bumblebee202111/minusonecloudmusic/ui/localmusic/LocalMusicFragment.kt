@@ -8,15 +8,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.getValue
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentLocalMusicBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.SimpleSongAdapter
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.SimpleSongList
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LocalMusicFragment : Fragment() {
@@ -28,7 +28,7 @@ class LocalMusicFragment : Fragment() {
     val viewModel: LocalMusicViewModel by viewModels()
     private lateinit var binding: FragmentLocalMusicBinding
     private lateinit var uiHelper: PlaylistFragmentUIHelper
-    private lateinit var adapter: SimpleSongAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,8 +46,15 @@ class LocalMusicFragment : Fragment() {
             view = view,
             playAllAction = viewModel::playAll
         )
-        adapter = SimpleSongAdapter(viewModel::onSongItemClick)
-        binding.list.adapter = adapter
+        
+        binding.list.setContent {
+            val songs by viewModel.songItems.collectAsStateWithLifecycle(initialValue = emptyList())
+            SimpleSongList(
+                songs = songs ?: emptyList(),
+                onItemClick = viewModel::onSongItemClick
+            )
+        }
+
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
                 if (isGranted) onPermissionGranted()
@@ -63,11 +70,6 @@ class LocalMusicFragment : Fragment() {
             requestPermissionLauncher.launch(permission)
         } else {
             onPermissionGranted()
-        }
-        repeatWithViewLifecycle {
-            launch {
-                viewModel.songItems.collect(adapter::submitList)
-            }
         }
     }
 

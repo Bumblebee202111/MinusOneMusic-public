@@ -5,15 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentSearchBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.SimpleSongList
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.hideSoftInput
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.SimpleSongAdapter
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -54,13 +54,12 @@ class SearchFragment : Fragment() {
             })
         }
 
-        val adapter = SimpleSongAdapter(viewModel::playSong)
-        binding.songList.adapter = adapter
-
-        repeatWithViewLifecycle {
-            launch {
-                viewModel.result.collect(adapter::submitList)
-            }
+        binding.songList.setContent {
+            val songs by viewModel.result.collectAsStateWithLifecycle(initialValue = emptyList())
+            SimpleSongList(
+                songs = songs ?: emptyList(),
+                onItemClick = viewModel::playSong
+            )
         }
     }
 

@@ -13,20 +13,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.media3.common.util.UnstableApi
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.load
 import coil3.request.error
 import coil3.request.placeholder
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentPlaylistBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PagedSongWithPositionList
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.applyDominantColor
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.setBackgroundColorAndTopCorner
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.PagedSongWithPositionAdapter
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import com.google.android.material.appbar.MaterialToolbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
@@ -108,9 +108,14 @@ class PlaylistFragment : Fragment() {
             view = view,
             playAllAction = viewModel::playAll
         )
-        val songAdapter = PagedSongWithPositionAdapter(viewModel::onSongItemClick)
-
-        binding.songList.adapter = songAdapter
+        
+        binding.songList.setContent {
+            val songs = viewModel.playlistSongs.collectAsLazyPagingItems()
+            PagedSongWithPositionList(
+                songs = songs,
+                onItemClick = viewModel::onSongItemClick
+            )
+        }
 
         repeatWithViewLifecycle {
             launch {
@@ -140,11 +145,6 @@ class PlaylistFragment : Fragment() {
 
                 }
 
-            }
-            launch {
-                viewModel.playlistSongs.collectLatest {
-                    songAdapter.submitData(it)
-                }
             }
         }
     }

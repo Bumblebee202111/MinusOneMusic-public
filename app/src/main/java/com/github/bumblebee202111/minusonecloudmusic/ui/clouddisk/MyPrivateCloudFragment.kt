@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMyPrivateCloudBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PagedSongWithPositionList
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.PagedSongWithPositionAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MyPrivateCloudFragment : Fragment() {
 
@@ -40,17 +39,13 @@ class MyPrivateCloudFragment : Fragment() {
             view = view,
             playAllAction = viewModel::playAll
         )
-        val cloudSongsList = binding.privateSongsList
-
-        val adapter = PagedSongWithPositionAdapter(viewModel::onSongItemClick)
-        cloudSongsList.adapter = adapter
-
-        repeatWithViewLifecycle {
-            launch {
-                viewModel.songUiItemsPagingData.collect {
-                    adapter.submitData(it)
-                }
-            }
+        
+        binding.privateSongsList.setContent {
+            val songs = viewModel.songUiItemsPagingData.collectAsLazyPagingItems()
+            PagedSongWithPositionList(
+                songs = songs,
+                onItemClick = viewModel::onSongItemClick
+            )
         }
     }
 }
