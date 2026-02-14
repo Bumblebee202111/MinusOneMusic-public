@@ -1,6 +1,5 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.playlist
 
-import androidx.recyclerview.widget.DiffUtil
 import com.github.bumblebee202111.minusonecloudmusic.model.AbstractAlbum
 import com.github.bumblebee202111.minusonecloudmusic.model.AbstractSong
 data class SongItemUiModel(
@@ -24,22 +23,4 @@ data class SongItemUiModel(
         isCurrentSong=isCurrentSong,
         isBeingPlayed = isBeingPlayed,
     )
-
-    companion object {
-        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<SongItemUiModel>() {
-            override fun areItemsTheSame(
-                oldItem: SongItemUiModel,
-                newItem: SongItemUiModel
-            ): Boolean {
-                return oldItem.mediaId == newItem.mediaId
-            }
-
-            override fun areContentsTheSame(
-                oldItem: SongItemUiModel,
-                newItem: SongItemUiModel
-            ): Boolean {
-                return oldItem.mediaId == newItem.mediaId && oldItem.isCurrentSong == newItem.isCurrentSong && oldItem.isBeingPlayed == newItem.isBeingPlayed
-            }
-        }
-    }
 }

@@ -13,9 +13,9 @@ import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRep
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongPagingDataFlowToUiItemsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,11 +25,10 @@ class PlayerHistoryViewModel @Inject constructor(
     private val playlistRepository: PlaylistRepository,
     @Dispatcher(AppDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
-    suspend fun getCurrentSongPosition() = withContext(ioDispatcher) {
-        musicServiceConnection.currentMediaId.first()?.let {
-            playlistRepository.getPlayerPlaylistSongPosition(it)
-        }
-    }
+
+    val currentSongPosition = musicServiceConnection.currentMediaId.map { mediaId ->
+        mediaId?.let { playlistRepository.getPlayerPlaylistSongPosition(it) }
+    }.flowOn(ioDispatcher)
 
     val songItemsPagingData =
         mapSongPagingDataFlowToUiItemsUseCase(

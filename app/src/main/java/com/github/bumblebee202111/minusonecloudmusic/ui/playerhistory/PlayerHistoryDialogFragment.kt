@@ -9,19 +9,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.awaitNotLoading
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDialogPlayerHistoryBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PagedPlayerSongList
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 @AndroidEntryPoint
 class PlayerHistoryDialogFragment : BottomSheetDialogFragment() {
@@ -65,32 +68,34 @@ class PlayerHistoryDialogFragment : BottomSheetDialogFragment() {
             peekHeight = dialogHeight
         }
 
+        binding.playlistSongs.setContent {
+            val songs = playerHistoryViewModel.songItemsPagingData.collectAsLazyPagingItems()
+            val listState = rememberLazyListState()
+            val currentSongPosition by playerHistoryViewModel.currentSongPosition.collectAsStateWithLifecycle(initialValue = null)
 
-        val adapter = PagedPlayerSongAdapter(onItemClick = { playlistSongItemUiModel, i ->
-            playerHistoryViewModel.onItemClick(playlistSongItemUiModel.mediaId, i)
-        }
-        )
-        val songList = binding.playlistSongs
-        songList.adapter = adapter
-        val linearLayoutManager = songList.layoutManager as LinearLayoutManager
+            BoxWithConstraints {
+                val viewportHeight = constraints.maxHeight
+                val itemHeight = getItemHeight()
 
-        repeatWithViewLifecycle(Lifecycle.State.RESUMED) {
-            launch {
-                playerHistoryViewModel.songItemsPagingData.collectLatest {
-                    adapter.submitData(it)
+                PagedPlayerSongList(
+                    songs = songs,
+                    onItemClick = { playlistSongItemUiModel, i ->
+                        playerHistoryViewModel.onItemClick(playlistSongItemUiModel.mediaId, i)
+                    },
+                    state = listState
+                )
 
+                LaunchedEffect(currentSongPosition) {
+                    snapshotFlow { songs.loadState }.awaitNotLoading()
+
+                    currentSongPosition?.let { index ->
+                        if (index < songs.itemCount) {
+                            val centerOffset = (viewportHeight / 2) - (itemHeight / 2)
+                            listState.scrollToItem(index, -centerOffset)
+                        }
+                    }
                 }
             }
-
-            launch {
-                adapter.loadStateFlow.awaitNotLoading()
-                playerHistoryViewModel.getCurrentSongPosition()
-                    ?.let {
-                        val centerOfScreen = songList.height / 2 - getItemHeight() / 2
-                        linearLayoutManager.scrollToPositionWithOffset(it, centerOfScreen)
-                    }
-            }
-
         }
     }
 
