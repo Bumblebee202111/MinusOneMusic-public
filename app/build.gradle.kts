@@ -128,6 +128,8 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.moshi.kotlin)
     implementation(libs.moshi.adapters)
+    implementation(platform(libs.okhttp.bom))
+    implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.persistent.cookie.jar)
     implementation(libs.retrofit.core)
