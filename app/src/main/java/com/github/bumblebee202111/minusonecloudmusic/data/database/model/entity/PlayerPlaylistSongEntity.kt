@@ -27,16 +27,16 @@ data class PlayerPlaylistSongEntity(
     val id: Long,
 )
 
-context (SongDao)
+context(dao: SongDao)
 suspend fun PlayerPlaylistSongEntity.populate(): AbstractSongEntity {
     return when (isLocal) {
-        true -> localSong(id)
-        false -> remoteSong(id)
+        true -> dao.localSong(id)
+        false -> dao.remoteSong(id)
     }
 
 }
 
-context (SongDao)
+context(dao: SongDao)
 suspend fun List<PlayerPlaylistSongEntity>.populate(): List<AbstractSongEntity> {
 
     val idPositions = mutableMapOf<Pair<Boolean, Long>, Int>()
@@ -50,8 +50,8 @@ suspend fun List<PlayerPlaylistSongEntity>.populate(): List<AbstractSongEntity> 
             entry.value.chunked(999).flatMap { chunked ->
                 val ids = chunked.map(PlayerPlaylistSongEntity::id)
                 when (entry.key) {
-                    true -> localSongs(ids)
-                    false -> remoteSongs(ids)
+                    true -> dao.localSongs(ids)
+                    false -> dao.remoteSongs(ids)
                 }
             }
         }

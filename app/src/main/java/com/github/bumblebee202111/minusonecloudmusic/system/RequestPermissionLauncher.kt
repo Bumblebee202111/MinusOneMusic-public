@@ -12,13 +12,13 @@ fun Fragment.requestPermissionLauncher(onPermissionGranted: () -> Unit): Activit
         if (isGranted) onPermissionGranted()
     }
 
-context (Fragment)
+context (fragment: Fragment)
 fun ActivityResultLauncher<String>.launchRequestPermission(
     permission: String,
     onPermissionGranted: () -> Unit
 ) {
     if (ActivityCompat.checkSelfPermission(
-            requireContext(),
+            fragment.requireContext(),
             permission
         ) != PackageManager.PERMISSION_GRANTED
     ) {

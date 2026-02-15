@@ -56,7 +56,7 @@ android {
     kotlin {
         jvmToolchain(libs.versions.java.get().toInt())
         compilerOptions {
-            freeCompilerArgs.add("-Xcontext-receivers")
+            freeCompilerArgs.add("-Xcontext-parameters")
         }
     }
     buildFeatures {

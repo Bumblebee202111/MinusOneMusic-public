@@ -91,9 +91,9 @@ fun View.setBackgroundColorAndTopCorner(@ColorRes color: Int, radius: Float) {
     })
 }
 
-context (Fragment)
+context (fragment: Fragment)
 fun View.hideSoftInput() {
-    val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    val imm = fragment.activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
     imm?.hideSoftInputFromWindow(windowToken, 0)
 }
 
