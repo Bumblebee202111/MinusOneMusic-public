@@ -651,6 +651,9 @@ class NowPlayingFragment : Fragment() {
     }
 
     fun updateProgress() {
+        if (!isVisible) {
+            return
+        }
         val player = this.player
 
         var position: Long = 0
