@@ -651,9 +651,6 @@ class NowPlayingFragment : Fragment() {
     }
 
     fun updateProgress() {
-        if (!isResumed) {
-            return
-        }
         val player = this.player
 
         var position: Long = 0
@@ -764,4 +761,3 @@ class NowPlayingFragment : Fragment() {
         const val IS_LYRICS_MODE_KEY = "is_lyrics_mode"
     }
 }
-
