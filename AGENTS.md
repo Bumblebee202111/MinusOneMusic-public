@@ -53,6 +53,13 @@
 - `app/`: Monolithic module.
 - `app/src/main/java/`: Kotlin source.
 - `app/src/main/cpp/`: Native code (Security constants).
+- `.../minusonecloudmusic/`: Root package.
+    - `ui/`: Compose screens & ViewModels.
+    - `data/`: Repositories & DataSources.
+    - `domain/`: UseCases.
+    - `model/`: Data models.
+    - `service/`: Media3 PlaybackService.
+    - `player/`: Player logic & utilities.
 
 ---
 **Note**: Consistency with existing code > New patterns.
