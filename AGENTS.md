@@ -1,35 +1,58 @@
 # AGENTS.md
 
-## Project Overview
-**MinusOne Cloud Music** (减一云音乐) is a lightweight, third-party NetEase Cloud Music (NCM) client for Android. It aims to provide a pure music experience by stripping away non-essential features like ads, podcasts, and social squares.
+> **System Instruction**: This file defines the context and constraints for AI agents working on **MinusOne Cloud Music**.
 
-## Technology Stack
-- **Language**: Kotlin
-- **UI**: Jetpack Compose (Modern), View-based (Legacy/Migration in progress)
-- **Architecture**: MVVM, Clean Architecture, Single Activity
-- **Navigation**: Navigation 3 (Compose), Legacy Navigation Component
-- **DI**: Hilt
-- **Data**: Room, DataStore, SharedPreferences
-- **Network**: Retrofit, Moshi, OkHttp
-- **Media**: Media3 (ExoPlayer)
-- **Image**: Coil 3
-- **Build**: Gradle (Kotlin DSL), Version Catalogs
+## 1. Project Identity
+- **Name**: MinusOne Cloud Music (减一云音乐)
+- **Type**: Third-party NetEase Cloud Music (NCM) client.
+- **Goal**: "MinusOne" — Remove ads, podcasts, social bloat. Pure music experience.
 
-## Project Structure
-- **`/app`**: Monolithic application module.
-- **`src/main/cpp`**: Native C++ code (NDK) for basic cryptography/security.
-- **`gradle/libs.versions.toml`**: Dependency management.
+## 2. Tech Stack
+| Category      | Technology         | Notes                      |
+|:--------------|:-------------------|:---------------------------|
+| **Language**  | Kotlin             |                            |
+| **UI**        | Jetpack Compose    | Material 3.                |
+| **Legacy UI** | Android Views      | XML/Fragments (Migrating). |
+| **Arch**      | MVVM + Clean       | Single Activity.           |
+| **DI**        | Hilt               |                            |
+| **Async**     | Coroutines + Flow  |                            |
+| **Network**   | Retrofit + OkHttp  | Moshi.                     |
+| **Media**     | Media3 (ExoPlayer) |                            |
+| **Image**     | Coil 3             |                            |
 
-## Specific Configuration
-- **API**: Direct NCM API integration using undocumented endpoints.
-- **Debugging**: **Chucker** is available in debug builds for HTTP inspection.
+## 3. Architecture & Guidelines
 
-## Guidelines
-1.  **Compose Migration**: Prefer **Jetpack Compose** for new UI. Adopt a gradual migration strategy: migrate containers (Fragments, RecyclerViews) first, then inner content.
-2.  **Naming Conventions**: Follow naming conventions of decompiled code or API fields if provided.
-3.  **Navigation**: Align new logic with Navigation 3 patterns.
-4.  **Media & Images**: Use Media3 for playback and Coil 3 for loading.
-5.  **NCM API**: Handle network errors gracefully due to the unofficial nature of the API.
-6.  **Large Screen**: Ensure UI adapts reasonably well to tablet/landscape (best-effort).
-7.  **NDK**: Avoid modifying `src/main/cpp` unless necessary for security logic.
-8.  **Philosophy**: Maintain the "MinusOne" approach—no ads, no bloat.
+### UI Layer
+- **Compose First**: New UI must be Jetpack Compose.
+- **State**: Use `StateFlow<UiState>` in ViewModels.
+
+### Data Layer
+- **API**: Undocumented NCM APIs. Handle errors gracefully (no crashes).
+- **Persistence**: Cache responses only if critical for offline playback.
+
+### Native (NDK)
+- **Path**: `app/src/main/cpp`
+- **Rule**: Security constants storage.
+
+## 4. Coding Standards
+
+### Reverse Engineering
+- **Naming**: Match NCM decompiled names/API fields.
+- **Comments**: **CRITICAL**: Preserve comments referencing original NCM classes/IDs (e.g., `// NCM: MyFriendActivity`).
+
+### Dependencies
+- **Catalog**: Use `gradle/libs.versions.toml`. No hardcoded versions.
+- **Versions**: **CRITICAL**: AI training data is outdated.
+    - **Existing**: STRICTLY use versions from `gradle/libs.versions.toml`.
+    - **New**: Check for latest stable versions only when adding new libraries.
+
+## 5. Workflow
+- **Debugging**: Use **Chucker** (debug builds) for HTTP inspection.
+
+## 6. Structure
+- `app/`: Monolithic module.
+- `app/src/main/java/`: Kotlin source.
+- `app/src/main/cpp/`: Native code (Security constants).
+
+---
+**Note**: Consistency with existing code > New patterns.
