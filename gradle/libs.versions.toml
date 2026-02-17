@@ -1,11 +1,9 @@
-# gradle/libs.versions.toml
-
 [versions]
 # Android & Tools
 agp = "8.13.2"
 compileSdk = "36"
 minSdk = "24"
-targetSdk = "34"
+targetSdk = "35"
 java = "17"
 kotlin = "2.3.10"
 ksp = "2.3.5"
