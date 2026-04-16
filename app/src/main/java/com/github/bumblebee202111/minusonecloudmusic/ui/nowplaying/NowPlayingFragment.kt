@@ -150,6 +150,7 @@ class NowPlayingFragment : Fragment() {
     private var playlistName: String? = "music"
 
     private lateinit var audioManager: AudioManager
+    private lateinit var audioDeviceCallback: AudioDeviceCallback
 
     private var player: Player? = null
         set(value) {
@@ -264,32 +265,27 @@ class NowPlayingFragment : Fragment() {
             }
         }
 
-        audioManager =
-            requireContext().applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager.registerAudioDeviceCallback(object : AudioDeviceCallback() {
+        audioManager = context.applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioDeviceCallback = object : AudioDeviceCallback() {
             var audioDevices: List<AudioDeviceInfo> = emptyList()
             override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>?) {
                 super.onAudioDevicesAdded(addedDevices)
-                if (addedDevices != null) {
-                    audioDevices += addedDevices
-                }
+                if (addedDevices != null) audioDevices += addedDevices
                 updateIcon()
             }
 
             override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>?) {
                 super.onAudioDevicesRemoved(removedDevices)
-                if (removedDevices != null) {
-                    audioDevices -= removedDevices
-                }
+                if (removedDevices != null) audioDevices -= removedDevices
                 updateIcon()
             }
 
             fun updateIcon() {
-                val isA2dpPlaying =
-                    audioDevices.find { it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP } != null
+                val isA2dpPlaying = audioDevices.any { it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP }
                 binding.deviceBtnStyle1.setImageResource(if (isA2dpPlaying) R.drawable.f5j else R.drawable.f5i)
             }
-        }, handler)
+        }
+        audioManager.registerAudioDeviceCallback(audioDeviceCallback, handler)
 
         binding.deviceBtnStyle1.apply {
             setOnClickListener {
@@ -504,6 +500,14 @@ class NowPlayingFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         player = null
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        handler.removeCallbacksAndMessages(null)
+        if (::audioManager.isInitialized && ::audioDeviceCallback.isInitialized) {
+            audioManager.unregisterAudioDeviceCallback(audioDeviceCallback)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -744,8 +748,8 @@ class NowPlayingFragment : Fragment() {
         BadgeDrawable.create(context).apply {
             isVisible = true
             setTextAppearance(R.style.TextAppearance_App_Player_Badge)
-            horizontalOffset = ViewUtils.dpToPx(requireContext(), 12).toInt()
-            verticalOffset = ViewUtils.dpToPx(requireContext(), 11).toInt()
+            horizontalOffset = ViewUtils.dpToPx(context, 12).toInt()
+            verticalOffset = ViewUtils.dpToPx(context, 11).toInt()
             backgroundColor = Color.TRANSPARENT
         }
 

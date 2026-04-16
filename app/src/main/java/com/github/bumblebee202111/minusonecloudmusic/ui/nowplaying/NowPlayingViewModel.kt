@@ -86,7 +86,7 @@ class NowPlayingViewModel @Inject constructor(
     fun onLikeClicked() {
         val songId = currentRemoteSongId.value ?: return
         viewModelScope.launch {
-            val isCurrentlyLiked = _liked.first() ?: false
+            val isCurrentlyLiked = likeState.value.like ?: false
             val newLikeState = !isCurrentlyLiked
             loggedInUserDataRepository.likeSong(songId = songId, like = newLikeState).collect { result ->
                 if (result is AppResult.Error) {
