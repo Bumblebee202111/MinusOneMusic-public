@@ -11,9 +11,9 @@
 | Category      | Technology         | Notes                      |
 |:--------------|:-------------------|:---------------------------|
 | **Language**  | Kotlin             |                            |
-| **UI**        | Jetpack Compose    | Material 3.                |
+| **UI**        | Jetpack Compose    | Material 3 + Custom Theme. |
 | **Legacy UI** | Android Views      | XML/Fragments (Migrating). |
-| **Arch**      | MVVM + Clean       | Single Activity.           |
+| **Arch**      | MVVM + Clean       | Navigation 3 (Compose).    |
 | **DI**        | Hilt               |                            |
 | **Async**     | Coroutines + Flow  |                            |
 | **Network**   | Retrofit + OkHttp  | Moshi.                     |
@@ -24,7 +24,7 @@
 
 ### UI Layer
 - **Compose First**: New UI must be Jetpack Compose.
-- **State**: Use `StateFlow<UiState>` in ViewModels.
+- **State**: Use `StateFlow` in ViewModels.
 
 ### Data Layer
 - **API**: Undocumented NCM APIs. Handle errors gracefully (no crashes).
@@ -36,8 +36,12 @@
 
 ## 4. Coding Standards
 
+### Code Quality
+- **Fail-Fast:** Focus on the 'Happy Path'. No silent defensive fallbacks. Let it crash/throw during development to expose bugs early.
+- **Relentless Refactoring**: Actively modernize, rename, and reorganize code. Fix anti-patterns immediately and prioritize modern Android best practices over preserving legacy structures.
+
 ### Reverse Engineering
-- **Naming**: Match NCM decompiled names/API fields.
+- **Naming**: Match NCM decompiled names and API fields.
 - **Comments**: **CRITICAL**: Preserve comments referencing original NCM classes/IDs (e.g., `// NCM: MyFriendActivity`).
 
 ### Dependencies
@@ -54,12 +58,9 @@
 - `app/src/main/java/`: Kotlin source.
 - `app/src/main/cpp/`: Native code (Security constants).
 - `.../minusonecloudmusic/`: Root package.
-    - `ui/`: Compose screens & ViewModels.
-    - `data/`: Repositories & DataSources.
+    - `ui/`: Compose screens and ViewModels.
+    - `data/`: Repositories, DataSources, and raw network DTOs.
     - `domain/`: UseCases.
     - `model/`: Data models.
     - `service/`: Media3 PlaybackService.
-    - `player/`: Player logic & utilities.
-
----
-**Note**: Consistency with existing code > New patterns.
+    - `player/`: Player logic and utilities.
