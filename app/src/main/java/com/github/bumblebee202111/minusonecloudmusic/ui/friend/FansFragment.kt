@@ -4,12 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentFansBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemUserFollowBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class FansFragment : Fragment() {
 
@@ -28,12 +36,21 @@ class FansFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = ProfileAdapter()
-        binding.fans.adapter = adapter
-        repeatWithViewLifecycle {
-            launch {
-                viewModel.userFans.collect {
-                    adapter.submitList(it)
+
+        binding.root.findViewById<ComposeView>(R.id.fans)?.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                DolphinTheme {
+                    val fans by viewModel.userFans.collectAsStateWithLifecycle(initialValue = emptyList())
+                    
+                    LazyColumn {
+                        items(fans ?: emptyList()) { user ->
+                            AndroidViewBinding(ListItemUserFollowBinding::inflate) {
+                                this.followingUser = user
+                                executePendingBindings()
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -42,7 +59,6 @@ class FansFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance()=
-            FansFragment()
+        fun newInstance() = FansFragment()
     }
 }

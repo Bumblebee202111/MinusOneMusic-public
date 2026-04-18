@@ -4,15 +4,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentCommentsBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
+import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemCommentBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
-import com.google.android.material.divider.MaterialDividerItemDecoration
+import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -38,26 +46,32 @@ class CommentsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.setNavigationOnClickListener {
             navigationManager.goBack()
         }
 
-        val adapter = CommentsAdapter()
-        binding.commentList.apply {
-            this.adapter = adapter
-            this.addItemDecoration(
-                MaterialDividerItemDecoration(
-                    context,
-                    MaterialDividerItemDecoration.VERTICAL
-                ).apply {
-                    setDividerColorResource(requireContext(), R.color.lineColor)
-                })
-        }
+        binding.root.findViewById<ComposeView>(R.id.commentList).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                DolphinTheme {
+                    val comments by viewModel.comments.collectAsStateWithLifecycle(initialValue = emptyList())
+                    val commentsList = comments ?: emptyList()
 
-        repeatWithViewLifecycle {
-            launch {
-                viewModel.comments.collect(adapter::submitList)
+                    LazyColumn {
+                        itemsIndexed(commentsList) { index, comment ->
+                            AndroidViewBinding(ListItemCommentBinding::inflate) {
+                                this.comment = comment
+                                executePendingBindings()
+                            }
+
+                            if (index < commentsList.lastIndex) {
+                                HorizontalDivider(color = colorResource(id = R.color.lineColor))
+                            }
+                        }
+                    }
+                }
             }
         }
     }

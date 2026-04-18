@@ -86,7 +86,6 @@ To align the project with current best practices and showcase significant skill 
   - Display missing error messages
 - Compose
   - Migrate
-    - RecyclerView to LazyList
 - Nav UI
   - NavigationSuiteScaffold
 - Request compressed images

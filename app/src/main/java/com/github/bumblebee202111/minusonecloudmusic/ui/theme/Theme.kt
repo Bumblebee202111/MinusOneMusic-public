@@ -1,6 +1,7 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -504,7 +505,8 @@ fun DolphinTheme(
 
     CompositionLocalProvider(
         LocalDolphinColors provides dolphinColors,
-        LocalDolphinShadows provides dolphinShadows
+        LocalDolphinShadows provides dolphinShadows,
+        LocalRippleConfiguration provides null
     ) {
         MaterialTheme(
             colorScheme = materialColors,
