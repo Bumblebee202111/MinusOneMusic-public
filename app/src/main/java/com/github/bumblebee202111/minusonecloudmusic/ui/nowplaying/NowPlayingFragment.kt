@@ -27,7 +27,6 @@ import androidx.fragment.app.viewModels
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
-import androidx.media3.common.util.Assertions
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.common.util.Util.getDrawable
@@ -60,6 +59,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationMan
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.ExperimentalBadgeUtils
+import com.google.common.base.Preconditions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.Formatter
@@ -154,8 +154,8 @@ class NowPlayingFragment : Fragment() {
 
     private var player: Player? = null
         set(value) {
-            Assertions.checkState(Looper.myLooper() == Looper.getMainLooper())
-            Assertions.checkArgument(
+            Preconditions.checkState(Looper.myLooper() == Looper.getMainLooper())
+            Preconditions.checkArgument(
                 value == null || value.applicationLooper == Looper.getMainLooper()
             )
 
