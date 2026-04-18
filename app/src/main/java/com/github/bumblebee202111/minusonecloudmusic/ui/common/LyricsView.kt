@@ -8,49 +8,45 @@ import android.graphics.Paint.ANTI_ALIAS_FLAG
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Scroller
-import androidx.core.view.isVisible
+import androidx.core.graphics.toColorInt
 import com.github.bumblebee202111.minusonecloudmusic.model.LyricsEntry
 import kotlin.math.roundToInt
-import androidx.core.graphics.toColorInt
-
+import androidx.core.graphics.withSave
 class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
-
 
     private val textColor: Int = Color.WHITE
     private var normalTextSize: Float = ViewUtils.dpToPx(context, 17)
     private var highlightedTextSize: Float = ViewUtils.dpToPx(context, 20)
     private val lineSpacing: Float = ViewUtils.dpToPx(context, 18)
+
     private var position: Long = 0
     private var highlightedLine: Int? = null
     private var scrollDestination: Int? = null
     private var lyricsLines: List<LyricsLine>? = null
+    private var lyricsEntries: List<LyricsEntry>? = null
+
     private val normalTextPaint: TextPaint = TextPaint(ANTI_ALIAS_FLAG).apply {
         color = "#AAFFFFFF".toColorInt()
-        textAlign = android.graphics.Paint.Align.CENTER
+        textAlign = Paint.Align.CENTER
         textSize = normalTextSize
     }
+
     private val highlightedTextPaint: TextPaint = TextPaint(ANTI_ALIAS_FLAG).apply {
         color = "#DDFFFFFF".toColorInt()
         textAlign = Paint.Align.CENTER
         textSize = highlightedTextSize
     }
-    private var lyricsEntries: List<LyricsEntry>? = null
 
-    private var scroller: Scroller
+    private var scroller: Scroller = Scroller(context, DecelerateInterpolator(0.604f))
     private var isPrepared = false
     private var isScrolling = false
     private lateinit var normalLineLayouts: List<StaticLayout>
     private lateinit var highlightedLineLayouts: List<StaticLayout>
     private var height: Int = 0
     private var width: Int = 0
-
-    init {
-        scroller = Scroller(context, DecelerateInterpolator(0.604f))
-    }
 
     fun setLyrics(lyrics: List<LyricsEntry>?) {
         if (this.lyricsEntries == lyrics) return
@@ -59,6 +55,7 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         val pairs =
             lyrics?.flatMap { entry -> entry.times.map { time -> Pair(time, entry.lyrics) } }
                 ?.sortedBy { it.first }
+
         lyricsLines = pairs?.mapIndexed { index, pair ->
             val dur =
                 if (index < pairs.size - 1) {
@@ -77,10 +74,7 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     fun setPosition(position: Long) {
-        if (this.position == position || lyricsLines == null) {
-            return
-        }
-
+        if (this.position == position || lyricsLines == null) return
         this.position = position
 
         val newLine = findLyricsLineAt(position)
@@ -97,14 +91,12 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             highlightedLine = newLine
             scrollTo(newLine)
         }
-
     }
 
     private fun scrollTo(destination: Int?) {
         this.scrollDestination = destination
         val destY = getOffsetY(destination ?: 0)
         val dy = destY - offsetY
-        Log.d("LyricsView", "$dy $offsetY ${destination.toString()}")
         isScrolling = true
 
         scroller.startScroll(0, offsetY.roundToInt(), 0, dy.roundToInt(), 300)
@@ -113,14 +105,11 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     
     private fun getOffsetY(line: Int): Float {
-
-        val highlightedLineLayouts = highlightedLineLayouts
-        val normalLineLayouts = normalLineLayouts
         var y = height / 2F - lineSpacing * (line - 1)
         for (i in 0 until line) {
-            y -= if (highlightedLine == i)
+            y -= if (highlightedLine == i) {
                 highlightedLineLayouts[i].height
-            else {
+            } else {
                 normalLineLayouts[i].height
             }
         }
@@ -133,7 +122,6 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     override fun onDraw(canvas: Canvas) {
-
         val highlightedLine = highlightedLine
         val lyricsLines = lyricsLines
 
@@ -149,7 +137,6 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             offsetY = getOffsetY(highlightedLine ?: 0)
         }
 
-
         val dx = width / 2F
         var dy = offsetY
 
@@ -162,18 +149,14 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
             val lineHeight = line.height
             if (dy + lineHeight > 0 && dy < height) {
-                with(canvas) {
-                    save()
-                    translate(dx, dy)
-                    line.draw(this)
-                    canvas.restore()
+                canvas.withSave {
+                        translate(dx, dy)
+                        line.draw(this)
                 }
-
             }
 
             dy += lineHeight + lineSpacing
         }
-
     }
 
     private fun findLyricsLineAt(position: Long): Int? {
@@ -181,7 +164,6 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             ?: throw RuntimeException("lyricsLines must be set before getLyricsLineAt() is called")
         return lyricsLines.lastOrNull { it.time <= position }?.lineNumber
     }
-
 
     private fun prepareForNewLyrics() {
         val lyricsLines = lyricsLines ?: return
@@ -193,7 +175,7 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 normalTextPaint,
                 width
             ).build()
-        }.also { normalLineLayouts = it }
+        }
         highlightedLineLayouts = List(lyricsLines.size) { index ->
             StaticLayout.Builder.obtain(
                 lyricsLines[index].lyrics,
@@ -202,7 +184,7 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 highlightedTextPaint,
                 width
             ).build()
-        }.also { highlightedLineLayouts = it }
+        }
         isPrepared = true
     }
 
@@ -211,19 +193,16 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     private var offsetY = 0F
+
     override fun computeScroll() {
         if (lyricsLines == null) return
         if (scroller.computeScrollOffset()) {
-            Log.d("LyricsView", "currY: " + scroller.currY)
             offsetY = scroller.currY.toFloat()
             invalidate()
-        } else {
-            if (isScrolling) {
-                isScrolling = false
-                highlightedLine = scrollDestination
-                invalidate()
-            }
-
+        } else if (isScrolling) {
+            isScrolling = false
+            highlightedLine = scrollDestination
+            invalidate()
         }
     }
 
@@ -233,5 +212,4 @@ class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         val lyrics: String,
         val dur: Long,
     )
-
 }

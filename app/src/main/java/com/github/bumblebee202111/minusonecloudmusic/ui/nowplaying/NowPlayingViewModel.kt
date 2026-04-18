@@ -84,7 +84,7 @@ class NowPlayingViewModel @Inject constructor(
         if (song == null) return@flatMapLatest flowOf(null)
 
         rawMetadataFlow.flatMapLatest { metadata ->
-            val embeddedLyrics = extractEmbeddedLyrics(metadata)
+            val embeddedLyrics = metadata.extractEmbeddedLyrics()
 
             if (!embeddedLyrics.isNullOrEmpty()) {
                 flowOf(embeddedLyrics)
@@ -97,29 +97,6 @@ class NowPlayingViewModel @Inject constructor(
             }
         }
     }.stateInUi()
-
-    private fun extractEmbeddedLyrics(metadata: Metadata?): List<LyricsEntry>? {
-        if (metadata == null) return null
-        var rawLyrics: String? = null
-
-        for (i in 0 until metadata.length()) {
-            val entry = metadata.get(i)
-            if (entry is CommentFrame && (entry.id == "USLT" || entry.description.equals("LYRICS", true))) {
-                rawLyrics = entry.text
-                break
-            }
-            if (entry is TextInformationFrame && entry.id == "TXXX" && entry.description?.equals("LYRICS", true) == true) {
-                rawLyrics = entry.values.first()
-                break
-            }
-            if (entry is VorbisComment && (entry.key.equals("LYRICS", true) || entry.key.equals("UNSYNCEDLYRICS", true))) {
-                rawLyrics = entry.value
-                break
-            }
-        }
-
-        return LyricsEntry.parseLrc(rawLyrics).takeIf { it.isNotEmpty() }
-    }
 
     private val _liked = currentRemoteSongId.flatMapLatest { songId ->
         songId?.let { loggedInUserDataRepository.observeSongLiked(it) } ?: flowOf(null)
@@ -164,3 +141,28 @@ class NowPlayingViewModel @Inject constructor(
 }
 
 data class LikeState(val like: Boolean?, val likeCountDisplayText: String?)
+
+
+@androidx.annotation.OptIn(UnstableApi::class)
+private fun Metadata?.extractEmbeddedLyrics(): List<LyricsEntry>? {
+    if (this == null) return null
+    var rawLyrics: String? = null
+
+    for (i in 0 until length()) {
+        val entry = get(i)
+        if (entry is CommentFrame && (entry.id == "USLT" || entry.description.equals("LYRICS", true))) {
+            rawLyrics = entry.text
+            break
+        }
+        if (entry is TextInformationFrame && entry.id == "TXXX" && entry.description?.equals("LYRICS", true) == true) {
+            rawLyrics = entry.values.first()
+            break
+        }
+        if (entry is VorbisComment && (entry.key.equals("LYRICS", true) || entry.key.equals("UNSYNCEDLYRICS", true))) {
+            rawLyrics = entry.value
+            break
+        }
+    }
+
+    return LyricsEntry.parseLrc(rawLyrics).takeIf { it.isNotEmpty() }
+}
