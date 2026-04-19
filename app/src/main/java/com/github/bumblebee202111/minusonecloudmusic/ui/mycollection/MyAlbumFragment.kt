@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMyAlbumBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemMyAlbumBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.loadImage
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
@@ -46,6 +47,7 @@ class MyAlbumFragment : Fragment() {
                         items(albums ?: emptyList()) { album ->
                             AndroidViewBinding(ListItemMyAlbumBinding::inflate) {
                                 this.album = album
+                                this.albumCover.loadImage(album.art)
                                 executePendingBindings()
                             }
                         }

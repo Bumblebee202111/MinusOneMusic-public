@@ -14,6 +14,7 @@ import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemUserPlaylistChartsBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemUserPlaylistNormalBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.loadImage
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 
 @Composable
@@ -62,6 +63,7 @@ private fun NormalPlaylistItemView(
         factory =  ListItemUserPlaylistNormalBinding::inflate,
         update = {
             playlist = item.playlist
+            playlistCoverImg.loadImage(item.playlist.coverImgUrl, thumbnailSize = 116, quality = 80)
         }
     )
 }

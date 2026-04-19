@@ -6,16 +6,13 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
-import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.toColorInt
-import androidx.databinding.BindingAdapter
 import coil3.load
 import coil3.request.crossfade
 import coil3.request.error
@@ -26,24 +23,6 @@ import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.utils.imageUrl
 import kotlin.math.roundToInt
 
-
-
-@BindingAdapter("isGone")
-fun View.setIsGone(
-    isGone: Boolean
-) {
-    visibility = if (isGone) View.GONE else View.VISIBLE
-}
-
-@BindingAdapter("isFakeBoldText")
-fun TextView.bindIsFakeBoldText(isFakeBoldText: Boolean) {
-    paint.isFakeBoldText = isFakeBoldText
-}
-
-@BindingAdapter(
-    value = ["image", "thumbnailSize", "quality", "circleCrop", "placeholder", "crossFadeDuration"],
-    requireAll = false
-)
 fun ImageView.loadImage(
     model: Any?,
     thumbnailSize: Int? = null,
@@ -56,10 +35,10 @@ fun ImageView.loadImage(
         is Drawable -> placeholder
         is Int -> try {
             ResourcesCompat.getDrawable(resources,placeholder,null)
-        } catch (e: Exception) { null }
+        } catch (_: Exception) { null }
         is String -> try {
             placeholder.toColorInt().toDrawable()
-        } catch (e: Exception) { null }
+        } catch (_: Exception) { null }
         else -> null
     }
 
@@ -90,23 +69,6 @@ fun ImageView.loadImage(
     }
 }
 
-
-@BindingAdapter("android:text")
-fun setText(view: TextView, @StringRes resId: Int) {
-    if (resId == 0) {
-        view.text = null
-    } else {
-        view.setText(resId)
-    }
-}
-
-
-@BindingAdapter("artists")
-fun TextView.artists(artists: List<String>?) {
-    text = artists?.joinToString("/") ?: "Unknown"
-}
-
-@BindingAdapter(value = ["songItemSubtitleArtists", "songItemSubtitleAlbum"], requireAll = false)
 fun TextView.playlistSongSubtitle(
     songItemSubtitleArtists: List<String>?,
     songItemSubtitleAlbum: String?
@@ -124,10 +86,6 @@ fun TextView.playlistSongSubtitle(
     text = sb.toString()
 }
 
-@BindingAdapter(
-    value = ["playerSongItemTitle", "playerSongItemArtists", "playerSongItemIsCurrentSong"],
-    requireAll = false
-)
 fun TextView.playerSongItem(
     songItemTitle: String?,
     songItemArtists: List<String>?,
@@ -169,7 +127,6 @@ fun TextView.playerSongItem(
     )
 }
 
-@BindingAdapter("isCurrentSong")
 fun TextView.setIsCurrentSong(isCurrentSong: Boolean) {
     setTextColor(
         if (isCurrentSong) ContextCompat.getColor(
@@ -179,7 +136,6 @@ fun TextView.setIsCurrentSong(isCurrentSong: Boolean) {
     )
 }
 
-@BindingAdapter("isCurrentSong")
 fun LinearLayout.setIsCurrentSong(isCurrentSong: Boolean) {
     if (isCurrentSong)
         setBackgroundResource(R.color.colorText7)

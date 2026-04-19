@@ -22,6 +22,7 @@ import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentPlaylis
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PagedSongWithPositionList
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.applyDominantColor
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.loadImage
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.setBackgroundColorAndTopCorner
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
@@ -121,6 +122,9 @@ class PlaylistFragment : Fragment() {
             launch {
                 viewModel.playlistDetail.collect {
                     val playlistCover = it?.coverImgUrl ?: return@collect
+
+                    binding.creatorAvatar.loadImage(it.creator?.avatarUrl, circleCrop = true)
+
                     Log.d("fuvk", playlistCover)
                     binding.playlistCover.load(playlistCover) {
                         placeholder(R.drawable.h_1)

@@ -31,9 +31,10 @@ fun DragonBallRow(
                         this.root.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
                     }
                     
-                    this.dragonBall = dragonBall
+                    this.imageDragonBall.setImageResource(dragonBall.iconResId)
+                    this.nameDragonBall.setText(dragonBall.nameResId)
+
                     this.root.setOnClickListener { onItemClick(dragonBall) }
-                    this.executePendingBindings()
                 }
             }
         }

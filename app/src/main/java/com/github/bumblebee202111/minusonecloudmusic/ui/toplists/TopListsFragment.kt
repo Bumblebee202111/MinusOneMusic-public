@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.view.isGone
@@ -23,6 +22,7 @@ import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentTopListsBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemBillboardBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemBillboardGroupBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.loadImage
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PlaylistRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistFragment
@@ -42,7 +42,7 @@ class TopListsFragment : Fragment() {
 
     @Inject
     lateinit var navigationManager: NavigationManager
-    
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -63,12 +63,13 @@ class TopListsFragment : Fragment() {
             setContent {
                 DolphinTheme {
                     val topLists by viewModel.topLists.collectAsStateWithLifecycle(initialValue = emptyList())
-                    
+
                     LazyColumn {
                         items(topLists ?: emptyList()) { billboardGroup ->
                             AndroidViewBinding(ListItemBillboardGroupBinding::inflate) {
-                                setBillboardGroup(billboardGroup)
-                                
+                                this.billboardCategory.text = billboardGroup.name
+                                this.billboardCategory.paint.isFakeBoldText = true
+
                                 val billboardsList = billboardGroup.billboards
                                 if (billboardsList.isNotEmpty()) {
                                     this.root.findViewById<View>(R.id.billboards).isVisible = true
@@ -82,6 +83,8 @@ class TopListsFragment : Fragment() {
                                                     items(billboardsList) { billboard ->
                                                         AndroidViewBinding(ListItemBillboardBinding::inflate) {
                                                             this.billboard = billboard
+                                                            this.billboardCover.loadImage(billboard.coverImgUrl, thumbnailSize = 137, quality = 80)
+
                                                             this.root.setOnClickListener {
                                                                 if (billboard.isMusicPlaylist) {
                                                                     navigationManager.navigate(
@@ -102,7 +105,6 @@ class TopListsFragment : Fragment() {
                                 } else {
                                     this.root.findViewById<View>(R.id.billboards).isGone = true
                                 }
-                                executePendingBindings()
                             }
                         }
                     }

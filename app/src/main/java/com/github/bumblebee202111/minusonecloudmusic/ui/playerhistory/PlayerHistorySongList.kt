@@ -8,8 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.core.view.isVisible
 import androidx.paging.compose.LazyPagingItems
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemPlayerPlaylistSongBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.playerSongItem
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.setIsCurrentSong
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SongItemUiModel
 
 @Composable
@@ -49,6 +52,11 @@ fun PlayerSongItem(
     ) {
         this.song = song
         this.position = position
+        
+        bsPlaylistListItem.setIsCurrentSong(song.isCurrentSong)
+        playingMark.isVisible = song.isCurrentSong
+        songTitleAndArtists.playerSongItem(song.name, song.artists.filterNotNull(), song.isCurrentSong)
+
         root.setOnClickListener { onClick() }
         playingMark.apply {
             if (song.isBeingPlayed)

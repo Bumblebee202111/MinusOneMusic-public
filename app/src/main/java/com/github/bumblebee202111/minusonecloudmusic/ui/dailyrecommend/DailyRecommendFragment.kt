@@ -16,8 +16,11 @@ import androidx.media3.common.util.UnstableApi
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentDailyRecommendBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithAlbumList
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.loadImage
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.repeatWithViewLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -56,6 +59,14 @@ class DailyRecommendFragment : Fragment() {
 
         binding.toolbar.setNavigationOnClickListener {
             navigationManager.goBack()
+        }
+
+        repeatWithViewLifecycle {
+            launch {
+                viewModel.banner.collect { bannerUrl ->
+                    binding.background.loadImage(bannerUrl)
+                }
+            }
         }
 
         binding.dailyRecommendList.setContent {

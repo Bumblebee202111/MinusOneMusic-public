@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.core.view.isVisible
 import androidx.paging.compose.LazyPagingItems
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemNormalSongSimpleBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ListItemNormalSongWithAlbumBinding
@@ -42,6 +43,11 @@ fun SimpleSongItem(
         modifier = modifier
     ) {
         this.song = song
+        
+        playingMark.isVisible = song.isCurrentSong
+        songInfo.songTitle.setIsCurrentSong(song.isCurrentSong)
+        songInfo.artistAndAlbum.playlistSongSubtitle(song.artists.filterNotNull(), song.album?.name)
+
         root.setOnClickListener { onClick() }
         playingMark.apply {
             if (song.isBeingPlayed)
@@ -82,6 +88,13 @@ fun SongWithAlbumItem(
         modifier = modifier
     ) {
         this.song = song
+        
+        playingMark.isVisible = song.isCurrentSong
+        albumCover.isVisible = !song.isCurrentSong
+        albumCover.loadImage(model = song.album?.art, thumbnailSize = 200, crossFadeDuration = 300)
+        songInfo.songTitle.setIsCurrentSong(song.isCurrentSong)
+        songInfo.artistAndAlbum.playlistSongSubtitle(song.artists.filterNotNull(), song.album?.name)
+
         root.setOnClickListener { onClick() }
         playingMark.apply {
             if (song.isBeingPlayed)
@@ -147,6 +160,12 @@ fun SongWithPositionItem(
     ) {
         this.song = song
         this.position = position
+        
+        songPosition.isVisible = !song.isCurrentSong
+        playingMark.isVisible = song.isCurrentSong
+        songInfo.songTitle.setIsCurrentSong(song.isCurrentSong)
+        songInfo.artistAndAlbum.playlistSongSubtitle(song.artists.filterNotNull(), song.album?.name)
+
         root.setOnClickListener { onClick() }
         playingMark.apply {
             if (song.isBeingPlayed)

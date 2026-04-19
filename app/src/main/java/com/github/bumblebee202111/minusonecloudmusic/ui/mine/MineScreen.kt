@@ -10,6 +10,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -25,10 +26,12 @@ import androidx.core.view.isVisible
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMineBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.loadImage
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.LocalMusicRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyCollectionRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyFriendRoute
@@ -55,10 +58,17 @@ fun MineScreen(
     val pagerState = rememberPagerState(pageCount = { 2 })
     val scope = rememberCoroutineScope()
 
+    val loggedInUserProfile by mainViewModel.loggedInUserProfile.collectAsStateWithLifecycle()
+    val myProfile by mineViewModel.myProfile.collectAsStateWithLifecycle()
+
     AndroidViewBinding(FragmentMineBinding::inflate, modifier = Modifier.fillMaxSize()) {
         this.lifecycleOwner = lifecycleOwner
         viewModel = mainViewModel
         this.mineViewModel = mineViewModel
+
+        this.headerSinglePicBgImage.loadImage(loggedInUserProfile?.backgroundUrl, placeholder = "#FF4D1414")
+        this.avatar.loadImage(loggedInUserProfile?.avatarUrl, circleCrop = true, placeholder = R.drawable.fgw, quality = 80, thumbnailSize = 148)
+        this.smallAvatar.loadImage(myProfile?.avatarUrl, circleCrop = true, placeholder = R.drawable.fgw)
 
         topAppBar.setNavigationOnClickListener { onOpenDrawer() }
 
