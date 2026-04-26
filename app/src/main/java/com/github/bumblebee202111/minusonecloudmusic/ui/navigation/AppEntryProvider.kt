@@ -7,7 +7,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.clouddisk.MyPrivateCloud
 import com.github.bumblebee202111.minusonecloudmusic.ui.comments.CommentsFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.dailyrecommend.DailyRecommendFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.discover.DiscoverScreen
-import com.github.bumblebee202111.minusonecloudmusic.ui.friend.MyFriendFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.friend.MyFriendScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.inbox.InboxScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.localmusic.LocalMusicFragment
@@ -45,7 +45,11 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
     entry<MyPrivateCloudRoute> { AndroidFragment<MyPrivateCloudFragment>() }
     entry<LocalMusicRoute> { AndroidFragment<LocalMusicFragment>() }
     entry<MyRecentPlayRoute> { AndroidFragment<MyRecentPlayFragment>() }
-    entry<MyFriendRoute> { AndroidFragment<MyFriendFragment>() }
+    entry<MyFriendRoute> { 
+        MyFriendScreen(
+            onNavigateBack = { navigationManager.goBack() }
+        ) 
+    }
     entry<MyCollectionRoute> { AndroidFragment<MyCollectionFragment>() }
     entry<SettingsRoute> { SettingsScreen() }
     entry<SearchRoute> { AndroidFragment<SearchFragment>() }
