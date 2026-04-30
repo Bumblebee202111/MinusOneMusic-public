@@ -92,7 +92,6 @@ dependencies {
     implementation(libs.androidx.fragment.compose)
     implementation(libs.androidx.interpolator)
     implementation(libs.androidx.palette.ktx)
-    implementation(libs.androidx.viewpager2)
     implementation(libs.google.material)
     implementation(libs.lottie)
     implementation(platform(libs.androidx.compose.bom))

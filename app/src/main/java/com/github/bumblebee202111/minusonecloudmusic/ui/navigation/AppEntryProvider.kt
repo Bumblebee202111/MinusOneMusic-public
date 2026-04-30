@@ -17,7 +17,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.mycollection.MyCollectionScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying.NowPlayingFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistFragment
-import com.github.bumblebee202111.minusonecloudmusic.ui.recentplay.MyRecentPlayFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.recentplay.MyRecentPlayScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.search.SearchFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.settings.SettingsScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.toplists.TopListsFragment
@@ -44,16 +44,20 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
     entry<TopListsRoute> { AndroidFragment<TopListsFragment>() }
     entry<MyPrivateCloudRoute> { AndroidFragment<MyPrivateCloudFragment>() }
     entry<LocalMusicRoute> { AndroidFragment<LocalMusicFragment>() }
-    entry<MyRecentPlayRoute> { AndroidFragment<MyRecentPlayFragment>() }
+    entry<MyRecentPlayRoute> { 
+        MyRecentPlayScreen(
+            onNavigateBack = { navigationManager.goBack() }
+        ) 
+    }
     entry<MyFriendRoute> { 
         MyFriendScreen(
             onNavigateBack = { navigationManager.goBack() }
         ) 
     }
-    entry<MyCollectionRoute> {
+    entry<MyCollectionRoute> { 
         MyCollectionScreen(
             onNavigateBack = { navigationManager.goBack() }
-        )
+        ) 
     }
     entry<SettingsRoute> { SettingsScreen() }
     entry<SearchRoute> { AndroidFragment<SearchFragment>() }
