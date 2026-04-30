@@ -14,7 +14,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.localmusic.LocalMusicFra
 import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhoneCaptchaLoginFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhonePasswordLoginFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineScreen
-import com.github.bumblebee202111.minusonecloudmusic.ui.mycollection.MyCollectionFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.mycollection.MyCollectionScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying.NowPlayingFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.recentplay.MyRecentPlayFragment
@@ -50,7 +50,11 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
             onNavigateBack = { navigationManager.goBack() }
         ) 
     }
-    entry<MyCollectionRoute> { AndroidFragment<MyCollectionFragment>() }
+    entry<MyCollectionRoute> {
+        MyCollectionScreen(
+            onNavigateBack = { navigationManager.goBack() }
+        )
+    }
     entry<SettingsRoute> { SettingsScreen() }
     entry<SearchRoute> { AndroidFragment<SearchFragment>() }
     entry<PhoneCaptchaLoginRoute> { AndroidFragment<PhoneCaptchaLoginFragment>() }
