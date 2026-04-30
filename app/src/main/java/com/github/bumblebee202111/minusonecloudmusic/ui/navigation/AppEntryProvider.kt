@@ -9,7 +9,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.dailyrecommend.DailyReco
 import com.github.bumblebee202111.minusonecloudmusic.ui.discover.DiscoverScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.friend.MyFriendScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.inbox.InboxScreen
-import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.localmusic.LocalMusicFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhoneCaptchaLoginFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhonePasswordLoginFragment
@@ -87,9 +87,9 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
         AndroidFragment<CommentsFragment>(arguments = args)
     }
     entry<ListenRankRoute> { route ->
-        val args = Bundle().apply {
-            putLong("userId", route.userId)
-        }
-        AndroidFragment<ListenRankFragment>(arguments = args)
+        ListenRankScreen(
+            userId = route.userId,
+            onNavigateBack = { navigationManager.goBack() }
+        )
     }
 }

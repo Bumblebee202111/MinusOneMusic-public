@@ -1,27 +1,26 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.listenrank
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongsFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
+import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ListenRankViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = ListenRankViewModel.Factory::class)
+class ListenRankViewModel @AssistedInject constructor(
+    @Assisted userId: Long,
     playlistRepository: PlaylistRepository,
     mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
     private val playPlaylistUseCase: PlayPlaylistUseCase,
-    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
-    private val userId: Long = checkNotNull(savedStateHandle["userId"])
 
     private val playRecords = playlistRepository.playRecords(userId).map { it.data }.stateInUi()
 
@@ -62,4 +61,8 @@ class ListenRankViewModel @Inject constructor(
         }
     }
 
+    @AssistedFactory
+    interface Factory {
+        fun create(@Assisted userId: Long): ListenRankViewModel
+    }
 }
