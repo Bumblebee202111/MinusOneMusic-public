@@ -11,8 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidViewBinding
-import com.github.bumblebee202111.minusonecloudmusic.databinding.LayoutMyCollectionHeaderBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.Toolbar
 import kotlinx.coroutines.launch
 @Composable
 fun MyCollectionScreen(
@@ -23,11 +22,9 @@ fun MyCollectionScreen(
     val tabs = listOf("专辑", "MV")
 
     Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
-        AndroidViewBinding(
-            factory = LayoutMyCollectionHeaderBinding::inflate,
-            update = {
-                toolbar.setNavigationOnClickListener { onNavigateBack() }
-            }
+        Toolbar(
+            title = "收藏",
+            onBackClick = onNavigateBack
         )
 
         SecondaryTabRow(
@@ -53,4 +50,3 @@ fun MyCollectionScreen(
         }
     }
 }
-

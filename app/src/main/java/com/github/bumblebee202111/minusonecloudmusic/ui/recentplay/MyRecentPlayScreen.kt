@@ -15,10 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.databinding.LayoutMyRecentPlayHeaderBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.Toolbar
 import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,11 +32,9 @@ fun MyRecentPlayScreen(
     val recentPlaySongs by viewModel.recentPlaySongUiList.collectAsStateWithLifecycle(initialValue = emptyList())
 
     Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
-        AndroidViewBinding(
-            factory = LayoutMyRecentPlayHeaderBinding::inflate,
-            update = {
-                toolbar.setNavigationOnClickListener { onNavigateBack() }
-            }
+        Toolbar(
+            title = "Recent Play",
+            onBackClick = onNavigateBack
         )
 
         SecondaryTabRow(

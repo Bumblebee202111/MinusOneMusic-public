@@ -3,14 +3,14 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.navigation
 import android.os.Bundle
 import androidx.fragment.compose.AndroidFragment
 import androidx.navigation3.runtime.entryProvider
-import com.github.bumblebee202111.minusonecloudmusic.ui.clouddisk.MyPrivateCloudFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.clouddisk.MyPrivateCloudScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.comments.CommentsFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.dailyrecommend.DailyRecommendFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.discover.DiscoverScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.friend.MyFriendScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.inbox.InboxScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankScreen
-import com.github.bumblebee202111.minusonecloudmusic.ui.localmusic.LocalMusicFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.localmusic.LocalMusicScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhoneCaptchaLoginFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhonePasswordLoginFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineScreen
@@ -20,7 +20,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistFragmen
 import com.github.bumblebee202111.minusonecloudmusic.ui.recentplay.MyRecentPlayScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.search.SearchFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.settings.SettingsScreen
-import com.github.bumblebee202111.minusonecloudmusic.ui.toplists.TopListsFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.toplists.TopListsScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.usertrack.FriendTracksScreen
 
 fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider {
@@ -41,9 +41,29 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
     entry<NowPlayingRoute> { AndroidFragment<NowPlayingFragment>() }
     entry<InboxRoute> { InboxScreen() }
     entry<DailyRecommendRoute> { AndroidFragment<DailyRecommendFragment>() }
-    entry<TopListsRoute> { AndroidFragment<TopListsFragment>() }
-    entry<MyPrivateCloudRoute> { AndroidFragment<MyPrivateCloudFragment>() }
-    entry<LocalMusicRoute> { AndroidFragment<LocalMusicFragment>() }
+    entry<TopListsRoute> {
+        TopListsScreen(
+            onNavigateBack = { navigationManager.goBack() },
+            onNavigateToPlaylist = { playlistId ->
+                navigationManager.navigate(
+                    PlaylistRoute(
+                        playlistId = playlistId,
+                        playlistCreatorId = PlaylistFragment.ARG_VALUE_PLAYLIST_CREATOR_ID_UNKNOWN
+                    )
+                )
+            }
+        )
+    }
+    entry<MyPrivateCloudRoute> {
+        MyPrivateCloudScreen(
+            onNavigateBack = { navigationManager.goBack() }
+        )
+    }
+    entry<LocalMusicRoute> {
+        LocalMusicScreen(
+            onNavigateBack = { navigationManager.goBack() }
+        )
+    }
     entry<MyRecentPlayRoute> { 
         MyRecentPlayScreen(
             onNavigateBack = { navigationManager.goBack() }
