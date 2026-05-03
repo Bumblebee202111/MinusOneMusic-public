@@ -3,7 +3,6 @@ package com.github.bumblebee202111.minusonecloudmusic
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -135,9 +134,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (!BuildConfig.DEBUG && !ensureOfficialNcmAppInstalled()) {
-            return
-        }
+
+        checkOfficialNcmAppStatus()
+
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
@@ -442,17 +441,15 @@ class MainActivity : AppCompatActivity() {
         MediaController.releaseFuture(mediaControllerFuture)
     }
 
-    private fun ensureOfficialNcmAppInstalled(): Boolean {
+    private fun checkOfficialNcmAppStatus() {
         val isOfficialNcmAppInstalled = packageManager.isPackageInstalled(OFFICIAL_NCM_PACKAGE)
         if (!isOfficialNcmAppInstalled) {
             activityScope.launch {
                 toastManager.showMessage(
-                    UiText.DynamicString("The official NCM app is not installed. Finishing myself.")
+                    UiText.StringResource(R.string.disclaimer_unofficial_app)
                 )
             }
-            Handler(mainLooper).postDelayed(::finish, FINISH_DELAY_MS)
         }
-        return isOfficialNcmAppInstalled
     }
 
     companion object {
@@ -461,6 +458,5 @@ class MainActivity : AppCompatActivity() {
         }
 
         private const val OFFICIAL_NCM_PACKAGE = "com.netease.cloudmusic"
-        private const val FINISH_DELAY_MS = 3500L
     }
 }

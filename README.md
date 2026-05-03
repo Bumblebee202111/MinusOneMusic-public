@@ -56,8 +56,8 @@ To align the project with current best practices and showcase significant skill 
 
 ## Notices
 
-- Users are strongly encouraged to use the official NCM app. By using this application, you agree to the following:
-  - It must coexist with the official NCM app.
+- Users are strongly encouraged to use and support the official NCM app. By using this application, you agree to the following:
+  - This is a third-party client intended solely for personal learning and educational purposes.
   - **Source Availability:** The project is primarily closed-source, with a public repository for a curated set of non-sensitive files. The expansion of public code is on hold pending a major cleanup, while a full source release is not planned to avoid potential copyright infringement.
   
 - ### Usage Guidelines
