@@ -14,8 +14,8 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentListenRankTabBinding
 import com.github.bumblebee202111.minusonecloudmusic.databinding.LayoutListenRankHeaderBinding
+import com.github.bumblebee202111.minusonecloudmusic.databinding.ViewListenRankTabBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithPositionList
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
@@ -87,7 +87,7 @@ fun ListenRankTabContent(
     val playRecords by playRecordsFlow.collectAsStateWithLifecycle(initialValue = emptyList())
 
     AndroidViewBinding(
-        factory = FragmentListenRankTabBinding::inflate,
+        factory = ViewListenRankTabBinding::inflate,
         update = {
             this.playRecords = playRecords
             executePendingBindings()

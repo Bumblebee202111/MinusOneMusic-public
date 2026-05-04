@@ -29,7 +29,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.databinding.FragmentMineBinding
+import com.github.bumblebee202111.minusonecloudmusic.databinding.ViewMineBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.loadImage
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.LocalMusicRoute
@@ -61,7 +61,7 @@ fun MineScreen(
     val loggedInUserProfile by mainViewModel.loggedInUserProfile.collectAsStateWithLifecycle()
     val myProfile by mineViewModel.myProfile.collectAsStateWithLifecycle()
 
-    AndroidViewBinding(FragmentMineBinding::inflate, modifier = Modifier.fillMaxSize()) {
+    AndroidViewBinding(ViewMineBinding::inflate, modifier = Modifier.fillMaxSize()) {
         this.lifecycleOwner = lifecycleOwner
         viewModel = mainViewModel
         this.mineViewModel = mineViewModel

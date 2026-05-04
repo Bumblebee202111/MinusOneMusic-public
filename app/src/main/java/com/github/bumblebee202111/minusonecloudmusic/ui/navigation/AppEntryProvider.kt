@@ -1,11 +1,10 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.navigation
 
-import android.os.Bundle
 import androidx.fragment.compose.AndroidFragment
 import androidx.navigation3.runtime.entryProvider
 import com.github.bumblebee202111.minusonecloudmusic.ui.clouddisk.MyPrivateCloudScreen
-import com.github.bumblebee202111.minusonecloudmusic.ui.comments.CommentsFragment
-import com.github.bumblebee202111.minusonecloudmusic.ui.dailyrecommend.DailyRecommendFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.comments.CommentsScreen
+import com.github.bumblebee202111.minusonecloudmusic.ui.dailyrecommend.DailyRecommendScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.discover.DiscoverScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.friend.MyFriendScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.inbox.InboxScreen
@@ -16,9 +15,10 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhonePasswordLogin
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.mycollection.MyCollectionScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying.NowPlayingFragment
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PLAYLIST_CREATOR_ID_UNKNOWN
+import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.recentplay.MyRecentPlayScreen
-import com.github.bumblebee202111.minusonecloudmusic.ui.search.SearchFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.search.SearchScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.settings.SettingsScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.toplists.TopListsScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.usertrack.FriendTracksScreen
@@ -40,7 +40,11 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
     }
     entry<NowPlayingRoute> { AndroidFragment<NowPlayingFragment>() }
     entry<InboxRoute> { InboxScreen() }
-    entry<DailyRecommendRoute> { AndroidFragment<DailyRecommendFragment>() }
+    entry<DailyRecommendRoute> {
+        DailyRecommendScreen(
+            onNavigateBack = { navigationManager.goBack() }
+        )
+    }
     entry<TopListsRoute> {
         TopListsScreen(
             onNavigateBack = { navigationManager.goBack() },
@@ -48,7 +52,7 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
                 navigationManager.navigate(
                     PlaylistRoute(
                         playlistId = playlistId,
-                        playlistCreatorId = PlaylistFragment.ARG_VALUE_PLAYLIST_CREATOR_ID_UNKNOWN
+                        playlistCreatorId = PLAYLIST_CREATOR_ID_UNKNOWN
                     )
                 )
             }
@@ -80,39 +84,40 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
         ) 
     }
     entry<SettingsRoute> { SettingsScreen() }
-    entry<SearchRoute> { AndroidFragment<SearchFragment>() }
+    entry<SearchRoute> {
+        SearchScreen(
+            onNavigateBack = { navigationManager.goBack() }
+        )
+    }
     entry<PhoneCaptchaLoginRoute> { AndroidFragment<PhoneCaptchaLoginFragment>() }
     entry<PhonePasswordLoginRoute> { AndroidFragment<PhonePasswordLoginFragment>() }
     entry<PlaylistRoute> { route ->
-        AndroidFragment<PlaylistFragment>(
-            arguments = Bundle().apply {
-                putLong("playlistId", route.playlistId)
-                putLong("playlistCreatorId", route.playlistCreatorId)
-                putBoolean("isMyPL", route.isMyPL)
-            }
+        PlaylistScreen(
+            playlistId = route.playlistId,
+            creatorId = route.playlistCreatorId,
+            isMyPL = route.isMyPL,
+            onNavigateBack = { navigationManager.goBack() }
         )
     }
     entry<PlaylistV4Route> { route ->
-        AndroidFragment<PlaylistFragment>(
-            arguments = Bundle().apply {
-                putLong("playlistId", route.id)
-                putBoolean("isV6", false)
-            }
+        PlaylistScreen(
+            playlistId = route.id,
+            isV6 = false,
+            onNavigateBack = { navigationManager.goBack() }
         )
     }
     entry<V6PlaylistRoute> { route ->
-        AndroidFragment<PlaylistFragment>(
-            arguments = Bundle().apply {
-                putLong("playlistId", route.id)
-                putBoolean("isV6", true)
-            }
+        PlaylistScreen(
+            playlistId = route.id,
+            isV6 = true,
+            onNavigateBack = { navigationManager.goBack() }
         )
     }
     entry<CommentsRoute> { route ->
-        val args = Bundle().apply {
-            putString("threadId", route.threadId)
-        }
-        AndroidFragment<CommentsFragment>(arguments = args)
+        CommentsScreen(
+            threadId = route.threadId,
+            onNavigateBack = { navigationManager.goBack() }
+        )
     }
     entry<ListenRankRoute> { route ->
         ListenRankScreen(
