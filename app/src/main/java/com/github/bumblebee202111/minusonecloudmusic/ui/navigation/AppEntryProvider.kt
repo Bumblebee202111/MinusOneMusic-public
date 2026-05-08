@@ -1,5 +1,7 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.navigation
 
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.compose.AndroidFragment
 import androidx.navigation3.runtime.entryProvider
 import com.github.bumblebee202111.minusonecloudmusic.ui.clouddisk.MyPrivateCloudScreen
@@ -14,7 +16,8 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhoneCaptchaLoginF
 import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhonePasswordLoginFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.mycollection.MyCollectionScreen
-import com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying.NowPlayingFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying.NowPlayingScreen
+import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PLAYLIST_CREATOR_ID_UNKNOWN
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.recentplay.MyRecentPlayScreen
@@ -38,7 +41,22 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
                 navigationManager.navigate(route)
             })
     }
-    entry<NowPlayingRoute> { AndroidFragment<NowPlayingFragment>() }
+    entry<NowPlayingRoute> {
+        val context = LocalContext.current
+        NowPlayingScreen(
+            onNavigateBack = { navigationManager.goBack() },
+            onNavigateToComments = { threadId -> navigationManager.navigate(CommentsRoute(threadId)) },
+            onOpenPlaylist = {
+                val activity = context as? AppCompatActivity
+                activity?.let {
+                    PlayerHistoryDialogFragment().show(
+                        it.supportFragmentManager,
+                        PlayerHistoryDialogFragment.TAG
+                    )
+                }
+            }
+        )
+    }
     entry<InboxRoute> { InboxScreen() }
     entry<DailyRecommendRoute> {
         DailyRecommendScreen(

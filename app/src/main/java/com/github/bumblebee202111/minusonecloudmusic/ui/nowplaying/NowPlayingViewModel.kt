@@ -1,5 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying
 
+import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Metadata
@@ -21,7 +22,6 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.mapper.toUiText
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
@@ -30,9 +30,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-@UnstableApi
 @HiltViewModel
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(UnstableApi::class)
 class NowPlayingViewModel @Inject constructor(
     private val songRepository: SongRepository,
     private val loggedInUserDataRepository: LoggedInUserDataRepository,
@@ -57,6 +56,7 @@ class NowPlayingViewModel @Inject constructor(
         if (currentPlayer == null) return@flatMapLatest flowOf(null)
         callbackFlow<Metadata?> {
             val listener = object : Player.Listener {
+
                 override fun onTracksChanged(tracks: Tracks) {
                     val metadata = tracks.groups.firstNotNullOfOrNull { group ->
                         (0 until group.length).firstNotNullOfOrNull { i ->
