@@ -22,6 +22,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.mapper.toUiText
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
@@ -31,7 +32,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 @HiltViewModel
-@OptIn(UnstableApi::class)
+@OptIn(UnstableApi::class, ExperimentalCoroutinesApi::class)
 class NowPlayingViewModel @Inject constructor(
     private val songRepository: SongRepository,
     private val loggedInUserDataRepository: LoggedInUserDataRepository,

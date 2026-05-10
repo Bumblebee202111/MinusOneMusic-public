@@ -45,7 +45,6 @@ import com.github.bumblebee202111.minusonecloudmusic.model.LyricsEntry
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.player.CountUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleModeUtil
-import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleToggleMode
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.attachBadge
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.doOnApplyWindowInsets
@@ -126,19 +125,19 @@ class NowPlayingView(
     private val updateLyricsAction = Runnable(::updateLyrics)
 
     private val repeatAllShuffleOffButtonDrawable: Drawable =
-        Util.getDrawable(context, resources, R.drawable.ic_full_screen_player_repeat_all_shuffle_disabled)!!
+        Util.getDrawable(context, resources, R.drawable.ic_full_screen_player_repeat_all_shuffle_disabled)
     private val repeatAllShuffleOnButtonDrawable: Drawable =
-        Util.getDrawable(context, resources, R.drawable.ic_full_screen_player_repeat_all_shuffle_enabled)!!
+        Util.getDrawable(context, resources, R.drawable.ic_full_screen_player_repeat_all_shuffle_enabled)
     private val repeatOneButtonDrawable: Drawable =
-        Util.getDrawable(context, resources, R.drawable.ic_full_screen_player_repeat_one)!!
+        Util.getDrawable(context, resources, R.drawable.ic_full_screen_player_repeat_one)
 
-    private val commentWithoutCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hbb)!!
-    private val commentWithCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hbi)!!
+    private val commentWithoutCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hbb)
+    private val commentWithCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hbi)
 
-    private val notLikedWithoutCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hct)!!
-    private val notLikedWithCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hco)!!
-    private val likedWithoutCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hcx)!!
-    private val likedWithCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hcv)!!
+    private val notLikedWithoutCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hct)
+    private val notLikedWithCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hco)
+    private val likedWithoutCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hcx)
+    private val likedWithCountDrawable: Drawable = Util.getDrawable(context, resources, R.drawable.hcv)
 
     private val lyricsModeNotLiked: Int = R.drawable.h_o
     private val lyricsModeLiked: Int = R.drawable.h_q
@@ -382,7 +381,7 @@ class NowPlayingView(
         handler.removeCallbacksAndMessages(null)
         try {
             audioManager.unregisterAudioDeviceCallback(audioDeviceCallback)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
     }
 
