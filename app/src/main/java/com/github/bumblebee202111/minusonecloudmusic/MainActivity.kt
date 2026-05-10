@@ -78,7 +78,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.SearchRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.V6PlaylistRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.rememberNavigationState
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.toEntries
-import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerListDialog2
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.common.util.concurrent.ListenableFuture
@@ -269,6 +269,9 @@ class MainActivity : AppCompatActivity() {
                                                     .weight(1f)
                                                     .fillMaxWidth().clipToBounds()
                                             )
+
+                                            var showPlayerHistory by remember { mutableStateOf(false) }
+
                                             if (isMiniBarVisible) {
                                                 AndroidView(
                                                     modifier = Modifier.fillMaxWidth(),
@@ -280,16 +283,19 @@ class MainActivity : AppCompatActivity() {
                                                                 )
                                                             }
                                                             setPlaylistButtonListener {
-                                                                PlayerHistoryDialogFragment().show(
-                                                                    supportFragmentManager,
-                                                                    PlayerHistoryDialogFragment.TAG
-                                                                )
+                                                                showPlayerHistory = true
                                                             }
                                                         }
                                                     },
                                                     update = { view ->
                                                         view.player = player
                                                     }
+                                                )
+                                            }
+
+                                            if (showPlayerHistory) {
+                                                PlayerListDialog2(
+                                                    onDismissRequest = { showPlayerHistory = false }
                                                 )
                                             }
 

@@ -1,7 +1,9 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.navigation
 
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.fragment.compose.AndroidFragment
 import androidx.navigation3.runtime.entryProvider
 import com.github.bumblebee202111.minusonecloudmusic.ui.clouddisk.MyPrivateCloudScreen
@@ -17,7 +19,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhonePasswordLogin
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.mycollection.MyCollectionScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying.NowPlayingScreen
-import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerHistoryDialogFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerListDialog2
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PLAYLIST_CREATOR_ID_UNKNOWN
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.PlaylistScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.recentplay.MyRecentPlayScreen
@@ -42,20 +44,19 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
             })
     }
     entry<NowPlayingRoute> {
-        val context = LocalContext.current
+        var showPlayerHistory by remember { mutableStateOf(false) }
+
         NowPlayingScreen(
             onNavigateBack = { navigationManager.goBack() },
             onNavigateToComments = { threadId -> navigationManager.navigate(CommentsRoute(threadId)) },
-            onOpenPlaylist = {
-                val activity = context as? AppCompatActivity
-                activity?.let {
-                    PlayerHistoryDialogFragment().show(
-                        it.supportFragmentManager,
-                        PlayerHistoryDialogFragment.TAG
-                    )
-                }
-            }
+            onOpenPlaylist = { showPlayerHistory = true }
         )
+
+        if (showPlayerHistory) {
+            PlayerListDialog2(
+                onDismissRequest = { showPlayerHistory = false }
+            )
+        }
     }
     entry<InboxRoute> { InboxScreen() }
     entry<DailyRecommendRoute> {
