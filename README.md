@@ -166,7 +166,6 @@ To align the project with current best practices and showcase significant skill 
   - DataStore & SharedPreferences
 - [UI][ui]
   - [Animations & Transitions][animation]
-  - [Fragment][fragment]
   - [Layout][layout]
   - Compose
 - Behavior
@@ -194,7 +193,6 @@ To align the project with current best practices and showcase significant skill 
 [workmanager]: https://developer.android.com/topic/libraries/architecture/workmanager
 [ui]: https://developer.android.com/guide/topics/ui
 [animation]: https://developer.android.com/training/animation/
-[fragment]: https://developer.android.com/guide/components/fragments
 [layout]: https://developer.android.com/guide/topics/ui/declaring-layout
 [notifications]: https://developer.android.com/develop/ui/views/notifications
 [retrofit]: https://square.github.io/retrofit/

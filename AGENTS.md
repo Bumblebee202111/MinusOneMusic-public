@@ -12,7 +12,7 @@
 |:--------------|:-------------------|:---------------------------|
 | **Language**  | Kotlin             |                            |
 | **UI**        | Jetpack Compose    | Material 3 + Custom Theme. |
-| **Legacy UI** | Android Views      | XML/Fragments (Migrating). |
+| **Legacy UI** | Android Views      | XML (Migrating).           |
 | **Arch**      | MVVM + Clean       | Navigation 3 (Compose).    |
 | **DI**        | Hilt               |                            |
 | **Async**     | Coroutines + Flow  |                            |

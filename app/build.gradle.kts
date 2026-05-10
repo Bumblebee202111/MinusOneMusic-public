@@ -88,8 +88,6 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.fragment.compose)
     implementation(libs.androidx.interpolator)
     implementation(libs.androidx.palette.ktx)
     implementation(libs.google.material)

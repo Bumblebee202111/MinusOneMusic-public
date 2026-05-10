@@ -22,7 +22,7 @@ import coil3.request.placeholder
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ViewPlaylistBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PagedSongWithPositionList
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistScreenUIHelper
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.applyDominantColor
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.loadImage
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.setBackgroundColorAndTopCorner
@@ -79,7 +79,7 @@ fun PlaylistScreen(
             val playlistActionsView = root.findViewById<View>(R.id.playlist_actions)
             playlistActionsView?.setBackgroundColorAndTopCorner(R.color.colorBackgroundAndroid, 12F)
 
-            PlaylistFragmentUIHelper(
+            PlaylistScreenUIHelper(
                 view = root,
                 playAllAction = viewModel::playAll
             )

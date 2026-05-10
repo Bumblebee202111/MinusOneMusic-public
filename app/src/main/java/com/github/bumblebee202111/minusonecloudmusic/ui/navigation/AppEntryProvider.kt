@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.fragment.compose.AndroidFragment
 import androidx.navigation3.runtime.entryProvider
 import com.github.bumblebee202111.minusonecloudmusic.ui.clouddisk.MyPrivateCloudScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.comments.CommentsScreen
@@ -14,8 +13,8 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.friend.MyFriendScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.inbox.InboxScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.listenrank.ListenRankScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.localmusic.LocalMusicScreen
-import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhoneCaptchaLoginFragment
-import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhonePasswordLoginFragment
+import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhoneCaptchaLoginScreen
+import com.github.bumblebee202111.minusonecloudmusic.ui.login.PhonePasswordLoginScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.mine.MineScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.mycollection.MyCollectionScreen
 import com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying.NowPlayingScreen
@@ -108,8 +107,18 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
             onNavigateBack = { navigationManager.goBack() }
         )
     }
-    entry<PhoneCaptchaLoginRoute> { AndroidFragment<PhoneCaptchaLoginFragment>() }
-    entry<PhonePasswordLoginRoute> { AndroidFragment<PhonePasswordLoginFragment>() }
+    entry<PhoneCaptchaLoginRoute> {
+        PhoneCaptchaLoginScreen(
+            onNavigateToPasswordLogin = { navigationManager.navigate(PhonePasswordLoginRoute) },
+            onLoginSuccess = { navigationManager.goBack() }
+        )
+    }
+    entry<PhonePasswordLoginRoute> {
+        PhonePasswordLoginScreen(
+            onNavigateToCaptchaLogin = { navigationManager.navigate(PhoneCaptchaLoginRoute) },
+            onLoginSuccess = { navigationManager.goBack() }
+        )
+    }
     entry<PlaylistRoute> { route ->
         PlaylistScreen(
             playlistId = route.playlistId,

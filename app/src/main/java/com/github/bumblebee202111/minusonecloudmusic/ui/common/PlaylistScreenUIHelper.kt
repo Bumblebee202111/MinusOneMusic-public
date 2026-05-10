@@ -3,7 +3,7 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.common
 import android.view.View
 import com.github.bumblebee202111.minusonecloudmusic.R
 
-class PlaylistFragmentUIHelper(
+class PlaylistScreenUIHelper(
     private val view: View,
     private val playAllAction: () -> Unit
 ) {

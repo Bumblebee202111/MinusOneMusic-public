@@ -11,7 +11,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ViewDailyRecommendBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistFragmentUIHelper
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistScreenUIHelper
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithAlbumList
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.loadImage
 
@@ -39,7 +39,7 @@ fun DailyRecommendScreen(
             tvPendantDayRecommendDateInfo.typeface = typeface
             tvPendantMonthText.typeface = typeface
 
-            PlaylistFragmentUIHelper(
+            PlaylistScreenUIHelper(
                 view = this.root,
                 playAllAction = viewModel::playAll
             )
