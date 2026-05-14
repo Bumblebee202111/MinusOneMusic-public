@@ -2,21 +2,37 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.mine
 
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -28,6 +44,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import coil3.compose.AsyncImage
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ViewMineBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
@@ -38,6 +55,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyFriendRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyPrivateCloudRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyRecentPlayRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PhoneCaptchaLoginRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -68,7 +86,6 @@ fun MineScreen(
 
         this.headerSinglePicBgImage.loadImage(loggedInUserProfile?.backgroundUrl, placeholder = "#FF4D1414")
         this.avatar.loadImage(loggedInUserProfile?.avatarUrl, circleCrop = true, placeholder = R.drawable.fgw, quality = 80, thumbnailSize = 148)
-        this.smallAvatar.loadImage(myProfile?.avatarUrl, circleCrop = true, placeholder = R.drawable.fgw)
 
         topAppBar.setNavigationOnClickListener { onOpenDrawer() }
 
@@ -82,19 +99,24 @@ fun MineScreen(
             WindowInsetsCompat.CONSUMED
         }
 
-        dragonBallArea.rvDragonBalls.setContent {
-            DragonBallRow(
-                dragonBalls = MineDragonBall.PINNED_DRAGON_BALLS,
-                onItemClick = { ball ->
-                    when (ball.code) {
-                        MineDragonBall.TYPE_LOCAL_MUSIC -> onNavigate(LocalMusicRoute)
-                        MineDragonBall.TYPE_CLOUD_DISK -> onNavigate(MyPrivateCloudRoute)
-                        MineDragonBall.TYPE_RECENT_PLAY -> onNavigate(MyRecentPlayRoute)
-                        MineDragonBall.TYPE_FOLLOW -> onNavigate(MyFriendRoute)
-                        MineDragonBall.TYPE_COLLECTION -> onNavigate(MyCollectionRoute)
-                    }
+        dragonBallArea.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                DolphinTheme {
+                    DragonBallRow(
+                        dragonBalls = MineDragonBall.PINNED_DRAGON_BALLS,
+                        onItemClick = { ball ->
+                            when (ball.code) {
+                                MineDragonBall.TYPE_LOCAL_MUSIC -> onNavigate(LocalMusicRoute)
+                                MineDragonBall.TYPE_CLOUD_DISK -> onNavigate(MyPrivateCloudRoute)
+                                MineDragonBall.TYPE_RECENT_PLAY -> onNavigate(MyRecentPlayRoute)
+                                MineDragonBall.TYPE_FOLLOW -> onNavigate(MyFriendRoute)
+                                MineDragonBall.TYPE_COLLECTION -> onNavigate(MyCollectionRoute)
+                            }
+                        }
+                    )
                 }
-            )
+            }
         }
 
         val tabBgDrawable = GradientDrawable().apply {
@@ -112,7 +134,8 @@ fun MineScreen(
             val isCollapsed = fraction >= 0.4F
             val iconColor = if (isCollapsed) R.color.black else R.color.white
             topAppBar.setNavigationIconTint(root.context.getColor(iconColor))
-            smallView.isVisible = isCollapsed
+
+            smallViewCompose.root.isVisible = isCollapsed
 
             val maxRadii = 24F
             val minRadii = 0F
@@ -129,7 +152,7 @@ fun MineScreen(
 
         if (tabLayout.tabCount != TAB_TEXTS.size) {
             tabLayout.removeAllTabs()
-            TAB_TEXTS.forEach {
+            repeat(TAB_TEXTS.size) {
                 tabLayout.addTab(tabLayout.newTab())
             }
         }
@@ -150,35 +173,94 @@ fun MineScreen(
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
-        val profileOnClickListener = View.OnClickListener {
+        val onProfileClick: () -> Unit = {
             if (mainViewModel.loggedInUserId.value == null) {
                 onNavigate(PhoneCaptchaLoginRoute)
             } else {
             }
         }
-        displayName.setOnClickListener(profileOnClickListener)
-        smallNameTv.setOnClickListener(profileOnClickListener)
-        smallAvatar.setOnClickListener(profileOnClickListener)
 
-        composeView.setContent {
-            LaunchedEffect(pagerState.currentPage) {
-                tabLayout.getTabAt(pagerState.currentPage)?.select()
-            }
+        avatar.setOnClickListener { onProfileClick() }
 
-            val nestedScrollConnection = rememberNestedScrollInteropConnection(LocalView.current)
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .nestedScroll(nestedScrollConnection)
-                    .fillMaxSize()
-            ) { page ->
-                when (page) {
-                    0 -> MyMusicTabScreen(
-                        viewModel = mineViewModel,
-                        onNavigate = onNavigate
+        displayNameCompose.root.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                DolphinTheme {
+                    Text(
+                        text = myProfile?.displayName ?: "立即登录",
+                        color = androidx.compose.ui.graphics.Color.White,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        modifier = Modifier.clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onProfileClick
+                        )
                     )
-                    else -> {
-                        Box(Modifier.fillMaxSize())
+                }
+            }
+        }
+
+        smallViewCompose.root.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                DolphinTheme {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onProfileClick
+                        )
+                    ) {
+                        AsyncImage(
+                            model = myProfile?.avatarUrl,
+                            contentDescription = null,
+                            placeholder = painterResource(id = R.drawable.fgw),
+                            error = painterResource(id = R.drawable.fgw),
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(25.dp)
+                                .clip(CircleShape)
+                        )
+                        Text(
+                            text = myProfile?.displayName ?: "Login",
+                            color = DolphinTheme.colors.neutral8_1,
+                            fontSize = 15.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        composeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                DolphinTheme {
+                    LaunchedEffect(pagerState.currentPage) {
+                        tabLayout.getTabAt(pagerState.currentPage)?.select()
+                    }
+
+                    val nestedScrollConnection = rememberNestedScrollInteropConnection(LocalView.current)
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .nestedScroll(nestedScrollConnection)
+                            .fillMaxSize()
+                    ) { page ->
+                        when (page) {
+                            0 -> MyMusicTabScreen(
+                                viewModel = mineViewModel,
+                                onNavigate = onNavigate
+                            )
+                            else -> {
+                                Box(Modifier.fillMaxSize())
+                            }
+                        }
                     }
                 }
             }
