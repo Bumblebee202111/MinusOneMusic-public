@@ -3,11 +3,17 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.mine
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -22,6 +28,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -31,8 +39,10 @@ import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -41,7 +51,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import coil3.compose.AsyncImage
@@ -72,7 +81,6 @@ fun MineScreen(
     onNavigate: (NavKey) -> Unit
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
     val pagerState = rememberPagerState(pageCount = { 2 })
     val scope = rememberCoroutineScope()
 
@@ -80,12 +88,8 @@ fun MineScreen(
     val myProfile by mineViewModel.myProfile.collectAsStateWithLifecycle()
 
     AndroidViewBinding(ViewMineBinding::inflate, modifier = Modifier.fillMaxSize()) {
-        this.lifecycleOwner = lifecycleOwner
-        viewModel = mainViewModel
-        this.mineViewModel = mineViewModel
 
         this.headerSinglePicBgImage.loadImage(loggedInUserProfile?.backgroundUrl, placeholder = "#FF4D1414")
-        this.avatar.loadImage(loggedInUserProfile?.avatarUrl, circleCrop = true, placeholder = R.drawable.fgw, quality = 80, thumbnailSize = 148)
 
         topAppBar.setNavigationOnClickListener { onOpenDrawer() }
 
@@ -97,26 +101,6 @@ fun MineScreen(
                 (currentStatusBarHeight + root.resources.getDimensionPixelSize(R.dimen.action_bar_size))
             toolbarBackground.requestLayout()
             WindowInsetsCompat.CONSUMED
-        }
-
-        dragonBallArea.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                DolphinTheme {
-                    DragonBallRow(
-                        dragonBalls = MineDragonBall.PINNED_DRAGON_BALLS,
-                        onItemClick = { ball ->
-                            when (ball.code) {
-                                MineDragonBall.TYPE_LOCAL_MUSIC -> onNavigate(LocalMusicRoute)
-                                MineDragonBall.TYPE_CLOUD_DISK -> onNavigate(MyPrivateCloudRoute)
-                                MineDragonBall.TYPE_RECENT_PLAY -> onNavigate(MyRecentPlayRoute)
-                                MineDragonBall.TYPE_FOLLOW -> onNavigate(MyFriendRoute)
-                                MineDragonBall.TYPE_COLLECTION -> onNavigate(MyCollectionRoute)
-                            }
-                        }
-                    )
-                }
-            }
         }
 
         val tabBgDrawable = GradientDrawable().apply {
@@ -135,7 +119,7 @@ fun MineScreen(
             val iconColor = if (isCollapsed) R.color.black else R.color.white
             topAppBar.setNavigationIconTint(root.context.getColor(iconColor))
 
-            smallViewCompose.root.isVisible = isCollapsed
+            smallViewCompose.isVisible = isCollapsed
 
             val maxRadii = 24F
             val minRadii = 0F
@@ -180,29 +164,89 @@ fun MineScreen(
             }
         }
 
-        avatar.setOnClickListener { onProfileClick() }
-
-        displayNameCompose.root.apply {
+        currentUserCompose.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 DolphinTheme {
-                    Text(
-                        text = myProfile?.displayName ?: "立即登录",
-                        color = androidx.compose.ui.graphics.Color.White,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        modifier = Modifier.clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = onProfileClick
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(77.3.dp)
+                                .dropShadow(
+                                    shape = CircleShape,
+                                    shadow = Shadow(
+                                        radius = 6.dp,
+                                        color = androidx.compose.ui.graphics.Color(0x3E000000),
+                                        offset = DpOffset(
+                                            x = 0.dp,
+                                            y = 1.dp
+                                        )
+                                    )
+                                )
+                                .background(androidx.compose.ui.graphics.Color.White, CircleShape)
+                                .clip(CircleShape)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    onClick = onProfileClick
+                                )
+                        ) {
+                            AndroidView(
+                                factory = { ctx ->
+                                    ImageView(ctx).apply {
+                                        scaleType = ImageView.ScaleType.CENTER_CROP
+                                    }
+                                },
+                                update = { view ->
+                                    view.loadImage(
+                                        model = loggedInUserProfile?.avatarUrl,
+                                        circleCrop = true,
+                                        placeholder = R.drawable.fgw,
+                                        quality = 80,
+                                        thumbnailSize = 148
+                                    )
+                                },
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = myProfile?.displayName ?: "立即登录",
+                            color = androidx.compose.ui.graphics.Color.White,
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            modifier = Modifier.clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = onProfileClick
+                            )
                         )
-                    )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                            DragonBallRow(
+                                dragonBalls = MineDragonBall.PINNED_DRAGON_BALLS,
+                                onItemClick = { ball ->
+                                    when (ball.code) {
+                                        MineDragonBall.TYPE_LOCAL_MUSIC -> onNavigate(LocalMusicRoute)
+                                        MineDragonBall.TYPE_CLOUD_DISK -> onNavigate(MyPrivateCloudRoute)
+                                        MineDragonBall.TYPE_RECENT_PLAY -> onNavigate(MyRecentPlayRoute)
+                                        MineDragonBall.TYPE_FOLLOW -> onNavigate(MyFriendRoute)
+                                        MineDragonBall.TYPE_COLLECTION -> onNavigate(MyCollectionRoute)
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
-
-        smallViewCompose.root.apply {
+        smallViewCompose.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 DolphinTheme {
