@@ -135,9 +135,7 @@ To align the project with current best practices and showcase significant skill 
   - About
   - Link of APK of latest NCM
 - SMS login
-  - UI
-  - Fix missing submit code button
-  - Track stability
+  - NCM UI
 - Upgrade persistence layer to DataStore
 - Share
 - Volume balance
