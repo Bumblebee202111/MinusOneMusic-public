@@ -12,10 +12,14 @@ import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Scroller
 import androidx.core.graphics.toColorInt
+import androidx.core.graphics.withSave
 import com.github.bumblebee202111.minusonecloudmusic.model.LyricsEntry
 import kotlin.math.roundToInt
-import androidx.core.graphics.withSave
-class LyricsView(context: Context, attrs: AttributeSet) : View(context, attrs) {
+class LyricsView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : View(context, attrs, defStyleAttr) {
 
     private val textColor: Int = Color.WHITE
     private var normalTextSize: Float = ViewUtils.dpToPx(context, 17)

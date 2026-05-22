@@ -1,9 +1,11 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.dailyrecommend
 
 import android.graphics.Typeface
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,9 +29,10 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ViewDailyRecommendBinding
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistScreenUIHelper
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlayAllActions
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithAlbumList
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.loadImage
+import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 
 
 @Composable
@@ -46,15 +49,8 @@ fun DailyRecommendScreen(
         factory = ViewDailyRecommendBinding::inflate,
         modifier = Modifier.fillMaxSize(),
         update = {
-            this.viewModel = viewModel
-            this.lifecycleOwner = lifecycleOwner
 
             toolbar.setNavigationOnClickListener { onNavigateBack() }
-
-            PlaylistScreenUIHelper(
-                view = this.root,
-                playAllAction = viewModel::playAll
-            )
 
             background.loadImage(bannerUrl)
 
@@ -109,6 +105,22 @@ fun DailyRecommendScreen(
                             modifier = Modifier
                                 .padding(start = 2.dp)
                                 .alignByBaseline()
+                        )
+                    }
+                }
+            }
+
+            playlistActionsCompose.apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
+                    DolphinTheme {
+                        PlaylistPlayAllActions(
+                            count = null,
+                            onClick = viewModel::playAll,
+                            modifier = Modifier.background(
+                                color = colorResource(id = R.color.colorBackgroundAndroid),
+                                shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                            )
                         )
                     }
                 }

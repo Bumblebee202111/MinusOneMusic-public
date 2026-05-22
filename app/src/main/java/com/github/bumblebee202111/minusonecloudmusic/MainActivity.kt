@@ -56,7 +56,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.BottomNavigationIconsUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.DolphinToast
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.MainDrawerContent
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBarView
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBar
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.UiText
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.createAppEntryProvider
@@ -273,23 +273,11 @@ class MainActivity : AppCompatActivity() {
                                             var showPlayerHistory by remember { mutableStateOf(false) }
 
                                             if (isMiniBarVisible) {
-                                                AndroidView(
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                    factory = { context ->
-                                                        MiniPlayerBarView(context).apply {
-                                                            setOnClickListener {
-                                                                navigationManager.navigate(
-                                                                    NowPlayingRoute
-                                                                )
-                                                            }
-                                                            setPlaylistButtonListener {
-                                                                showPlayerHistory = true
-                                                            }
-                                                        }
-                                                    },
-                                                    update = { view ->
-                                                        view.player = player
-                                                    }
+                                                MiniPlayerBar(
+                                                    player = player,
+                                                    onNavigateToNowPlaying = { navigationManager.navigate(NowPlayingRoute) },
+                                                    onShowPlaylist = { showPlayerHistory = true },
+                                                    modifier = Modifier.fillMaxWidth()
                                                 )
                                             }
 

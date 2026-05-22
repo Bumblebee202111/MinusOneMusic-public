@@ -10,23 +10,39 @@ import android.os.Handler
 import android.os.Looper
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,10 +60,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.ColorUtils
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -57,7 +78,6 @@ import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
-import androidx.media3.ui.TimeBar
 import androidx.mediarouter.app.SystemOutputSwitcherDialogController
 import androidx.palette.graphics.Palette
 import coil3.BitmapImage
@@ -65,18 +85,14 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.databinding.LayoutNowPlayingActionsBinding
-import com.github.bumblebee202111.minusonecloudmusic.databinding.LayoutNowPlayingLyricsBinding
-import com.github.bumblebee202111.minusonecloudmusic.databinding.LayoutNowPlayingProgressBinding
-import com.github.bumblebee202111.minusonecloudmusic.databinding.LayoutNowPlayingToolbarBinding
 import com.github.bumblebee202111.minusonecloudmusic.model.CommentInfo
 import com.github.bumblebee202111.minusonecloudmusic.model.LyricsEntry
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.player.CountUtil
 import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleModeUtil
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.ViewUtils
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.attachBadge
-import com.google.android.material.badge.BadgeDrawable
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.LyricsView
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.Toolbar
+import kotlinx.coroutines.delay
 import java.util.Formatter
 import java.util.Locale
 import android.graphics.Color as AndroidColor
@@ -97,7 +113,7 @@ fun NowPlayingScreen(
     val commentInfo by viewModel.commentInfo.collectAsStateWithLifecycle()
     val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
 
-    val defaultBgColor = colorResource(id = R.color.default_player_background)
+    val defaultBgColor = Color(0xFF262626)
     var backgroundColor by remember { mutableStateOf(defaultBgColor) }
 
     var isLyricsMode by remember { mutableStateOf(false) }
@@ -181,7 +197,7 @@ fun NowPlayingScreen(
                     currentPosition = p.contentPosition
                     bufferedPosition = p.contentBufferedPosition
                 }
-                kotlinx.coroutines.delay(200)
+                delay(200)
             }
         }
     }
@@ -282,17 +298,49 @@ private fun NowPlayingToolbar(
     songArtist: String?,
     onNavigateBack: () -> Unit
 ) {
-    AndroidViewBinding(
-        factory = LayoutNowPlayingToolbarBinding::inflate,
-        modifier = Modifier.fillMaxWidth(),
-        update = {
-            toolbar.setNavigationOnClickListener { onNavigateBack() }
-            if (isLyricsMode) {
-                toolbar.title = songTitle.orEmpty()
-                toolbar.subtitle = songArtist.orEmpty()
-            } else {
-                toolbar.title = null
-                toolbar.subtitle = "music"
+    Toolbar(
+        onBackClick = onNavigateBack,
+        iconRes = R.drawable.yg,
+        iconTint = Color(0x99FFFFFF),
+        centerContent = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                if (isLyricsMode && !songTitle.isNullOrEmpty()) {
+                    Text(
+                        text = songTitle,
+                        color = Color(0xEEFFFFFF),
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        modifier = Modifier.basicMarquee()
+                    )
+                }
+                val subtitle = if (isLyricsMode) songArtist.orEmpty() else "music"
+                if (subtitle.isNotEmpty()) {
+                    Text(
+                        text = subtitle,
+                        color = Color(0xBBFFFFFF),
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        modifier = Modifier.basicMarquee()
+                    )
+                }
+            }
+        },
+        trailingContent = {
+            IconButton(
+                onClick = {  },
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .size(48.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.hxo),
+                    contentDescription = "Share",
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
+                )
             }
         }
     )
@@ -397,23 +445,83 @@ private fun NowPlayingLyrics(
     onLikeClicked: () -> Unit,
     onClick: () -> Unit
 ) {
-    AndroidViewBinding(
-        factory = LayoutNowPlayingLyricsBinding::inflate,
+    val x8 = dimensionResource(id = R.dimen.x8)
+
+    Column(
         modifier = Modifier
             .fillMaxWidth(0.9f)
-            .fillMaxHeight(),
-        update = {
-            this.lyrics.setOnClickListener { onClick() }
-            if (lyrics != null) {
-                this.lyrics.setLyrics(lyrics)
+            .fillMaxHeight()
+            .padding(bottom = 12.dp)
+    ) {
+        AndroidView(
+            factory = { context ->
+                LyricsView(context).apply {
+                    setOnClickListener { onClick() }
+                }
+            },
+            update = { view ->
+                if (lyrics != null) {
+                    view.setLyrics(lyrics)
+                }
+                view.setPosition(currentPosition)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(bottom = 16.dp)
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(x8),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = if (likeState.like == true) R.drawable.h_q else R.drawable.h_o),
+                    contentDescription = "Like",
+                    modifier = Modifier
+                        .padding(end = 12.dp)
+                        .size(x8)
+                        .alpha(0.6f)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            enabled = isLoggedIn == true
+                        ) { onLikeClicked() },
+                    contentScale = ContentScale.Inside
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.h_n),
+                    contentDescription = "MLog",
+                    modifier = Modifier
+                        .padding(end = 12.dp)
+                        .size(x8)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {  }
+                        .padding(vertical = 1.dp),
+                    contentScale = ContentScale.Fit
+                )
             }
-            this.lyrics.setPosition(currentPosition)
-
-            lyricLikeBtn.setImageResource(if (likeState.like == true) R.drawable.h_q else R.drawable.h_o)
-            lyricLikeBtn.isEnabled = isLoggedIn == true
-            lyricLikeBtn.setOnClickListener { onLikeClicked() }
+            Image(
+                painter = painterResource(id = R.drawable.g71),
+                contentDescription = "Options",
+                modifier = Modifier
+                    .size(x8)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {  }
+                    .padding(4.dp),
+                contentScale = ContentScale.Fit
+            )
         }
-    )
+    }
 }
 
 @Composable
@@ -427,55 +535,118 @@ private fun NowPlayingActions(
     onLikeClicked: () -> Unit,
     onNavigateToComments: (String) -> Unit
 ) {
-    val context = LocalContext.current
+    val density = LocalDensity.current
+    val titleTextSize = with(density) { 17.dp.toSp() }
+    val artistTextSize = with(density) { 14.dp.toSp() }
+    val badgeTextSize = with(density) { 9.dp.toSp() }
 
-    AndroidViewBinding(
-        factory = LayoutNowPlayingActionsBinding::inflate,
-        modifier = modifier,
-        update = {
-            songActionsTitle.text = songTitle
-            songActionsArtistName.text = songArtist
-
-            val likeBadge = BadgeDrawable.create(context).apply {
-                isVisible = true
-                setTextAppearance(R.style.TextAppearance_App_Player_Badge)
-                horizontalOffset = ViewUtils.dpToPx(context, 12).toInt()
-                verticalOffset = ViewUtils.dpToPx(context, 11).toInt()
-                this.backgroundColor = AndroidColor.TRANSPARENT
-                text = likeState.likeCountDisplayText
-            }
-            likeButton.attachBadge(likeBadge)
-            likeButton.isEnabled = isLoggedIn == true
-            likeButton.setOnClickListener { onLikeClicked() }
-
-            val isLiked = likeState.like == true
-            val hasLikeCount = likeState.likeCountDisplayText != null
-            likeButton.setImageResource(
-                when {
-                    isLiked && hasLikeCount -> R.drawable.hcv
-                    isLiked && !hasLikeCount -> R.drawable.hcx
-                    !isLiked && hasLikeCount -> R.drawable.hco
-                    else -> R.drawable.hct
-                }
+    Row(
+        modifier = modifier.height(64.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 16.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = songTitle.orEmpty(),
+                color = Color(0xFFEEF6EC).copy(alpha = 0.7f),
+                fontSize = titleTextSize,
+                maxLines = 1,
+                modifier = Modifier.basicMarquee()
             )
 
-            val commentBadge = BadgeDrawable.create(context).apply {
-                isVisible = true
-                setTextAppearance(R.style.TextAppearance_App_Player_Badge)
-                horizontalOffset = ViewUtils.dpToPx(context, 12).toInt()
-                verticalOffset = ViewUtils.dpToPx(context, 11).toInt()
-                this.backgroundColor = AndroidColor.TRANSPARENT
-                text = commentInfo?.commentCount?.let(CountUtil::getAbbreviatedCommentCount) ?: ""
+            Text(
+                text = songArtist.orEmpty(),
+                color = Color(0xFFEEF6EC).copy(alpha = 0.4f),
+                fontSize = artistTextSize,
+                maxLines = 1,
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .basicMarquee()
+            )
+        }
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(modifier = Modifier.weight(1f))
+            val isLiked = likeState.like == true
+            val hasLikeCount = likeState.likeCountDisplayText != null
+            val likeIconRes = when {
+                isLiked && hasLikeCount -> R.drawable.hcv
+                isLiked && !hasLikeCount -> R.drawable.hcx
+                !isLiked && hasLikeCount -> R.drawable.hco
+                else -> R.drawable.hct
             }
-            commentButton.attachBadge(commentBadge)
-            commentButton.setImageResource(if (commentInfo != null) R.drawable.hbi else R.drawable.hbb)
-            commentButton.setOnClickListener {
-                commentInfo?.threadId?.let { onNavigateToComments(it) }
+
+            BadgedBox(
+                badge = {
+                    if (hasLikeCount) {
+                        Text(
+                            text = likeState.likeCountDisplayText,
+                            color = Color(0xB3FFFFFF),
+                            fontSize = badgeTextSize,
+                            fontFamily = FontFamily(Font(R.font.a)),
+                            maxLines = 1,
+                            modifier = Modifier.offset(x = (-1).dp, y = 10.dp)
+                        )
+                    }
+                }
+            ) {
+                Image(
+                    painter = painterResource(id = likeIconRes),
+                    contentDescription = "Like",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            enabled = isLoggedIn == true
+                        ) { onLikeClicked() }
+                        .padding(5.dp),
+                    contentScale = ContentScale.Inside
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+            BadgedBox(
+                badge = {
+                    val count =
+                        commentInfo?.commentCount?.let(CountUtil::getAbbreviatedCommentCount)
+                    if (!count.isNullOrEmpty()) {
+                        Text(
+                            text = count,
+                            color = Color(0xB3FFFFFF),
+                            fontSize = badgeTextSize,
+                            fontFamily = FontFamily(Font(R.font.a)),
+                            maxLines = 1,
+                            modifier = Modifier.offset(x = (-1).dp, y = 10.dp)
+                        )
+                    }
+                }
+            ) {
+                Image(
+                    painter = painterResource(id = if (commentInfo != null) R.drawable.hbi else R.drawable.hbb),
+                    contentDescription = "Comment",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            commentInfo?.threadId?.let { onNavigateToComments(it) }
+                        },
+                    contentScale = ContentScale.Inside
+                )
             }
         }
-    )
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @UnstableApi
 @Composable
 private fun NowPlayingProgress(
@@ -490,40 +661,123 @@ private fun NowPlayingProgress(
     val formatBuilder = remember { java.lang.StringBuilder() }
     val formatter = remember { Formatter(formatBuilder, Locale.getDefault()) }
 
-    AndroidViewBinding(
-        factory = LayoutNowPlayingProgressBinding::inflate,
-        modifier = modifier,
-        update = {
-            if (!scrubbing) {
-                position.text = Util.getStringForTime(formatBuilder, formatter, currentPosition)
-            }
-            this.duration.text = Util.getStringForTime(formatBuilder, formatter, duration)
+    var scrubPosition by remember { mutableStateOf<Long?>(null) }
+    val displayPosition = scrubPosition ?: currentPosition
 
-            timeBar.setDuration(duration)
-            timeBar.setPosition(currentPosition)
-            timeBar.setBufferedPosition(bufferedPosition)
+    val positionText = remember(displayPosition) {
+        Util.getStringForTime(formatBuilder, formatter, displayPosition)
+    }
+    val durationText = remember(duration) {
+        Util.getStringForTime(formatBuilder, formatter, duration)
+    }
 
-            timeBar.addListener(object : TimeBar.OnScrubListener {
-                override fun onScrubStart(timeBar: TimeBar, pos: Long) {
-                    onScrubbingChange(true, pos)
-                    position.text = Util.getStringForTime(formatBuilder, formatter, pos)
-                }
+    val fontB = remember { FontFamily(Font(R.font.b)) }
 
-                override fun onScrubMove(timeBar: TimeBar, pos: Long) {
-                    onScrubbingChange(true, pos)
-                    position.text = Util.getStringForTime(formatBuilder, formatter, pos)
-                }
-
-                override fun onScrubStop(timeBar: TimeBar, pos: Long, canceled: Boolean) {
-                    onScrubbingChange(false, null)
-                    if (!canceled && player?.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM) == true) {
-                        player.seekTo(pos)
-                    }
-                }
-            })
-        }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isDragged by interactionSource.collectIsDraggedAsState()
+    val thumbSize by animateDpAsState(
+        targetValue = if (isDragged) 15.dp else 6.dp,
+        label = "thumbSize"
     )
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(30.dp)
+    ) {
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides Dp.Unspecified) {
+            Slider(
+                value = if (duration > 0) (displayPosition.toFloat() / duration).coerceIn(0f, 1f) else 0f,
+                onValueChange = { value ->
+                    val newPos = (value * duration).toLong()
+                    scrubPosition = newPos
+                    onScrubbingChange(true, newPos)
+                },
+                onValueChangeFinished = {
+                    scrubPosition?.let { pos ->
+                        if (player?.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM) == true) {
+                            player.seekTo(pos)
+                        }
+                    }
+                    scrubPosition = null
+                    onScrubbingChange(false, null)
+                },
+                interactionSource = interactionSource,
+                thumb = {
+                    Box(
+                        modifier = Modifier.size(20.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(thumbSize)
+                                .background(Color.White, CircleShape)
+                        )
+                    }
+                },
+                track = {
+                    val fraction = if (duration > 0) (displayPosition.toFloat() / duration).coerceIn(0f, 1f) else 0f
+                    val bufferedFraction = if (duration > 0) (bufferedPosition.toFloat() / duration).coerceIn(0f, 1f) else 0f
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(20.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(2.dp)
+                                .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(1.dp)),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(fraction = bufferedFraction)
+                                    .fillMaxHeight()
+                                    .background(Color.White.copy(alpha = 0.3f), RoundedCornerShape(1.dp))
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(fraction = fraction)
+                                    .fillMaxHeight()
+                                    .background(Color.White.copy(alpha = 0.7f), RoundedCornerShape(1.dp))
+                            )
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(20.dp)
+                    .align(Alignment.TopCenter)
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+                .offset(y = 24.dp)
+                .padding(horizontal = 14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = positionText,
+                color = Color(0xFFD9D9D9),
+                fontSize = 11.sp,
+                fontFamily = fontB,
+                modifier = Modifier.alpha(0.3f)
+            )
+            Text(
+                text = durationText,
+                color = Color(0xFFD9D9D9),
+                fontSize = 11.sp,
+                fontFamily = fontB,
+                modifier = Modifier.alpha(0.3f)
+            )
+        }
+    }
 }
+
 
 @Composable
 private fun NowPlayingControls(

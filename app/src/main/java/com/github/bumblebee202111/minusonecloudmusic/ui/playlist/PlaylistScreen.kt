@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,9 +47,8 @@ import coil3.request.allowHardware
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.databinding.ViewPlaylistBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PagedSongWithPositionList
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistScreenUIHelper
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlayAllActions
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.applyDominantColor
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.setBackgroundColorAndTopCorner
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 import com.github.bumblebee202111.minusonecloudmusic.utils.imageUrl
 import kotlin.math.abs
@@ -103,13 +104,21 @@ fun PlaylistScreen(
             toolbarBackground.alpha = alpha
         }
 
-            val playlistActionsView = root.findViewById<View>(R.id.playlist_actions)
-            playlistActionsView?.setBackgroundColorAndTopCorner(R.color.colorBackgroundAndroid, 12F)
-
-            PlaylistScreenUIHelper(
-                view = root,
-                playAllAction = viewModel::playAll
-            )
+            playlistActionsCompose.apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
+                    DolphinTheme {
+                        PlaylistPlayAllActions(
+                            count = playlistDetail?.songCount,
+                            onClick = viewModel::playAll,
+                            modifier = Modifier.background(
+                                color = colorResource(id = R.color.colorBackgroundAndroid),
+                                shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                            )
+                        )
+                    }
+                }
+            }
 
             songList.apply {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)

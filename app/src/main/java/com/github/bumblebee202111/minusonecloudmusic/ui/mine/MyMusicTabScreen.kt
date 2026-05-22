@@ -1,23 +1,36 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.mine
 
-import android.view.LayoutInflater
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.ListenRankRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PlaylistRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import kotlinx.coroutines.launch
 
 @Composable
@@ -30,62 +43,59 @@ fun MyMusicTabScreen(
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val scope = rememberCoroutineScope()
 
+    val tabTexts = listOf(
+        R.string.my_music_title_created,
+        R.string.title_my_music_tab_collected,
+        R.string.title_my_music_tab_albums
+    )
+
     DolphinTheme {
         Column {
-            AndroidView(
-                modifier = Modifier.fillMaxWidth(),
-                factory = { context ->
-                    val tabLayout = LayoutInflater.from(context)
-                        .inflate(R.layout.layout_my_music_tab_tab_layout, null) as TabLayout
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                tabs.forEachIndexed { index, userPlaylistTab ->
+                    val selected = pagerState.currentPage == index
+                    val count = myPlaylistTabs?.get(userPlaylistTab)?.size ?: 0
+                    val textColor = if (selected) DolphinTheme.colors.text1 else DolphinTheme.colors.text4
 
-                    val tabTexts = listOf(
-                        R.string.my_music_title_created,
-                        R.string.title_my_music_tab_collected,
-                        R.string.title_my_music_tab_albums
-                    )
-
-                    val tabBadgeTextColor = context.getColor(R.color.colorText4)
-                    val selectedTabBadgeTextColor = context.getColor(R.color.colorText1)
-
-                    tabTexts.forEachIndexed { index, resId ->
-                        val tab = tabLayout.newTab().setText(resId)
-                        tab.orCreateBadge.apply {
-                            backgroundColor = context.getColor(android.R.color.transparent)
-                            badgeTextColor = if (index == tabLayout.selectedTabPosition)
-                                selectedTabBadgeTextColor else tabBadgeTextColor
-                        }
-                        tabLayout.addTab(tab)
-                    }
-
-                    tabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
-                        override fun onTabSelected(tab: TabLayout.Tab?) {
-                            tab?.let {
-                                it.badge?.badgeTextColor = selectedTabBadgeTextColor
-                                if (pagerState.currentPage != it.position) {
-                                    scope.launch { pagerState.animateScrollToPage(it.position) }
+                    Box(
+                        modifier = Modifier
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
+                            )
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        BadgedBox(
+                            badge = {
+                                if (count > 0) {
+                                    Text(
+                                        text = count.toString(),
+                                        color = textColor,
+                                        fontSize = 11.sp,
+                                        modifier = Modifier.offset(x = 10.dp, y = (-2).dp)
+                                    )
                                 }
                             }
+                        ) {
+                            Text(
+                                text = stringResource(id = tabTexts[index]),
+                                color = textColor,
+                                fontSize = 15.sp,
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
+                            )
                         }
-                        override fun onTabUnselected(tab: TabLayout.Tab?) {
-                            tab?.badge?.badgeTextColor = tabBadgeTextColor
-                        }
-                        override fun onTabReselected(tab: TabLayout.Tab?) {}
-                    })
-
-                    tabLayout
-                },
-                update = { tabLayout ->
-                    myPlaylistTabs?.let { data ->
-                        tabs.forEachIndexed { index, userPlaylistTab ->
-                            tabLayout.getTabAt(index)?.badge?.number =
-                                data[userPlaylistTab]?.size ?: 0
-                        }
-                    }
-                    if (tabLayout.selectedTabPosition != pagerState.currentPage) {
-                        tabLayout.getTabAt(pagerState.currentPage)?.select()
                     }
                 }
-            )
+            }
 
             HorizontalPager(
                 state = pagerState,

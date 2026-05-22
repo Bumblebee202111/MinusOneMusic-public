@@ -27,15 +27,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.databinding.ViewListenRankTabBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlayAllActions
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.SongWithPositionList
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.Toolbar
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
@@ -140,33 +138,26 @@ fun ListenRankTabContent(
     }
     val playRecords by playRecordsFlow.collectAsStateWithLifecycle(initialValue = emptyList())
 
-    AndroidViewBinding(
-        factory = ViewListenRankTabBinding::inflate,
-        update = {
-            this.playRecords = playRecords
-            executePendingBindings()
-            
-            playlistActions.setOnClickListener {
+    Column(modifier = Modifier.fillMaxSize()) {
+        PlaylistPlayAllActions(
+            count = playRecords?.size,
+            onClick = {
                 when (tabIndex) {
                     PLAY_RECORDS_TAB_INDEX_WEEK_DATA -> viewModel.playAllWeekRecords()
                     PLAY_RECORDS_TAB_INDEX_ALL_DATA -> viewModel.playAllAllRecords()
                 }
             }
-            
-            list.apply {
-                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                setContent {
-                    SongWithPositionList(
-                        songs = playRecords ?: emptyList(),
-                        onItemClick = { position ->
-                            when (tabIndex) {
-                                PLAY_RECORDS_TAB_INDEX_WEEK_DATA -> viewModel.onWeekRecordClick(position)
-                                PLAY_RECORDS_TAB_INDEX_ALL_DATA -> viewModel.onAllRecordClick(position)
-                            }
-                        }
-                    )
+        )
+
+        SongWithPositionList(
+            songs = playRecords?:emptyList(),
+            onItemClick = { position ->
+                when (tabIndex) {
+                    PLAY_RECORDS_TAB_INDEX_WEEK_DATA -> viewModel.onWeekRecordClick(position)
+                    PLAY_RECORDS_TAB_INDEX_ALL_DATA -> viewModel.onAllRecordClick(position)
                 }
-            }
-        }
-    )
+            },
+            modifier = Modifier.weight(1f)
+        )
+    }
 }

@@ -5,9 +5,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.bumblebee202111.minusonecloudmusic.databinding.LayoutMyRecentPlayMusicActionsBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlayAllActions
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.SimpleSongList
 
 @Composable
@@ -17,13 +16,9 @@ fun MyRecentPlayMusicTabContent(
     val songs by viewModel.recentPlaySongUiList.collectAsStateWithLifecycle(initialValue = emptyList())
 
     Column(modifier = Modifier.fillMaxSize()) {
-        AndroidViewBinding(
-            factory = LayoutMyRecentPlayMusicActionsBinding::inflate,
-            update = {
-                playlistActions.setOnClickListener {
-                    viewModel.playAll()
-                }
-            }
+        PlaylistPlayAllActions(
+            count = null,
+            onClick = { viewModel.playAll() }
         )
 
         SimpleSongList(

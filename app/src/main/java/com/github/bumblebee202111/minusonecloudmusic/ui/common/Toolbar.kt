@@ -1,8 +1,10 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -14,6 +16,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
@@ -49,5 +52,47 @@ fun Toolbar(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+    }
+}
+
+@Composable
+fun Toolbar(
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    iconRes: Int = R.drawable.aid,
+    iconTint: Color = Color(0xFF333333),
+    centerContent: @Composable () -> Unit,
+    trailingContent: @Composable () -> Unit = {}
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(dimensionResource(id = R.dimen.toolbar_size))
+    ) {
+        IconButton(
+            onClick = onBackClick,
+            modifier = Modifier.align(Alignment.CenterStart)
+        ) {
+            Icon(
+                painter = painterResource(id = iconRes),
+                contentDescription = "Back",
+                tint = iconTint
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(horizontal = 48.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            centerContent()
+        }
+
+        Box(
+            modifier = Modifier.align(Alignment.CenterEnd)
+        ) {
+            trailingContent()
+        }
     }
 }

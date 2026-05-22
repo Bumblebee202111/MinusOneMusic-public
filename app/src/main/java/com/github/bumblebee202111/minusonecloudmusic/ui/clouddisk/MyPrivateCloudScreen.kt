@@ -6,12 +6,11 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.github.bumblebee202111.minusonecloudmusic.databinding.IncludePlaylistActionsWithCountBinding
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PagedSongWithPositionList
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlayAllActions
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.Toolbar
 
 @Composable
@@ -28,14 +27,9 @@ fun MyPrivateCloudScreen(
             onBackClick = onNavigateBack
         )
 
-        AndroidViewBinding(
-            factory = IncludePlaylistActionsWithCountBinding::inflate,
-            update = {
-                cloudSongsCount?.let {
-                    this.count = it
-                }
-                this.root.setOnClickListener { viewModel.playAll() }
-            }
+        PlaylistPlayAllActions(
+            count = cloudSongsCount,
+            onClick = { viewModel.playAll() }
         )
 
         PagedSongWithPositionList(

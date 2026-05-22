@@ -33,7 +33,7 @@ fun DragonBallRow(
 ) {
     Row(
         modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dragon_ball_spacing))
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         dragonBalls.forEach { dragonBall ->
             DragonBallItem(

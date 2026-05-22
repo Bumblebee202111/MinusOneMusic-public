@@ -14,12 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.databinding.IncludePlaylistActionsWithCountBinding
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlayAllActions
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.SimpleSongList
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.Toolbar
 
@@ -52,12 +51,9 @@ fun LocalMusicScreen(
             onBackClick = onNavigateBack
         )
 
-        AndroidViewBinding(
-            factory = IncludePlaylistActionsWithCountBinding::inflate,
-            update = {
-                this.count = songs?.size ?: 0
-                this.root.setOnClickListener { viewModel.playAll() }
-            }
+        PlaylistPlayAllActions(
+            count = songs?.size ?: 0,
+            onClick = { viewModel.playAll() }
         )
 
         SimpleSongList(

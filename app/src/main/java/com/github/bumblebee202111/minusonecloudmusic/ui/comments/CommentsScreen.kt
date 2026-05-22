@@ -58,7 +58,7 @@ fun CommentItem(comment: Comment) {
     ) {
         Text(
             text = comment.displayTime,
-            color = colorResource(id = R.color.at8),
+            color = Color(0x66000000),
             fontSize = 9.sp,
             modifier = Modifier
                 .padding(start = 10.dp, end = 10.dp, top = 5.dp)

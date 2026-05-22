@@ -98,7 +98,7 @@ retrofit-converter-moshi = { group = "com.squareup.retrofit2", name = "converter
 retrofit-response-type-keeper = { group = "com.squareup.retrofit2", name = "response-type-keeper", version.ref = "retrofit" }
 
 # UI
-lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
+lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 google-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 # Debugging
