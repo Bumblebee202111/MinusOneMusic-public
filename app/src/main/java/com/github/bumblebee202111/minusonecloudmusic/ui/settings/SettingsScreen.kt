@@ -13,7 +13,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.usertrack.FriendTracksVi
 
 @Composable
 fun SettingsScreen(
-    viewModel: FriendTracksViewModel = hiltViewModel()
+    viewModel: SettingsViewModel = hiltViewModel()
 ) {
     Scaffold { paddingValues ->
         Box(

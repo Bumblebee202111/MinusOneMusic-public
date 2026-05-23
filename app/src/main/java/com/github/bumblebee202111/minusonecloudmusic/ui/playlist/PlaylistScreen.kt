@@ -88,7 +88,8 @@ fun PlaylistScreen(
     var headerHeightPx by remember { mutableFloatStateOf(0f) }
     var offsetPx by remember { mutableFloatStateOf(0f) }
 
-    val minOffsetPx = if (headerHeightPx > 0) -(headerHeightPx - (toolbarHeightPx + topInsetPx)) else 0f
+    val minOffsetPx =
+        if (headerHeightPx > 0) -(headerHeightPx - (toolbarHeightPx + topInsetPx)) else 0f
     val pinnedHeightPx = toolbarHeightPx + topInsetPx + with(density) { 50.dp.toPx() }
 
     val nestedScrollConnection = remember(minOffsetPx) {
@@ -123,102 +124,101 @@ fun PlaylistScreen(
         }
     }
 
-    DolphinTheme {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.colorBackgroundAndroid))
+            .nestedScroll(nestedScrollConnection)
+    ) {
+        PagedSongWithPositionList(
+            songs = songs,
+            onItemClick = viewModel::onSongItemClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .layout { measurable, constraints ->
+                    val listHeight = constraints.maxHeight - pinnedHeightPx.roundToInt()
+                    val placeable = measurable.measure(
+                        constraints.copy(
+                            minHeight = listHeight,
+                            maxHeight = listHeight
+                        )
+                    )
+                    layout(placeable.width, placeable.height) {
+                        val yPosition =
+                            (headerHeightPx + with(density) { 50.dp.toPx() } + offsetPx).roundToInt()
+                        placeable.place(0, yPosition)
+                    }
+                }
+        )
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .background(colorResource(id = R.color.colorBackgroundAndroid))
-                .nestedScroll(nestedScrollConnection)
-        ) {
-            PagedSongWithPositionList(
-                songs = songs,
-                onItemClick = viewModel::onSongItemClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .layout { measurable, constraints ->
-                        val listHeight = constraints.maxHeight - pinnedHeightPx.roundToInt()
-                        val placeable = measurable.measure(
-                            constraints.copy(
-                                minHeight = listHeight,
-                                maxHeight = listHeight
-                            )
-                        )
-                        layout(placeable.width, placeable.height) {
-                            val yPosition = (headerHeightPx + with(density) { 50.dp.toPx() } + offsetPx).roundToInt()
-                            placeable.place(0, yPosition)
-                        }
+                .fillMaxWidth()
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    layout(placeable.width, placeable.height) {
+                        placeable.place(0, offsetPx.roundToInt())
                     }
-            )
+                }
+        ) {
+            var dominantColor by remember { mutableIntStateOf(android.graphics.Color.BLACK) }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .layout { measurable, constraints ->
-                        val placeable = measurable.measure(constraints)
-                        layout(placeable.width, placeable.height) {
-                            placeable.place(0, offsetPx.roundToInt())
-                        }
-                    }
-            ) {
-                var dominantColor by remember { mutableIntStateOf(android.graphics.Color.BLACK) }
+                    .height(with(density) { headerHeightPx.toDp() } + 50.dp)
+                    .background(Color(dominantColor).copy(alpha = 0.6f))
+            )
 
+            Column(modifier = Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(with(density) { headerHeightPx.toDp() } + 50.dp)
-                        .background(Color(dominantColor).copy(alpha = 0.6f))
-                )
-
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .onGloballyPositioned { coordinates ->
-                                headerHeightPx = coordinates.size.height.toFloat()
-                            }
-                    ) {
-                        PlaylistDetailContent(
-                            detail = playlistDetail,
-                            topInset = topInset,
-                            toolbarHeight = toolbarHeight,
-                            onColorGenerated = { dominantColor = it }
-                        )
-                    }
-
-                    PlaylistPlayAllActions(
-                        count = playlistDetail?.songCount,
-                        onClick = viewModel::playAll,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .background(
-                                color = colorResource(id = R.color.colorBackgroundAndroid),
-                                shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
-                            )
+                        .onGloballyPositioned { coordinates ->
+                            headerHeightPx = coordinates.size.height.toFloat()
+                        }
+                ) {
+                    PlaylistDetailContent(
+                        detail = playlistDetail,
+                        topInset = topInset,
+                        toolbarHeight = toolbarHeight,
+                        onColorGenerated = { dominantColor = it }
                     )
                 }
-            }
-            val totalScrollRange = abs(minOffsetPx)
-            val fraction = if (totalScrollRange > 0) {
-                min(abs(offsetPx) / totalScrollRange, 0.3f)
-            } else 0f
-            val timeInterpolator = remember { FastOutSlowInInterpolator() }
-            val interpolation = timeInterpolator.getInterpolation(fraction)
-            val toolbarAlpha = interpolation * 0.3f
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(toolbarHeight + topInset)
-                    .background(colorResource(id = R.color.colorBackgroundAndroid).copy(alpha = toolbarAlpha))
-            )
-            Toolbar(
-                title = playlistDetail?.name ?: "",
-                onBackClick = onNavigateBack,
-                modifier = Modifier.padding(top = topInset),
-                iconTint = Color.White,
-                titleColor = Color.White
-            )
+                PlaylistPlayAllActions(
+                    count = playlistDetail?.songCount,
+                    onClick = viewModel::playAll,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .background(
+                            color = colorResource(id = R.color.colorBackgroundAndroid),
+                            shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                        )
+                )
+            }
         }
+        val totalScrollRange = abs(minOffsetPx)
+        val fraction = if (totalScrollRange > 0) {
+            min(abs(offsetPx) / totalScrollRange, 0.3f)
+        } else 0f
+        val timeInterpolator = remember { FastOutSlowInInterpolator() }
+        val interpolation = timeInterpolator.getInterpolation(fraction)
+        val toolbarAlpha = interpolation * 0.3f
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(toolbarHeight + topInset)
+                .background(colorResource(id = R.color.colorBackgroundAndroid).copy(alpha = toolbarAlpha))
+        )
+        Toolbar(
+            title = playlistDetail?.name ?: "",
+            onBackClick = onNavigateBack,
+            modifier = Modifier.padding(top = topInset),
+            iconTint = Color.White,
+            titleColor = Color.White
+        )
     }
 }
 

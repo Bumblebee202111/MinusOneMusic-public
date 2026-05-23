@@ -17,9 +17,10 @@ class DailyRecommendViewModel @Inject constructor(
     loggedInUserDataRepository: LoggedInUserDataRepository,
     playPlaylistUseCase: PlayPlaylistUseCase,
     mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase
-) :ViewModel() {
+) : ViewModel() {
 
-   private val songs=loggedInUserDataRepository.getDailyRecommendSongs().map { it.data }.stateInUi()
+    private val songs =
+        loggedInUserDataRepository.getDailyRecommendSongs().map { it.data }.stateInUi()
 
     val songItems =
         mapSongsFlowToUiItemsUseCase(songs).stateInUi()
@@ -37,7 +38,7 @@ class DailyRecommendViewModel @Inject constructor(
     val banner =
         loggedInUserDataRepository.getDailyRecommendBanner().map { it.data }.stateInUi()
 
-    val month=DateUtils.getCurrentMonthDisplayText()
-    val day=DateUtils.getCurrentDayDisplayText()
+    val month = DateUtils.getCurrentMonthDisplayText()
+    val day = DateUtils.getCurrentDayDisplayText()
 
 }

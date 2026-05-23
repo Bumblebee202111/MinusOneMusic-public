@@ -20,12 +20,11 @@ class FollowViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
-    val userFollows=loginRepository.loggedInUserId.flatMapLatest { userId ->
-        if(userId!=null){
+    val userFollows = loginRepository.loggedInUserId.flatMapLatest { userId ->
+        if (userId != null) {
             userRepository.getUserFollows(userId).map { it.data }
-        }
-        else{
-           flowOf(null)
+        } else {
+            flowOf(null)
         }
     }.flowOn(Dispatchers.IO).stateInUi()
 }

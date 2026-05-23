@@ -19,12 +19,11 @@ class FansViewModel @Inject constructor(
     loginRepository: LoginRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
-    val userFans=loginRepository.loggedInUserId.flatMapLatest { userId ->
-        if(userId!=null){
+    val userFans = loginRepository.loggedInUserId.flatMapLatest { userId ->
+        if (userId != null) {
             userRepository.getUserFans(userId).map { it.data }
-        }
-        else{
-           flowOf(null)
+        } else {
+            flowOf(null)
         }
     }.flowOn(Dispatchers.IO).stateInUi()
 }

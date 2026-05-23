@@ -156,262 +156,267 @@ fun MineScreen(
         }
     }
 
-    DolphinTheme {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.colorBackgroundAndroid))
+            .nestedScroll(nestedScrollConnection)
+    ) {
+        AsyncImage(
+            model = loggedInUserProfile?.backgroundUrl?.imageUrl(
+                thumbnailSize = null,
+                quality = 80
+            ),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            placeholder = ColorPainter(Color(0xFF4D1414)),
+            error = ColorPainter(Color(0xFF4D1414)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    layout(placeable.width, placeable.height) {
+                        placeable.place(0, offsetPx.roundToInt())
+                    }
+                }
+                .height(with(density) { headerHeightPx.toDp() } + 50.dp)
+        )
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .background(colorResource(id = R.color.colorBackgroundAndroid))
-                .nestedScroll(nestedScrollConnection)
+                .fillMaxWidth()
+                .draggable(
+                    orientation = Orientation.Vertical,
+                    state = headerDraggableState
+                )
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    layout(placeable.width, placeable.height) {
+                        placeable.place(0, offsetPx.roundToInt())
+                    }
+                }
+                .onGloballyPositioned { coordinates ->
+                    headerHeightPx = coordinates.size.height.toFloat()
+                }
         ) {
-            AsyncImage(
-                model = loggedInUserProfile?.backgroundUrl?.imageUrl(thumbnailSize = null, quality = 80),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                placeholder = ColorPainter(Color(0xFF4D1414)),
-                error = ColorPainter(Color(0xFF4D1414)),
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .layout { measurable, constraints ->
-                        val placeable = measurable.measure(constraints)
-                        layout(placeable.width, placeable.height) {
-                            placeable.place(0, offsetPx.roundToInt())
-                        }
-                    }
-                    .height(with(density) { headerHeightPx.toDp() } + 50.dp)
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .draggable(
-                        orientation = Orientation.Vertical,
-                        state = headerDraggableState
-                    )
-                    .layout { measurable, constraints ->
-                        val placeable = measurable.measure(constraints)
-                        layout(placeable.width, placeable.height) {
-                            placeable.place(0, offsetPx.roundToInt())
-                        }
-                    }
-                    .onGloballyPositioned { coordinates ->
-                        headerHeightPx = coordinates.size.height.toFloat()
-                    }
+                    .padding(top = topInset + 80.dp, bottom = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = topInset + 80.dp, bottom = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(77.3.dp)
-                            .dropShadow(
-                                shape = CircleShape,
-                                shadow = Shadow(
-                                    radius = 6.dp,
-                                    color = Color(0x3E000000),
-                                    offset = DpOffset(0.dp, 1.dp)
-                                )
+                        .size(77.3.dp)
+                        .dropShadow(
+                            shape = CircleShape,
+                            shadow = Shadow(
+                                radius = 6.dp,
+                                color = Color(0x3E000000),
+                                offset = DpOffset(0.dp, 1.dp)
                             )
-                            .background(Color.White, CircleShape)
-                            .clip(CircleShape)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClick = onProfileClick
-                            )
-                    ) {
-                        AsyncImage(
-                            model = loggedInUserProfile?.avatarUrl?.imageUrl(thumbnailSize = 148, quality = 80),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            placeholder = painterResource(id = R.drawable.fgw),
-                            error = painterResource(id = R.drawable.fgw),
-                            modifier = Modifier.fillMaxSize()
                         )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = myProfile?.displayName ?: "立即登录",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        modifier = Modifier.clickable(
+                        .background(Color.White, CircleShape)
+                        .clip(CircleShape)
+                        .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = onProfileClick
                         )
+                ) {
+                    AsyncImage(
+                        model = loggedInUserProfile?.avatarUrl?.imageUrl(
+                            thumbnailSize = 148,
+                            quality = 80
+                        ),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        placeholder = painterResource(id = R.drawable.fgw),
+                        error = painterResource(id = R.drawable.fgw),
+                        modifier = Modifier.fillMaxSize()
                     )
+                }
 
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        DragonBallRow(
-                            dragonBalls = MineDragonBall.PINNED_DRAGON_BALLS,
-                            onItemClick = { ball ->
-                                when (ball.code) {
-                                    MineDragonBall.TYPE_LOCAL_MUSIC -> onNavigate(LocalMusicRoute)
-                                    MineDragonBall.TYPE_CLOUD_DISK -> onNavigate(MyPrivateCloudRoute)
-                                    MineDragonBall.TYPE_RECENT_PLAY -> onNavigate(MyRecentPlayRoute)
-                                    MineDragonBall.TYPE_FOLLOW -> onNavigate(MyFriendRoute)
-                                    MineDragonBall.TYPE_COLLECTION -> onNavigate(MyCollectionRoute)
-                                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = myProfile?.displayName ?: "立即登录",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    modifier = Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onProfileClick
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    DragonBallRow(
+                        dragonBalls = MineDragonBall.PINNED_DRAGON_BALLS,
+                        onItemClick = { ball ->
+                            when (ball.code) {
+                                MineDragonBall.TYPE_LOCAL_MUSIC -> onNavigate(LocalMusicRoute)
+                                MineDragonBall.TYPE_CLOUD_DISK -> onNavigate(MyPrivateCloudRoute)
+                                MineDragonBall.TYPE_RECENT_PLAY -> onNavigate(MyRecentPlayRoute)
+                                MineDragonBall.TYPE_FOLLOW -> onNavigate(MyFriendRoute)
+                                MineDragonBall.TYPE_COLLECTION -> onNavigate(MyCollectionRoute)
                             }
-                        )
-                    }
-                }
-            }
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .layout { measurable, constraints ->
-                        val listHeight = constraints.maxHeight - pinnedHeightPx.roundToInt()
-                        val placeable = measurable.measure(
-                            constraints.copy(minHeight = listHeight, maxHeight = listHeight)
-                        )
-                        layout(placeable.width, placeable.height) {
-                            val yPosition = (headerHeightPx + tabHeightPx + offsetPx).roundToInt()
-                            placeable.place(0, yPosition)
                         }
-                    }
-                    .background(colorResource(id = R.color.colorBackgroundAndroid))
-            ) { page ->
-                when (page) {
-                    0 -> MyMusicTabScreen(
-                        viewModel = mineViewModel,
-                        onNavigate = onNavigate
                     )
-                    else -> Box(Modifier.fillMaxSize())
                 }
             }
-            val totalScrollRange = abs(minOffsetPx)
-            val fraction = if (totalScrollRange > 0) min(abs(offsetPx) / totalScrollRange, 1.0f) else 0f
-            val interpolation = FOSI.getInterpolation(fraction)
-            val isCollapsed = fraction >= 0.4f
-            val maxRadiiDp = 24.dp
-            val minRadiiDp = 0.dp
-            val radiiDp = maxRadiiDp + (minRadiiDp - maxRadiiDp) * fraction * fraction
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .layout { measurable, constraints ->
-                        val placeable = measurable.measure(constraints)
-                        layout(placeable.width, placeable.height) {
-                            val yPosition = (headerHeightPx + offsetPx).roundToInt()
-                            placeable.place(0, yPosition)
-                        }
+        }
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .layout { measurable, constraints ->
+                    val listHeight = constraints.maxHeight - pinnedHeightPx.roundToInt()
+                    val placeable = measurable.measure(
+                        constraints.copy(minHeight = listHeight, maxHeight = listHeight)
+                    )
+                    layout(placeable.width, placeable.height) {
+                        val yPosition = (headerHeightPx + tabHeightPx + offsetPx).roundToInt()
+                        placeable.place(0, yPosition)
                     }
-                    .height(44.dp)
-                    .background(
-                        color = colorResource(id = R.color.colorBackgroundAndroid),
-                        shape = RoundedCornerShape(topStart = radiiDp, topEnd = radiiDp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                PrimaryTabRow(
-                    selectedTabIndex = pagerState.currentPage,
-                    modifier = Modifier
-                        .width(140.dp)
-                        .height(44.dp),
-                    containerColor = Color.Transparent,
-                    divider = {},
-                    indicator = {
+                }
+                .background(colorResource(id = R.color.colorBackgroundAndroid))
+        ) { page ->
+            when (page) {
+                0 -> MyMusicTabScreen(
+                    viewModel = mineViewModel,
+                    onNavigate = onNavigate
+                )
+
+                else -> Box(Modifier.fillMaxSize())
+            }
+        }
+        val totalScrollRange = abs(minOffsetPx)
+        val fraction = if (totalScrollRange > 0) min(abs(offsetPx) / totalScrollRange, 1.0f) else 0f
+        val interpolation = FOSI.getInterpolation(fraction)
+        val isCollapsed = fraction >= 0.4f
+        val maxRadiiDp = 24.dp
+        val minRadiiDp = 0.dp
+        val radiiDp = maxRadiiDp + (minRadiiDp - maxRadiiDp) * fraction * fraction
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    layout(placeable.width, placeable.height) {
+                        val yPosition = (headerHeightPx + offsetPx).roundToInt()
+                        placeable.place(0, yPosition)
+                    }
+                }
+                .height(44.dp)
+                .background(
+                    color = colorResource(id = R.color.colorBackgroundAndroid),
+                    shape = RoundedCornerShape(topStart = radiiDp, topEnd = radiiDp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            PrimaryTabRow(
+                selectedTabIndex = pagerState.currentPage,
+                modifier = Modifier
+                    .width(140.dp)
+                    .height(44.dp),
+                containerColor = Color.Transparent,
+                divider = {},
+                indicator = {
+                    Box(
+                        modifier = Modifier
+                            .tabIndicatorOffset(pagerState.currentPage, matchContentSize = false)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.BottomCenter
+                    ) {
                         Box(
                             modifier = Modifier
-                                .tabIndicatorOffset(pagerState.currentPage, matchContentSize = false)
-                                .fillMaxSize(),
-                            contentAlignment = Alignment.BottomCenter
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .width(15.dp)
-                                    .height(3.dp)
-                                    .background(
-                                        color = colorResource(id = R.color.colorPrimary1),
-                                        shape = RoundedCornerShape(3.dp)
-                                    )
-                            )
-                        }
+                                .width(15.dp)
+                                .height(3.dp)
+                                .background(
+                                    color = colorResource(id = R.color.colorPrimary1),
+                                    shape = RoundedCornerShape(3.dp)
+                                )
+                        )
                     }
-                ) {
-                    TAB_TEXTS.forEachIndexed { index, resId ->
-                        val selected = pagerState.currentPage == index
-                        Tab(
-                            selected = selected,
-                            onClick = {
-                                scope.launch { pagerState.animateScrollToPage(index) }
-                            },
-                            modifier = Modifier.height(44.dp),
-                            interactionSource = remember { MutableInteractionSource() }
-                        ) {
-                            Text(
-                                text = stringResource(id = resId),
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (selected) DolphinTheme.colors.text1 else DolphinTheme.colors.text4
-                            )
-                        }
+                }
+            ) {
+                TAB_TEXTS.forEachIndexed { index, resId ->
+                    val selected = pagerState.currentPage == index
+                    Tab(
+                        selected = selected,
+                        onClick = {
+                            scope.launch { pagerState.animateScrollToPage(index) }
+                        },
+                        modifier = Modifier.height(44.dp),
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        Text(
+                            text = stringResource(id = resId),
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (selected) DolphinTheme.colors.text1 else DolphinTheme.colors.text4
+                        )
                     }
                 }
             }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(with(density) { toolbarHeightPx.toDp() })
-                    .alpha(interpolation)
-                    .background(colorResource(id = R.color.colorBackgroundAndroid))
-            )
-            val iconTint = if (isCollapsed) Color.Black else Color.White
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = topInset)
-                    .height(actionBarHeight)
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(with(density) { toolbarHeightPx.toDp() })
+                .alpha(interpolation)
+                .background(colorResource(id = R.color.colorBackgroundAndroid))
+        )
+        val iconTint = if (isCollapsed) Color.Black else Color.White
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = topInset)
+                .height(actionBarHeight)
+        ) {
+            IconButton(
+                onClick = onOpenDrawer,
+                modifier = Modifier.align(Alignment.CenterStart)
             ) {
-                IconButton(
-                    onClick = onOpenDrawer,
-                    modifier = Modifier.align(Alignment.CenterStart)
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_menu),
+                    contentDescription = null,
+                    tint = iconTint
+                )
+            }
+            if (isCollapsed) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onProfileClick
+                        )
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_menu),
+                    AsyncImage(
+                        model = myProfile?.avatarUrl?.imageUrl(thumbnailSize = 100, quality = 80),
                         contentDescription = null,
-                        tint = iconTint
-                    )
-                }
-                if (isCollapsed) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                        placeholder = painterResource(id = R.drawable.fgw),
+                        error = painterResource(id = R.drawable.fgw),
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .align(Alignment.Center)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClick = onProfileClick
-                            )
-                    ) {
-                        AsyncImage(
-                            model = myProfile?.avatarUrl?.imageUrl(thumbnailSize = 100, quality = 80),
-                            contentDescription = null,
-                            placeholder = painterResource(id = R.drawable.fgw),
-                            error = painterResource(id = R.drawable.fgw),
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(25.dp)
-                                .clip(CircleShape)
-                        )
-                        Text(
-                            text = myProfile?.displayName ?: "Login",
-                            color = DolphinTheme.colors.neutral8_1,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
+                            .size(25.dp)
+                            .clip(CircleShape)
+                    )
+                    Text(
+                        text = myProfile?.displayName ?: "Login",
+                        color = DolphinTheme.colors.neutral8_1,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
                 }
             }
         }

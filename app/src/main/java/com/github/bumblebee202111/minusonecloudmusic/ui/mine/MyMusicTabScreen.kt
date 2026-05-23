@@ -49,78 +49,78 @@ fun MyMusicTabScreen(
         R.string.title_my_music_tab_albums
     )
 
-    DolphinTheme {
-        Column {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                tabs.forEachIndexed { index, userPlaylistTab ->
-                    val selected = pagerState.currentPage == index
-                    val count = myPlaylistTabs?.get(userPlaylistTab)?.size ?: 0
-                    val textColor = if (selected) DolphinTheme.colors.text1 else DolphinTheme.colors.text4
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            tabs.forEachIndexed { index, userPlaylistTab ->
+                val selected = pagerState.currentPage == index
+                val count = myPlaylistTabs?.get(userPlaylistTab)?.size ?: 0
+                val textColor =
+                    if (selected) DolphinTheme.colors.text1 else DolphinTheme.colors.text4
 
-                    Box(
-                        modifier = Modifier
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
-                            )
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        BadgedBox(
-                            badge = {
-                                if (count > 0) {
-                                    Text(
-                                        text = count.toString(),
-                                        color = textColor,
-                                        fontSize = 11.sp,
-                                        modifier = Modifier.offset(x = 10.dp, y = (-2).dp)
-                                    )
-                                }
+                Box(
+                    modifier = Modifier
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
+                        )
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    BadgedBox(
+                        badge = {
+                            if (count > 0) {
+                                Text(
+                                    text = count.toString(),
+                                    color = textColor,
+                                    fontSize = 11.sp,
+                                    modifier = Modifier.offset(x = 10.dp, y = (-2).dp)
+                                )
                             }
-                        ) {
-                            Text(
-                                text = stringResource(id = tabTexts[index]),
-                                color = textColor,
-                                fontSize = 15.sp,
-                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
-                            )
                         }
+                    ) {
+                        Text(
+                            text = stringResource(id = tabTexts[index]),
+                            color = textColor,
+                            fontSize = 15.sp,
+                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
+                        )
                     }
                 }
             }
+        }
 
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.weight(1f)
-            ) { page ->
-                UserPlaylistTabScreen(
-                    viewModel = viewModel,
-                    category = tabs[page],
-                    onItemClick = { userPlaylistItem ->
-                        val route = when (userPlaylistItem) {
-                            is NormalPlaylistItem -> {
-                                PlaylistRoute(
-                                    playlistId = userPlaylistItem.playlist.id,
-                                    playlistCreatorId = userPlaylistItem.playlist.creatorId ?: 0,
-                                    isMyPL = true
-                                )
-                            }
-                            is UserChartsItem -> {
-                                ListenRankRoute(userPlaylistItem.userId)
-                            }
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.weight(1f)
+        ) { page ->
+            UserPlaylistTabScreen(
+                viewModel = viewModel,
+                category = tabs[page],
+                onItemClick = { userPlaylistItem ->
+                    val route = when (userPlaylistItem) {
+                        is NormalPlaylistItem -> {
+                            PlaylistRoute(
+                                playlistId = userPlaylistItem.playlist.id,
+                                playlistCreatorId = userPlaylistItem.playlist.creatorId ?: 0,
+                                isMyPL = true
+                            )
                         }
-                        onNavigate(route)
+
+                        is UserChartsItem -> {
+                            ListenRankRoute(userPlaylistItem.userId)
+                        }
                     }
-                )
-            }
+                    onNavigate(route)
+                }
+            )
         }
     }
 }

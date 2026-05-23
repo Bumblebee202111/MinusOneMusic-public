@@ -12,5 +12,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TopListsViewModel @Inject constructor(playlistRepository: PlaylistRepository) : ViewModel() {
-    val topLists=playlistRepository.getTopLists().map { it.data }.stateIn(viewModelScope, SharingStarted.Lazily,null).stateInUi()
+    val topLists = playlistRepository.getTopLists().map { it.data }
+        .stateIn(viewModelScope, SharingStarted.Lazily, null).stateInUi()
 }

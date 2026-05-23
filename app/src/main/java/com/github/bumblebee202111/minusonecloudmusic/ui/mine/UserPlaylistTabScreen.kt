@@ -48,24 +48,23 @@ fun UserPlaylistTabScreen(
     val allTabsData by viewModel.myPlaylistTabs.collectAsStateWithLifecycle(initialValue = null)
     val items = allTabsData?.get(category) ?: emptyList()
 
-    DolphinTheme {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(
-                items = items,
-                key = { item ->
-                    when (item) {
-                        is NormalPlaylistItem -> item.playlist.id
-                        is UserChartsItem -> "charts_${item.userId}"
-                    }
-                }
-            ) { item ->
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(
+            items = items,
+            key = { item ->
                 when (item) {
-                    is NormalPlaylistItem -> {
-                        NormalPlaylistItemView(item) { onItemClick(item) }
-                    }
-                    is UserChartsItem -> {
-                        UserChartsItemView(item) { onItemClick(item) }
-                    }
+                    is NormalPlaylistItem -> item.playlist.id
+                    is UserChartsItem -> "charts_${item.userId}"
+                }
+            }
+        ) { item ->
+            when (item) {
+                is NormalPlaylistItem -> {
+                    NormalPlaylistItemView(item) { onItemClick(item) }
+                }
+
+                is UserChartsItem -> {
+                    UserChartsItemView(item) { onItemClick(item) }
                 }
             }
         }
@@ -82,7 +81,8 @@ private fun NormalPlaylistItemView(
     val sizePx = remember(density) { with(density) { 58.dp.roundToPx() } }
     val placeholderPainter = remember(context, sizePx) {
         val drawable = ContextCompat.getDrawable(context, R.drawable.dnl)
-        drawable?.toBitmap(width = sizePx, height = sizePx)?.asImageBitmap()?.let { BitmapPainter(it) }
+        drawable?.toBitmap(width = sizePx, height = sizePx)?.asImageBitmap()
+            ?.let { BitmapPainter(it) }
     }
 
     Row(

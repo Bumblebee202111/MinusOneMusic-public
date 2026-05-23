@@ -24,6 +24,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -80,14 +81,13 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.rememberNavig
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.toEntries
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerListDialog2
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
+import com.github.bumblebee202111.minusonecloudmusic.utils.await
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.common.util.concurrent.ListenableFuture
-import com.google.common.util.concurrent.MoreExecutors
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -98,8 +98,6 @@ class MainActivity : AppCompatActivity() {
     private val mainActivityViewModel: MainActivityViewModel by viewModels()
 
     private lateinit var mediaControllerFuture: ListenableFuture<MediaController>
-    private val mediaController: MediaController?
-        get() = if (mediaControllerFuture.isDone) mediaControllerFuture.get() else null
 
     private val bottomNavMap = mapOf(
         R.id.nav_main to DiscoverRoute,
@@ -121,8 +119,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var toastManager: ToastManager
 
-    private val activityScope = MainScope()
-
     private val snackbarHostState = SnackbarHostState()
 
     @Inject
@@ -134,11 +130,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        checkOfficialNcmAppStatus()
-
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        checkOfficialNcmAppStatus()
 
         val deepLinkKey: NavKey? = DeepLinkRegistry.resolve(intent.data?.toString())
 
@@ -146,9 +141,7 @@ class MainActivity : AppCompatActivity() {
             toastManager.uiTextEvent.collect { event ->
                 event?.let {
                     val messageText = it.message.asString(this@MainActivity)
-
                     val result = snackbarHostState.showSnackbar(messageText)
-
                     if (result == SnackbarResult.Dismissed || result == SnackbarResult.ActionPerformed) {
                         toastManager.onMessageShown()
                     }
@@ -223,180 +216,72 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                val drawerLayoutRef = remember { mutableStateOf<DrawerLayout?>(null) }
-                var isDrawerOpen by remember { mutableStateOf(false) }
+                MainDrawerLayout(
+                    isTopLevel = isTopLevel,
+                    drawerEvents = navigationManager.drawerEvents,
+                    onNavigate = { navigator.navigate(it) },
+                    onLogout = { mainActivityViewModel.onLogout() }
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column(modifier = Modifier.fillMaxSize()) {
 
-                BackHandler(enabled = isDrawerOpen) {
-                    drawerLayoutRef.value?.closeDrawer(GravityCompat.START)
-                }
-
-                LaunchedEffect(Unit) {
-                    navigationManager.drawerEvents.collect {
-                        drawerLayoutRef.value?.openDrawer(GravityCompat.START)
-                    }
-                }
-
-                AndroidView(
-                    factory = { context ->
-                        DrawerLayout(context).apply {
-                            id = View.generateViewId()
-                            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-
-                            addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
-                                override fun onDrawerOpened(drawerView: View) {
-                                    isDrawerOpen = true
-                                }
-
-                                override fun onDrawerClosed(drawerView: View) {
-                                    isDrawerOpen = false
-                                }
-
-                                override fun onDrawerStateChanged(newState: Int) {
-                                    isDrawerOpen = isDrawerOpen(GravityCompat.START)
-                                }
-                            })
-
-                            val contentView = ComposeView(context).apply {
-                                layoutParams = DrawerLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-                                setContent {
-                                    Box(modifier = Modifier.fillMaxSize()) {
-                                        Column(modifier = Modifier.fillMaxSize()) {
-
-                                            NavDisplay(
-                                                entries = state.toEntries(createAppEntryProvider(navigationManager)),
-                                                onBack = { navigator.goBack() },
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .fillMaxWidth().clipToBounds()
-                                            )
-
-                                            var showPlayerHistory by remember { mutableStateOf(false) }
-
-                                            if (isMiniBarVisible) {
-                                                MiniPlayerBar(
-                                                    player = player,
-                                                    onNavigateToNowPlaying = { navigationManager.navigate(NowPlayingRoute) },
-                                                    onShowPlaylist = { showPlayerHistory = true },
-                                                    modifier = Modifier.fillMaxWidth()
-                                                )
-                                            }
-
-                                            if (showPlayerHistory) {
-                                                PlayerListDialog2(
-                                                    onDismissRequest = { showPlayerHistory = false }
-                                                )
-                                            }
-
-                                            if (isTopLevel) {
-                                                HorizontalDivider(color = DolphinTheme.colors.text7)
-
-                                                AndroidView(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .navigationBarsPadding(),
-                                                    factory = { context ->
-                                                        BottomNavigationView(context).apply {
-                                                            layoutParams = ViewGroup.LayoutParams(
-                                                                MATCH_PARENT,
-                                                                resources.getDimensionPixelSize(R.dimen.bottom_nav_view_height)
-                                                            )
-                                                            background =
-                                                                "#fcfdff".toColorInt()
-                                                                    .toDrawable()
-                                                            elevation = 0f
-                                                            inflateMenu(R.menu.menu_bottom_nav)
-                                                            itemIconTintList =
-                                                                ContextCompat.getColorStateList(
-                                                                    context,
-                                                                    R.color.bnv_icon_tint
-                                                                )
-                                                            itemTextColor =
-                                                                ContextCompat.getColorStateList(
-                                                                    context,
-                                                                    R.color.bnv_title_color
-                                                                )
-                                                            val icons =
-                                                                BottomNavigationIconsUtils.getBottomNavigationIcons(
-                                                                    context
-                                                                )
-                                                            menu.forEach { item ->
-                                                                icons[item.itemId]?.let { icon ->
-                                                                    item.icon = icon
-                                                                }
-                                                            }
-
-                                                            setOnItemSelectedListener { menuItem ->
-                                                                val route =
-                                                                    bottomNavMap[menuItem.itemId]
-                                                                if (route != null) {
-                                                                    navigator.navigate(route)
-                                                                    true
-                                                                } else {
-                                                                    false
-                                                                }
-                                                            }
-                                                        }
-                                                    },
-                                                    update = { view ->
-                                                        val selectedMenuId =
-                                                            bottomNavMap.entries.find { it.value == currentKey }?.key
-                                                        if (selectedMenuId != null && view.selectedItemId != selectedMenuId) {
-                                                            view.selectedItemId = selectedMenuId
-                                                        }
-                                                    }
-                                                )
-                                            }
-                                        }
-
-                                        SnackbarHost(
-                                            hostState = snackbarHostState,
-                                            modifier = Modifier
-                                                .align(Alignment.TopCenter)
-                                                .statusBarsPadding(),
-                                            snackbar = { data -> DolphinToast(data.visuals.message) }
-                                        )
-                                    }
-                                }
-                            }
-                            addView(contentView)
-
-                            val drawerView = ComposeView(context).apply {
-                                layoutParams = DrawerLayout.LayoutParams(
-                                    (context.resources.displayMetrics.widthPixels * 0.84).toInt(),
-                                    MATCH_PARENT
-                                ).apply {
-                                    gravity = GravityCompat.START
-                                }
-                                setContent {
-                                    MainDrawerContent(
-                                        onNavigate = { route ->
-                                            scope.launch { drawerState.close() }
-                                            navigator.navigate(route)
-                                        },
-                                        onLogout = {
-                                            scope.launch { drawerState.close() }
-                                            mainActivityViewModel.onLogout()
-                                        }
+                            NavDisplay(
+                                entries = state.toEntries(
+                                    createAppEntryProvider(
+                                        navigationManager
                                     )
-                                }
-                            }
-                            addView(drawerView)
+                                ),
+                                onBack = { navigator.goBack() },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                                    .clipToBounds()
+                            )
 
-                            drawerLayoutRef.value = this
+                            var showPlayerHistory by remember { mutableStateOf(false) }
+
+                            if (isMiniBarVisible) {
+                                MiniPlayerBar(
+                                    player = player,
+                                    onNavigateToNowPlaying = {
+                                        navigationManager.navigate(
+                                            NowPlayingRoute
+                                        )
+                                    },
+                                    onShowPlaylist = { showPlayerHistory = true },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+
+                            if (showPlayerHistory) {
+                                PlayerListDialog2(
+                                    onDismissRequest = { showPlayerHistory = false }
+                                )
+                            }
+
+                            if (isTopLevel) {
+                                HorizontalDivider(color = DolphinTheme.colors.text7)
+                                MainBottomNavigation(
+                                    currentKey = currentKey,
+                                    bottomNavMap = bottomNavMap,
+                                    onNavigate = { navigator.navigate(it) }
+                                )
+                            }
                         }
-                    },
-                    update = { view ->
-                        val lockMode = if (isTopLevel) {
-                            DrawerLayout.LOCK_MODE_UNLOCKED
-                        } else {
-                            DrawerLayout.LOCK_MODE_LOCKED_CLOSED
-                        }
-                        view.setDrawerLockMode(lockMode)
+
+                        SnackbarHost(
+                            hostState = snackbarHostState,
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .statusBarsPadding(),
+                            snackbar = { data -> DolphinToast(data.visuals.message) }
+                        )
                     }
-                )
+                }
             }
         }
     }
+
 
     override fun onStop() {
         musicServiceConnection.close()
@@ -421,24 +306,30 @@ class MainActivity : AppCompatActivity() {
                 this,
                 ComponentName(this, PlaybackService::class.java)
             )
-        )
-            .buildAsync()
-        mediaControllerFuture.addListener({
-            val mediaController = this.mediaController ?: return@addListener
-            musicServiceConnection.connect(mediaController) {
-                mediaController.release()
+        ).buildAsync()
+
+        lifecycleScope.launch {
+            try {
+                val mediaController = mediaControllerFuture.await()
+                musicServiceConnection.connect(mediaController) {
+                    mediaController.release()
+                }
+            } catch (_: Exception) {
             }
-        }, MoreExecutors.directExecutor())
+        }
     }
 
     private fun releaseController() {
-        MediaController.releaseFuture(mediaControllerFuture)
+        if (::mediaControllerFuture.isInitialized) {
+            MediaController.releaseFuture(mediaControllerFuture)
+        }
     }
 
     private fun checkOfficialNcmAppStatus() {
-        val isOfficialNcmAppInstalled = packageManager.isPackageInstalled(OFFICIAL_NCM_PACKAGE)
+        val isOfficialNcmAppInstalled =
+            packageManager.isPackageInstalled(OFFICIAL_NCM_PACKAGE)
         if (!isOfficialNcmAppInstalled) {
-            activityScope.launch {
+            lifecycleScope.launch {
                 toastManager.showMessage(
                     UiText.StringResource(R.string.disclaimer_unofficial_app)
                 )
@@ -453,4 +344,145 @@ class MainActivity : AppCompatActivity() {
 
         private const val OFFICIAL_NCM_PACKAGE = "com.netease.cloudmusic"
     }
+}
+
+
+@Composable
+private fun MainDrawerLayout(
+    isTopLevel: Boolean,
+    drawerEvents: Flow<Unit>,
+    onNavigate: (NavKey) -> Unit,
+    onLogout: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val drawerLayoutRef = remember { mutableStateOf<DrawerLayout?>(null) }
+    var isDrawerOpen by remember { mutableStateOf(false) }
+
+    BackHandler(enabled = isDrawerOpen) {
+        drawerLayoutRef.value?.closeDrawer(GravityCompat.START)
+    }
+
+    LaunchedEffect(drawerEvents) {
+        drawerEvents.collect {
+            drawerLayoutRef.value?.openDrawer(GravityCompat.START)
+        }
+    }
+
+    AndroidView(
+        factory = { context ->
+            DrawerLayout(context).apply {
+                id = View.generateViewId()
+                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+
+                addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+                    override fun onDrawerOpened(drawerView: View) {
+                        isDrawerOpen = true
+                    }
+
+                    override fun onDrawerClosed(drawerView: View) {
+                        isDrawerOpen = false
+                    }
+
+                    override fun onDrawerStateChanged(newState: Int) {
+                        isDrawerOpen = isDrawerOpen(GravityCompat.START)
+                    }
+                })
+
+                val contentView = ComposeView(context).apply {
+                    layoutParams = DrawerLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+                    setContent {
+                        DolphinTheme {
+                            content()
+                        }
+                    }
+                }
+                addView(contentView)
+
+                val drawerView = ComposeView(context).apply {
+                    layoutParams = DrawerLayout.LayoutParams(
+                        (context.resources.displayMetrics.widthPixels * 0.84).toInt(),
+                        MATCH_PARENT
+                    ).apply {
+                        gravity = GravityCompat.START
+                    }
+                    setContent {
+                        DolphinTheme {
+                            MainDrawerContent(
+                                onNavigate = { route ->
+                                    closeDrawer(GravityCompat.START)
+                                    onNavigate(route)
+                                },
+                                onLogout = {
+                                    closeDrawer(GravityCompat.START)
+                                    onLogout()
+                                }
+                            )
+                        }
+                    }
+                }
+                addView(drawerView)
+
+                drawerLayoutRef.value = this
+            }
+        },
+        update = { view ->
+            val lockMode = if (isTopLevel) {
+                DrawerLayout.LOCK_MODE_UNLOCKED
+            } else {
+                DrawerLayout.LOCK_MODE_LOCKED_CLOSED
+            }
+            view.setDrawerLockMode(lockMode)
+        }
+    )
+}
+
+@Composable
+private fun MainBottomNavigation(
+    currentKey: NavKey?,
+    bottomNavMap: Map<Int, NavKey>,
+    onNavigate: (NavKey) -> Unit
+) {
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding(),
+        factory = { context ->
+            BottomNavigationView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    MATCH_PARENT,
+                    resources.getDimensionPixelSize(R.dimen.bottom_nav_view_height)
+                )
+                background = "#fcfdff".toColorInt().toDrawable()
+                elevation = 0f
+                inflateMenu(R.menu.menu_bottom_nav)
+                itemIconTintList =
+                    ContextCompat.getColorStateList(context, R.color.bnv_icon_tint)
+                itemTextColor =
+                    ContextCompat.getColorStateList(context, R.color.bnv_title_color)
+
+                val icons = BottomNavigationIconsUtils.getBottomNavigationIcons(context)
+                menu.forEach { item ->
+                    icons[item.itemId]?.let { icon ->
+                        item.icon = icon
+                    }
+                }
+
+                setOnItemSelectedListener { menuItem ->
+                    val route = bottomNavMap[menuItem.itemId]
+                    if (route != null) {
+                        onNavigate(route)
+                        true
+                    } else {
+                        false
+                    }
+                }
+            }
+        },
+        update = { view ->
+            val selectedMenuId = bottomNavMap.entries.find { it.value == currentKey }?.key
+            if (selectedMenuId != null && view.selectedItemId != selectedMenuId) {
+                view.selectedItemId = selectedMenuId
+            }
+        }
+    )
 }
