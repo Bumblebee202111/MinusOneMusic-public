@@ -105,7 +105,7 @@ class PhoneCaptchaLoginViewModel @Inject constructor(
         return phoneNumber.length == 11
     }
     private fun isCaptchaValid(captcha: String): Boolean {
-        return captcha.length == 6
+        return captcha.length == 4
     }
 }
 
