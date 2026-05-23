@@ -27,6 +27,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlayingMark
 import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SongItemUiModel
+import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 @Composable
 fun PagedPlayerSongList(
     songs: LazyPagingItems<SongItemUiModel>,
@@ -60,7 +61,7 @@ fun PlayerSongItem(
 ) {
     val isCurrent = song.isCurrentSong
     val primaryColor = colorResource(id = R.color.colorPrimary1)
-    val bgColor = if (isCurrent) colorResource(id = R.color.colorText7) else Color.White
+    val bgColor = if (isCurrent) DolphinTheme.colors.text7 else Color.White
 
     Row(
         modifier = modifier
