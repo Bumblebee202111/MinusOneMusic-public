@@ -12,17 +12,25 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -31,12 +39,16 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
@@ -60,7 +72,6 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.MainDrawerContent
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniPlayerBar
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.UiText
-import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.createAppEntryProvider
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DailyRecommendRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DeepLinkRegistry
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DiscoverRoute
@@ -77,6 +88,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PlaylistRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.PlaylistV4Route
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.SearchRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.V6PlaylistRoute
+import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.createAppEntryProvider
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.rememberNavigationState
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.toEntries
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerListDialog2
@@ -153,7 +165,6 @@ class MainActivity : AppCompatActivity() {
             val player by musicServiceConnection.player.collectAsStateWithLifecycle()
             DolphinTheme {
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-                val scope = rememberCoroutineScope()
 
                 val topLevelRoutes = setOf(DiscoverRoute, FriendTracksRoute, MineRoute)
 
@@ -261,11 +272,19 @@ class MainActivity : AppCompatActivity() {
 
                             if (isTopLevel) {
                                 HorizontalDivider(color = DolphinTheme.colors.text7)
-                                MainBottomNavigation(
-                                    currentKey = currentKey,
-                                    bottomNavMap = bottomNavMap,
-                                    onNavigate = { navigator.navigate(it) }
-                                )
+                                val useTextOnlyMode = true
+                                if (useTextOnlyMode) {
+                                    NavigationTabLayout(
+                                        currentKey = currentKey,
+                                        onNavigate = { navigator.navigate(it) }
+                                    )
+                                } else {
+                                    MainBottomNavigation(
+                                        currentKey = currentKey,
+                                        bottomNavMap = bottomNavMap,
+                                        onNavigate = { navigator.navigate(it) }
+                                    )
+                                }
                             }
                         }
 
@@ -485,4 +504,73 @@ private fun MainBottomNavigation(
             }
         }
     )
+}
+private data class NavigationTabUiState(
+    val tabCode: String,
+    val tabTitle: String,
+    val route: NavKey
+)
+private val textOnlyTabs = listOf(
+    NavigationTabUiState(tabCode = "main", tabTitle = "首页", route = DiscoverRoute),
+    NavigationTabUiState(tabCode = "follow", tabTitle = "关注", route = FriendTracksRoute),
+    NavigationTabUiState(tabCode = "mine", tabTitle = "我的", route = MineRoute)
+)
+@Composable
+private fun NavigationTabLayout(
+    currentKey: NavKey?,
+    onNavigate: (NavKey) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .height(dimensionResource(R.dimen.bottom_nav_view_height))
+            .background(Color(0xFFFCFDFF)),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        textOnlyTabs.forEach { tabInfo ->
+            val isSelected = currentKey == tabInfo.route
+            NavigationTabItem(
+                tabInfo = tabInfo,
+                isSelected = isSelected,
+                onClick = { onNavigate(tabInfo.route) },
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+@Composable
+private fun NavigationTabItem(
+    tabInfo: NavigationTabUiState,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val textColor = if (isSelected) DolphinTheme.colors.text1 else DolphinTheme.colors.text4
+    val fontWeight = FontWeight.Medium
+
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .selectable(
+                selected = isSelected,
+                onClick = onClick,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Row(
+            modifier = Modifier.padding(bottom = 17.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Text(
+                text = tabInfo.tabTitle,
+                color = textColor,
+                fontSize = 16.sp,
+                fontWeight = fontWeight
+            )
+            
+        }
+    }
 }
