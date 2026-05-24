@@ -154,7 +154,6 @@ To align the project with current best practices and showcase significant skill 
 
 - [Foundation][foundation]: [Android KTX][android-ktx]
 - [Architecture][arch]
-  - [Data Binding][data-binding]
   - [Lifecycle][lifecycle]
   - [Navigation 3][navigation-3]
   - [Paging][paging]
@@ -178,11 +177,9 @@ To align the project with current best practices and showcase significant skill 
   - Chucker
   - PersistentCookieJar
 
-
 [foundation]: https://developer.android.com/jetpack/components
 [android-ktx]: https://developer.android.com/kotlin/ktx
 [arch]: https://developer.android.com/jetpack/arch/
-[data-binding]: https://developer.android.com/topic/libraries/data-binding/
 [lifecycle]: https://developer.android.com/topic/libraries/architecture/lifecycle
 [navigation-3]: https://developer.android.com/guide/navigation/navigation-3
 [paging]: https://developer.android.com/topic/libraries/architecture/paging/v3-overview

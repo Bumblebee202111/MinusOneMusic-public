@@ -3,6 +3,12 @@ Change Log
 
 ## Version 1.0.0-beta06
 
+### What's New
+
+* **Massive UI Rewrite:** Almost every screen has been completely rebuilt in Jetpack Compose.
+* **Embedded Lyrics Support:** Embedded lyrics can be read directly from audio files (ID3/Vorbis).
+* **Fixes & Under-the-hood:** Fixed SMS login UI and updated the app for Android 15.
+
 ## Version 1.0.0-beta05
 
 - **UI Overhaul:** Fully modernized the **Discover** screen and **Side Drawer** using Jetpack Compose.
