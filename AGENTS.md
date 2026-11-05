@@ -19,12 +19,14 @@
 | **Network**   | Retrofit + OkHttp  | Moshi.                     |
 | **Media**     | Media3 (ExoPlayer) |                            |
 | **Image**     | Coil 3             |                            |
+| **Graphics**  | Canvas API         | Compose Canvas & Native Canvas for 1:1 UI. |
 
 ## 3. Architecture & Guidelines
 
 ### UI Layer
 - **Compose First**: New UI must be Jetpack Compose.
 - **State**: Use `StateFlow` in ViewModels.
+- **Theme Boundaries**: `AndroidView` acts as a hard boundary. Always re-apply `DolphinTheme` inside nested `ComposeView`s.
 
 ### Data Layer
 - **API**: Undocumented NCM APIs. Handle errors gracefully (no crashes).
@@ -42,7 +44,9 @@
 
 ### Reverse Engineering
 - **Naming**: Match NCM decompiled names and API fields.
-- **Comments**: **CRITICAL**: Preserve comments referencing original NCM classes/IDs (e.g., `// NCM: MyFriendActivity`).
+- **UI Replication**: Strive for 1:1 pixel-perfect replication (margins, alphas, z-indexes) using decompiled NCM code as the source of truth.
+- **Comments**: **CRITICAL**: Preserve comments referencing original NCM classes/IDs (e.g., `// NCM: MyFriendActivity`, `// NCM: v4ShadowViewMask`).
+- **Assets**: Decompiled 9-patch images (`.9.png`) often fail AAPT2. Strip the `.9` and draw natively or via Compose `ContentScale.FillBounds`.
 
 ### Dependencies
 - **Catalog**: Use `gradle/libs.versions.toml`. No hardcoded versions.

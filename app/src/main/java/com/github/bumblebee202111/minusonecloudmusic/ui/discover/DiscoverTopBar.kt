@@ -1,5 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.discover
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Row
@@ -37,6 +38,7 @@ fun DiscoverTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .background(DolphinTheme.colors.backgroundAndroid)
             .statusBarsPadding()
             .height(52.dp),
         verticalAlignment = Alignment.CenterVertically

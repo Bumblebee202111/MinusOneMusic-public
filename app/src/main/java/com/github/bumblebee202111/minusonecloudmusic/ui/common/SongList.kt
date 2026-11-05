@@ -3,6 +3,7 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.common
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -234,10 +235,12 @@ fun SongWithPositionList(
 fun PagedSongWithPositionList(
     songs: LazyPagingItems<SongItemUiModel>,
     onItemClick: (position: Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     LazyColumn(
-        modifier = modifier.nestedScroll(rememberNestedScrollInteropConnection())
+        modifier = modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+        contentPadding = contentPadding
     ) {
         items(count = songs.itemCount) { index ->
             val song = songs[index]
