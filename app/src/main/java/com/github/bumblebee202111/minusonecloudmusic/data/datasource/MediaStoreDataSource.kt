@@ -3,16 +3,23 @@ package com.github.bumblebee202111.minusonecloudmusic.data.datasource
 import android.content.Context
 import android.os.Build
 import android.provider.MediaStore
+import com.github.bumblebee202111.minusonecloudmusic.coroutines.AppDispatchers.IO
+import com.github.bumblebee202111.minusonecloudmusic.coroutines.Dispatcher
 import com.github.bumblebee202111.minusonecloudmusic.model.LocalAlbum
 import com.github.bumblebee202111.minusonecloudmusic.model.LocalSong
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MediaStoreDataSource @Inject constructor(@ApplicationContext private val context: Context) {
+class MediaStoreDataSource @Inject constructor(
+    @ApplicationContext private val context: Context,
+    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
+) {
 
-    fun getMusicResources(): MutableList<LocalSong> {
+    suspend fun getMusicResources(): List<LocalSong> = withContext(ioDispatcher) {
 
         val contentResolver = context.contentResolver
 
@@ -30,7 +37,8 @@ class MediaStoreDataSource @Inject constructor(@ApplicationContext private val c
         val pathColumn = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             MediaStore.MediaColumns.RELATIVE_PATH
         } else {
-            MediaStore.Images.Media.DATA
+            @Suppress("DEPRECATION")
+            MediaStore.MediaColumns.DATA
         }
         val selection =
             "$pathColumn like ? "
@@ -42,9 +50,6 @@ class MediaStoreDataSource @Inject constructor(@ApplicationContext private val c
             MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.TITLE,
             MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.DISPLAY_NAME,
-            MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.SIZE,
         )
         val query =
             contentResolver.query(
@@ -60,20 +65,13 @@ class MediaStoreDataSource @Inject constructor(@ApplicationContext private val c
             val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
             val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
             val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
-            val nameColumn =
-                cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
-            val durationColumn =
-                cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
-            val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
                 val album = cursor.getString(albumColumn)
                 val title = cursor.getString(titleColumn)
                 val artist = cursor.getString(artistColumn)
-                val name = cursor.getString(nameColumn)
-                val duration = cursor.getInt(durationColumn)
-                val size = cursor.getInt(sizeColumn)
+
                 songList += LocalSong(
                     name = title,
                     id = id,
@@ -83,11 +81,6 @@ class MediaStoreDataSource @Inject constructor(@ApplicationContext private val c
                 )
             }
         }
-        return songList
-    }
-
-    private companion object {
-        val ncmDownloadPaths =
-            arrayOf("Download/netease/cloudmusic/Music", "netease/cloudmusic/Music")
+        songList
     }
 }

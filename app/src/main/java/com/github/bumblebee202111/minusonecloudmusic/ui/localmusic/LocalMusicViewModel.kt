@@ -7,8 +7,10 @@ import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongReposit
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongsFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlaybackHandler
+import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,9 +19,9 @@ class LocalMusicViewModel @Inject constructor(
     playPlaylistUseCase: PlayPlaylistUseCase,
     mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase
 ) : ViewModel() {
-    val songs = MutableStateFlow<List<LocalSong>?>(null)
+    private val songs = MutableStateFlow<List<LocalSong>?>(null)
 
-    val songItems = mapSongsFlowToUiItemsUseCase(songs)
+    val songItems = mapSongsFlowToUiItemsUseCase(songs).stateInUi()
 
     private val playbackHandler = PlaylistPlaybackHandler(
         playPlaylistUseCase = playPlaylistUseCase,
@@ -28,7 +30,9 @@ class LocalMusicViewModel @Inject constructor(
     )
 
     fun onPermissionGranted() {
-        songs.value = songRepository.getLocalSongs()
+        viewModelScope.launch {
+            songs.value = songRepository.getLocalSongs()
+        }
     }
     fun onSongItemClick(startIndex: Int) = playbackHandler.onSongItemClick(startIndex)
     fun playAll() = playbackHandler.playAll()

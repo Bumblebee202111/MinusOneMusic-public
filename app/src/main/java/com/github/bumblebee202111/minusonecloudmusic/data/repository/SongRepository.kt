@@ -143,7 +143,7 @@ class SongRepository @Inject constructor(
         mapSuccess = { it[0].toCommentInfo() }
     )
 
-    fun getLocalSongs(): List<LocalSong> {
+    suspend fun getLocalSongs(): List<LocalSong> {
         return mediaStoreDataSource.getMusicResources()
     }
 
