@@ -26,6 +26,8 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 import com.github.bumblebee202111.minusonecloudmusic.utils.await
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     private val mainActivityViewModel: MainActivityViewModel by viewModels()
 
     private lateinit var mediaControllerFuture: ListenableFuture<MediaController>
+    private var controllerConnectionJob: Job? = null
 
     @Inject
     lateinit var toastManager: ToastManager
@@ -77,6 +80,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
+        controllerConnectionJob?.cancel()
+        controllerConnectionJob = null
         musicServiceConnection.close()
         releaseController()
         super.onStop()
@@ -101,12 +106,12 @@ class MainActivity : AppCompatActivity() {
             )
         ).buildAsync()
 
-        lifecycleScope.launch {
+        controllerConnectionJob = lifecycleScope.launch {
             try {
                 val mediaController = mediaControllerFuture.await()
-                musicServiceConnection.connect(mediaController) {
-                    mediaController.release()
-                }
+                musicServiceConnection.connect(mediaController)
+            } catch (e: CancellationException) {
+                throw e
             } catch (_: Exception) {
             }
         }
