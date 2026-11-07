@@ -15,13 +15,17 @@ import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import com.github.bumblebee202111.minusonecloudmusic.ui.mapper.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MyPrivateCloudViewModel @Inject constructor(
     loginRepository: LoginRepository,
@@ -34,35 +38,38 @@ class MyPrivateCloudViewModel @Inject constructor(
 
     private val loadedSongs = CopyOnWriteArrayList<RemoteSong>()
 
-    private val cloudSongsCountAndPagingData = loggedInUserDataRepository.getCloudSongsPagingData1(
-        onPageLoaded = { isInitialPage, items ->
-            if (isInitialPage) {
-                loadedSongs.clear()
-            }
-            loadedSongs.addAll(items)
-        }
-    )
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val cloudSongsCount = isLoggedIn.flatMapLatest { isLoggedIn ->
-        if (isLoggedIn) {
-            cloudSongsCountAndPagingData.first.map { it.data }
-        } else {
-            emptyFlow()
-        }
-    }.stateInUi(0)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val songUiItemsPagingData = isLoggedIn.flatMapLatest { isLoggedIn ->
-        if (isLoggedIn) {
-            mapSongPagingDataFlowToUiItemsUseCase(
-                cloudSongsCountAndPagingData.second.cachedIn(viewModelScope)
-            )
-        } else {
+    private val cloudSongsCountAndPagingData = isLoggedIn
+        .distinctUntilChanged()
+        .map { loggedIn ->
             loadedSongs.clear()
-            emptyFlow()
+            if (loggedIn) {
+                loggedInUserDataRepository.getCloudSongsPagingData1(
+                    onPageLoaded = { isInitialPage, items ->
+                        if (isInitialPage) {
+                            loadedSongs.clear()
+                        }
+                        loadedSongs.addAll(items)
+                    }
+                )
+            } else {
+                null
+            }
         }
-    }
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), replay = 1)
+
+    val cloudSongsCount = cloudSongsCountAndPagingData
+        .flatMapLatest { pair ->
+            pair?.first?.map { it.data } ?: emptyFlow()
+        }
+        .stateInUi(0)
+
+    private val basePagingDataFlow = cloudSongsCountAndPagingData
+        .flatMapLatest { pair ->
+            pair?.second ?: emptyFlow()
+        }
+        .cachedIn(viewModelScope)
+
+    val songUiItemsPagingData = mapSongPagingDataFlowToUiItemsUseCase(basePagingDataFlow)
 
     private val playbackHandler = PlaylistPlaybackHandler(
         playPlaylistUseCase = playPlaylistUseCase,

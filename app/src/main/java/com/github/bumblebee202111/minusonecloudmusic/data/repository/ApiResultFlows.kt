@@ -8,9 +8,9 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResul
 import com.github.bumblebee202111.minusonecloudmusic.data.pagingsource.ApiLimitOffsetPagingSource
 import com.github.bumblebee202111.minusonecloudmusic.data.pagingsource.apiPageConfig
 import com.github.bumblebee202111.minusonecloudmusic.ui.mapper.toAppError
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
@@ -89,7 +89,6 @@ inline fun <ApiResultDataType, reified ResultType> offlineFirstApiResultFlow(
 }
 
 inline fun <DetailResult : Any, PageResult : Any, reified DetailModel : Any, reified PageItem : Any, DomainItem : Any> apiFlowsOfDetailAndPaging(
-    scope: CoroutineScope,
     limit: Int,
     noinline initialFetch: suspend (limit: Int) -> ApiResult<DetailResult>,
     noinline mapToDetailModel: suspend (result: DetailResult) -> DetailModel,
@@ -100,21 +99,42 @@ inline fun <DetailResult : Any, PageResult : Any, reified DetailModel : Any, rei
     noinline onPageLoaded: ((isInitialPage: Boolean, items: List<DomainItem>) -> Unit)? = null,
     crossinline mapToDomainItem: suspend (item: PageItem) -> DomainItem,
 ): Pair<Flow<AppResult<DetailModel>>, Flow<PagingData<DomainItem>>> {
-    val deferredInitialFetch = scope.async {
-        initialFetch(limit)
-    }
+    val detailState = MutableStateFlow<AppResult<DetailModel>>(AppResult.Loading())
 
-    val appResult: Flow<AppResult<DetailModel>> = apiResultFlow(
-        fetch = { deferredInitialFetch.await() },
-        mapSuccess = { data ->
-            mapToDetailModel(data)
-        }
-    )
     val pagingData: Flow<PagingData<DomainItem>> = Pager(
         apiPageConfig(limit)
     ) {
         ApiLimitOffsetPagingSource(
-            deferredInitialFetch = deferredInitialFetch,
+            initialFetch = {
+                detailState.value = AppResult.Loading(detailState.value.data)
+                initialFetch(limit)
+            },
+            onInitialResult = { apiResult ->
+                detailState.value = when (apiResult) {
+                    is ApiResult.Success -> AppResult.Success(mapToDetailModel(apiResult.data))
+                    is ApiResult.SuccessEmpty -> {
+                        if (DetailModel::class == Unit::class) {
+                            AppResult.Success(Unit as DetailModel)
+                        } else {
+                            AppResult.Error(
+                                AppError.Unknown(
+                                    "EmptyResultError",
+                                    "API returned empty success where ${DetailModel::class.java.simpleName} was expected."
+                                ),
+                                detailState.value.data
+                            )
+                        }
+                    }
+
+                    is ApiResult.Error -> AppResult.Error(
+                        AppError.Server(apiResult.code, apiResult.message),
+                        detailState.value.data
+                    )
+                }
+            },
+            onInitialError = { throwable ->
+                detailState.value = AppResult.Error(throwable.toAppError(), detailState.value.data)
+            },
             getTotalCount = getTotalCount,
             getInitialPageItems = { result ->
                 getInitialPageItems(result).map { mapToDomainItem(it) }
@@ -126,5 +146,5 @@ inline fun <DetailResult : Any, PageResult : Any, reified DetailModel : Any, rei
             onPageLoaded = onPageLoaded
         )
     }.flow
-    return Pair(appResult, pagingData)
+    return Pair(detailState.asStateFlow(), pagingData)
 }

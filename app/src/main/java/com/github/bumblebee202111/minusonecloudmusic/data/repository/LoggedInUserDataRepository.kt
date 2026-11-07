@@ -1,10 +1,6 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.map
-import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
@@ -16,12 +12,9 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.toDailyRecommendedSongs
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.toRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.toRemoteAlbum
-import com.github.bumblebee202111.minusonecloudmusic.data.pagingsource.CloudSongsPagingSource
 import com.github.bumblebee202111.minusonecloudmusic.model.DailyRecommendSong
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.model.Video
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -31,8 +24,7 @@ import javax.inject.Singleton
 @Singleton
 class LoggedInUserDataRepository @Inject constructor(
     private val appDatabase: AppDatabase,
-    private val ncmEapiService: NcmEapiService,
-    @ApplicationScope private val coroutineScope: CoroutineScope
+    private val ncmEapiService: NcmEapiService
 ) {
     fun getCloudSongs() = apiResultFlow(
         fetch = { ncmEapiService.getV1Cloud(500, 0) },
@@ -72,34 +64,10 @@ class LoggedInUserDataRepository @Inject constructor(
         }
     )
 
-    fun getCloudSongsPagingData(): Pair<Flow<AppResult<Int>>, Flow<PagingData<RemoteSong>>> {
-        val d = coroutineScope.async {
-            ncmEapiService.getV1Cloud(
-                CLOUD_SONG_LIST_PAGE_SIZE, 0
-            )
-        }
-        val pd = Pager(
-            PagingConfig(CLOUD_SONG_LIST_PAGE_SIZE)
-        ) {
-            CloudSongsPagingSource(d, CLOUD_SONG_LIST_PAGE_SIZE) { offset, limit ->
-                ncmEapiService.getV1Cloud(
-                    offset,
-                    limit
-                )
-            }
-        }.flow.map { it.map(CloudSongsApiPage.CloudSongData::toRemoteSong) }
-        return Pair(
-            apiResultFlow(
-            fetch = { d.await() },
-            mapSuccess = { it.count }
-        ), pd)
-    }
-
     fun getCloudSongsPagingData1(
         onPageLoaded: ((isInitialPage: Boolean, items: List<RemoteSong>) -> Unit)? = null
     ): Pair<Flow<AppResult<Int>>, Flow<PagingData<RemoteSong>>> =
         apiFlowsOfDetailAndPaging(
-            scope = coroutineScope,
             limit = CLOUD_SONG_LIST_PAGE_SIZE,
             initialFetch = { limit ->
                 ncmEapiService.getV1Cloud(

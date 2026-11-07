@@ -7,7 +7,6 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
 import toPlayRecords
-import com.github.bumblebee202111.minusonecloudmusic.coroutines.ApplicationScope
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.AbstractSongEntity
@@ -46,8 +45,7 @@ class PlaylistRepository @Inject constructor(
     private val ncmEapiService: NcmEapiService,
     private val appDatabase: AppDatabase,
     private val preferenceStorage: PreferenceStorage,
-    private val moshiAdapter: JsonAdapter<Any>,
-    @ApplicationScope private val coroutineScope: CoroutineScope
+    private val moshiAdapter: JsonAdapter<Any>
 ) {
     private val songDao = appDatabase.songDao()
     private val playerDao = appDatabase.playerDao()
@@ -78,7 +76,6 @@ class PlaylistRepository @Inject constructor(
         onPageLoaded: ((isInitialPage: Boolean, items: List<RemoteSong>) -> Unit)? = null
     ): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
         return apiFlowsOfDetailAndPaging(
-            scope = coroutineScope,
             limit = PLAYLIST_PAGE_SIZE,
             initialFetch = {
                 ncmEapiService.getPlaylistV4Detail(playlistId).combine {
@@ -110,7 +107,6 @@ class PlaylistRepository @Inject constructor(
         onPageLoaded: ((isInitialPage: Boolean, items: List<RemoteSong>) -> Unit)? = null
     ): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
         return apiFlowsOfDetailAndPaging(
-            scope = coroutineScope,
             limit = PLAYLIST_PAGE_SIZE,
             initialFetch = { ncmEapiService.getV6PlaylistDetail(playlistId) },
             mapToDetailModel = { result -> result.toPlaylistDetail() },
