@@ -2,7 +2,6 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.playlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
@@ -11,21 +10,21 @@ import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRep
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
 import com.github.bumblebee202111.minusonecloudmusic.domain.MapSongPagingDataFlowToUiItemsUseCase
 import com.github.bumblebee202111.minusonecloudmusic.domain.PlayPlaylistUseCase
-import com.github.bumblebee202111.minusonecloudmusic.model.PlaylistDetail
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.model.SimpleRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlaybackHandler
+import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.shareIn
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = PlaylistViewModel.Factory::class)
@@ -41,46 +40,41 @@ class PlaylistViewModel @AssistedInject constructor(
     private val getPlaylistSongItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase
 ) : ViewModel() {
 
-    private val _playlistDetail = MutableStateFlow<PlaylistDetail?>(null)
-    val playlistDetail = _playlistDetail.asStateFlow()
-
-    private val _songs = MutableStateFlow<PagingData<SongItemUiModel>?>(null)
-    val playlistSongs = _songs.filterNotNull().cachedIn(viewModelScope)
-
     val loadedSongs = mutableListOf<RemoteSong>()
 
-    init {
-        viewModelScope.launch {
-            loginRepository.loggedInUserId.collect { loggedInUserId ->
-                val (playlistDetailResultFlow, pagingDataFlow) =
-                    when(isV6){
-                        true -> playlistRepository.getMyPlaylistDetailAndPagingData(playlistId)
-                        false -> playlistRepository.getPlaylistDetailAndPagingData(playlistId)
-                        else->{
-                            if (isMyPL==true || loggedInUserId == creatorId)
-                                playlistRepository.getMyPlaylistDetailAndPagingData(playlistId)
-                            else
-                                playlistRepository.getPlaylistDetailAndPagingData(playlistId)
-                        }
-                    }
+    private val detailAndPagingFlows = loginRepository.loggedInUserId
+        .map { loggedInUserId ->
+            isV6 ?: (isMyPL == true || loggedInUserId == creatorId)
+        }
+        .distinctUntilChanged()
+        .map { useV6 ->
+            loadedSongs.clear()
+            if (useV6) {
+                playlistRepository.getMyPlaylistDetailAndPagingData(playlistId)
+            } else {
+                playlistRepository.getPlaylistDetailAndPagingData(playlistId)
+            }
+        }
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), replay = 1)
 
-                loadedSongs.clear()
-                playlistDetailResultFlow.collect {
-                    _playlistDetail.value = it.data
-                }
-                getPlaylistSongItemsUseCase(
-                    pagingDataFlow.map {
-                        it.map { song ->
-                            loadedSongs += song
-                            song
-                        }
-                    }.cachedIn(viewModelScope)
-                ).cachedIn(viewModelScope).collect {
-                    _songs.value = it
+    val playlistDetail = detailAndPagingFlows
+        .flatMapLatest { (detailResultFlow, _) ->
+            detailResultFlow.map { it.data }
+        }
+        .stateInUi()
+
+    private val basePagingDataFlow = detailAndPagingFlows
+        .flatMapLatest { (_, pagingDataFlow) ->
+            pagingDataFlow.map { pagingData ->
+                pagingData.map { song ->
+                    loadedSongs += song
+                    song
                 }
             }
         }
-    }
+        .cachedIn(viewModelScope)
+
+    val playlistSongs = getPlaylistSongItemsUseCase(basePagingDataFlow)
 
     private val playbackHandler = PlaylistPlaybackHandler(
         playPlaylistUseCase = playPlaylistUseCase,
