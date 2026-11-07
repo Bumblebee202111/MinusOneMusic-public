@@ -18,13 +18,11 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -125,7 +123,6 @@ fun MinusOneApp(
 ) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val topLevelRoutes = setOf(DiscoverRoute, FriendTracksRoute, MineRoute)
 
@@ -169,10 +166,6 @@ fun MinusOneApp(
                 }
             }
         }
-    }
-
-    LaunchedEffect(Unit) {
-        navigationManager.drawerEvents.collect { drawerState.open() }
     }
 
     LaunchedEffect(initialDeepLinkKey) {
@@ -314,9 +307,7 @@ private fun MainDrawerLayout(
                 val contentView = ComposeView(context).apply {
                     layoutParams = DrawerLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
                     setContent {
-                        DolphinTheme {
-                            content()
-                        }
+                        content()
                     }
                 }
                 addView(contentView)
@@ -328,18 +319,16 @@ private fun MainDrawerLayout(
                         gravity = GravityCompat.START
                     }
                     setContent {
-                        DolphinTheme {
-                            MainDrawerContent(
-                                onNavigate = { route ->
-                                    closeDrawer(GravityCompat.START)
-                                    onNavigate(route)
-                                },
-                                onLogout = {
-                                    closeDrawer(GravityCompat.START)
-                                    onLogout()
-                                }
-                            )
-                        }
+                        MainDrawerContent(
+                            onNavigate = { route ->
+                                closeDrawer(GravityCompat.START)
+                                onNavigate(route)
+                            },
+                            onLogout = {
+                                closeDrawer(GravityCompat.START)
+                                onLogout()
+                            }
+                        )
                     }
                 }
                 addView(drawerView)
