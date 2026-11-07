@@ -10,6 +10,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DeepLinkRegis
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,7 +19,7 @@ class DiscoverViewModel @Inject constructor(
     private val navigationManager: NavigationManager
 ) : ViewModel() {
 
-    val blocks=discoverRepository.fetchDiscoverPage().stateInUi()
+    val blocks = discoverRepository.fetchDiscoverPage().map { it.data }.stateInUi()
 
     fun onGenericUrlClick(url: String) {
         val navKey = DeepLinkRegistry.resolve(url)

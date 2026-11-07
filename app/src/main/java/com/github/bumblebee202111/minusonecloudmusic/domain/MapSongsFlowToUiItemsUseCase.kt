@@ -4,7 +4,7 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.model.AbstractSong
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SongItemUiModel
+import com.github.bumblebee202111.minusonecloudmusic.model.SongItemUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject

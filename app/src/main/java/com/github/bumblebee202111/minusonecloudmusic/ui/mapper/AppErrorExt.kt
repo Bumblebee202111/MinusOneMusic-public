@@ -1,10 +1,8 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.mapper
 
-import android.util.Log
 import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.data.AppError
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.UiText
-import java.io.IOException
 
 
 fun AppError.toUiText(): UiText {
@@ -42,13 +40,5 @@ fun AppError.toUiText(): UiText {
                 listOf(exceptionName, exceptionMessage)
             )
         }
-    }
-}
-
-fun Throwable.toAppError(): AppError {
-    Log.e("ApiFlow", "An unexpected error occurred in a flow", this)
-    return when (this) {
-        is IOException -> AppError.Network
-        else -> AppError.Unknown(this::class.java.simpleName, this.message ?: "No message")
     }
 }

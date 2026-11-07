@@ -30,7 +30,7 @@ fun DiscoverScreen(
         }
     ) { innerPadding ->
 
-        val items = blocks?.data ?: emptyList()
+        val items = blocks ?: emptyList()
         DiscoverList(
             items = items,
             contentPadding = PaddingValues(

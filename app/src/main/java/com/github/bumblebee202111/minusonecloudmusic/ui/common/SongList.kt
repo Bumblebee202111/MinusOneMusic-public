@@ -43,7 +43,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.ui.playlist.SongItemUiModel
+import com.github.bumblebee202111.minusonecloudmusic.model.SongItemUiModel
 import com.github.bumblebee202111.minusonecloudmusic.utils.imageUrl
 @Composable
 fun PlayingMark(isBeingPlayed: Boolean, modifier: Modifier = Modifier) {

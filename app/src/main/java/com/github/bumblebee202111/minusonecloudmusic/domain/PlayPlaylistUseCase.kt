@@ -8,12 +8,14 @@ import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.model.AbstractRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.model.AbstractSong
 import com.github.bumblebee202111.minusonecloudmusic.model.LocalSong
-import com.github.bumblebee202111.minusonecloudmusic.model.asMediaItem
+import com.github.bumblebee202111.minusonecloudmusic.player.asMediaItem
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class PlayPlaylistUseCase @Inject constructor(
     private val musicServiceConnection: MusicServiceConnection,
     private val playlistRepository: PlaylistRepository,
@@ -31,21 +33,19 @@ class PlayPlaylistUseCase @Inject constructor(
             return
         }
 
-        val player = musicServiceConnection.player.value ?: return
-
-        val isSongChanged = startIndex == C.INDEX_UNSET || (
-                musicServiceConnection.currentMediaId.value != loadedSnapshot[startIndex].mediaId)
-
         val loadedMediaItems =
             loadedSnapshot.map(::mapSongToMediaItem)
 
-        val startPositionMs =
-            if (isSongChanged)
-                C.TIME_UNSET
-            else
-                player.currentPosition
-
         withContext(mainDispatcher) {
+            val player = musicServiceConnection.awaitPlayer()
+            val isSongChanged = startIndex == C.INDEX_UNSET ||
+                musicServiceConnection.currentMediaId.value != loadedSnapshot[startIndex].mediaId
+            val startPositionMs =
+                if (isSongChanged)
+                    C.TIME_UNSET
+                else
+                    player.currentPosition
+
             player.run {
                 setMediaItems(loadedMediaItems, startIndex, startPositionMs)
                 prepare()
@@ -61,7 +61,7 @@ class PlayPlaylistUseCase @Inject constructor(
             if (remainingSongs.isNotEmpty()) {
                 val mediaItems = remainingSongs.map(::mapSongToMediaItem)
                 withContext(mainDispatcher) {
-                    player.addMediaItems(mediaItems)
+                    musicServiceConnection.awaitPlayer().addMediaItems(mediaItems)
                 }
                 playlistRepository.addSongsToPlayerPlaylist(remainingSongs)
             }

@@ -22,3 +22,11 @@ fun LocalSongEntity.toLocalSong() = LocalSong(
     artists = artists,
     available = available
 )
+
+fun LocalSong.toLocalSongEntity() = LocalSongEntity(
+    name = name,
+    id = id,
+    album = album,
+    artists = artists,
+    available = available
+)

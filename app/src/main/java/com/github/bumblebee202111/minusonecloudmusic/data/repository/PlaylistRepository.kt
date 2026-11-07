@@ -12,6 +12,8 @@ import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.AbstractSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.PlayerPlaylistSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.toAbstractSong
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.toLocalSongEntity
+import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.toRemoteSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.populate
 import com.github.bumblebee202111.minusonecloudmusic.data.datastore.PreferenceStorage
 import com.github.bumblebee202111.minusonecloudmusic.model.AbstractRemoteSong
@@ -21,8 +23,6 @@ import com.github.bumblebee202111.minusonecloudmusic.model.MainPageBillboardRowG
 import com.github.bumblebee202111.minusonecloudmusic.model.PlaylistDetail
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.model.SongIdAndVersion
-import com.github.bumblebee202111.minusonecloudmusic.model.toRemoteSongEntity
-import com.github.bumblebee202111.minusonecloudmusic.model.toLocalSongEntity
 import com.github.bumblebee202111.minusonecloudmusic.data.network.NcmEapiService
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.combine

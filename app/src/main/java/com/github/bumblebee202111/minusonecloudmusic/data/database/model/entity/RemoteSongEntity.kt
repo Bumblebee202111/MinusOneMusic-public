@@ -3,6 +3,7 @@ package com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.github.bumblebee202111.minusonecloudmusic.model.AbstractRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteAlbum
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 
@@ -28,3 +29,11 @@ fun RemoteSongEntity.toRemoteSong() =
         isDownloadable = isDownloadable,
     )
 
+fun AbstractRemoteSong.toRemoteSongEntity() = RemoteSongEntity(
+    name = name,
+    id = id,
+    album = album,
+    artists = artists,
+    available = available,
+    isDownloadable = isDownloadable,
+)

@@ -36,10 +36,10 @@ class PlayerHistoryViewModel @Inject constructor(
         ).cachedIn(viewModelScope)
 
     fun onItemClick(mediaId: String, songItemPosition: Int) {
-        val player = musicServiceConnection.player.value ?: return
         val currentMediaId = musicServiceConnection.currentMediaId.value
         if (mediaId != currentMediaId) {
             viewModelScope.launch {
+                val player = musicServiceConnection.awaitPlayer()
                 with(player) {
                     if (isCommandAvailable(Player.COMMAND_SET_MEDIA_ITEM))
                         seekTo(songItemPosition, C.TIME_UNSET)

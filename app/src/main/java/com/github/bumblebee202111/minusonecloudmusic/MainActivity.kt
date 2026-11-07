@@ -1,6 +1,5 @@
 package com.github.bumblebee202111.minusonecloudmusic
 
-import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -10,11 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.media3.session.MediaController
-import androidx.media3.session.SessionToken
 import androidx.navigation3.runtime.NavKey
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
-import com.github.bumblebee202111.minusonecloudmusic.service.PlaybackService
 import com.github.bumblebee202111.minusonecloudmusic.system.isPackageInstalled
 import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
 import com.github.bumblebee202111.minusonecloudmusic.ui.MinusOneApp
@@ -23,11 +19,7 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.common.UiText
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.DeepLinkRegistry
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.NavigationManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
-import com.github.bumblebee202111.minusonecloudmusic.utils.await
-import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,9 +31,6 @@ class MainActivity : AppCompatActivity() {
 
     private val mainActivityViewModel: MainActivityViewModel by viewModels()
 
-    private lateinit var mediaControllerFuture: ListenableFuture<MediaController>
-    private var controllerConnectionJob: Job? = null
-
     @Inject
     lateinit var toastManager: ToastManager
 
@@ -50,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        initializeController()
+        musicServiceConnection.connect()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,14 +68,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStop() {
-        controllerConnectionJob?.cancel()
-        controllerConnectionJob = null
-        musicServiceConnection.close()
-        releaseController()
-        super.onStop()
-    }
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         this.intent = intent
@@ -94,32 +75,6 @@ class MainActivity : AppCompatActivity() {
         val key = DeepLinkRegistry.resolve(intent.data?.toString())
         if (key != null) {
             navigationManager.navigate(key)
-        }
-    }
-
-    private fun initializeController() {
-        mediaControllerFuture = MediaController.Builder(
-            this,
-            SessionToken(
-                this,
-                ComponentName(this, PlaybackService::class.java)
-            )
-        ).buildAsync()
-
-        controllerConnectionJob = lifecycleScope.launch {
-            try {
-                val mediaController = mediaControllerFuture.await()
-                musicServiceConnection.connect(mediaController)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (_: Exception) {
-            }
-        }
-    }
-
-    private fun releaseController() {
-        if (::mediaControllerFuture.isInitialized) {
-            MediaController.releaseFuture(mediaControllerFuture)
         }
     }
 
