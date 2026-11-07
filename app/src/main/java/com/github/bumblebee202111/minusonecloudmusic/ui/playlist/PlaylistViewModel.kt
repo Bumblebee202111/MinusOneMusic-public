@@ -15,13 +15,13 @@ import com.github.bumblebee202111.minusonecloudmusic.model.PlaylistDetail
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.model.SimpleRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlaylistPlaybackHandler
-import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -42,10 +42,10 @@ class PlaylistViewModel @AssistedInject constructor(
 ) : ViewModel() {
 
     private val _playlistDetail = MutableStateFlow<PlaylistDetail?>(null)
-    val playlistDetail get() = _playlistDetail.stateInUi()
+    val playlistDetail = _playlistDetail.asStateFlow()
 
     private val _songs = MutableStateFlow<PagingData<SongItemUiModel>?>(null)
-    val playlistSongs get() = _songs.filterNotNull().cachedIn(viewModelScope)
+    val playlistSongs = _songs.filterNotNull().cachedIn(viewModelScope)
 
     val loadedSongs = mutableListOf<RemoteSong>()
 
