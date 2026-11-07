@@ -1,13 +1,7 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying
 
 import android.Manifest
-import android.content.Context
-import android.media.AudioDeviceCallback
-import android.media.AudioDeviceInfo
-import android.media.AudioManager
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
@@ -39,15 +33,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -69,17 +58,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.graphics.ColorUtils
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.media3.common.C
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
-import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.mediarouter.app.SystemOutputSwitcherDialogController
-import androidx.palette.graphics.Palette
 import coil3.BitmapImage
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -89,10 +74,9 @@ import com.github.bumblebee202111.minusonecloudmusic.model.CommentInfo
 import com.github.bumblebee202111.minusonecloudmusic.model.LyricsEntry
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.player.CountUtil
-import com.github.bumblebee202111.minusonecloudmusic.player.RepeatShuffleModeUtil
+import com.github.bumblebee202111.minusonecloudmusic.ui.common.ColorUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.LyricsView
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.Toolbar
-import kotlinx.coroutines.delay
 import java.util.Formatter
 import java.util.Locale
 import android.graphics.Color as AndroidColor
@@ -105,102 +89,30 @@ fun NowPlayingScreen(
     onOpenPlaylist: () -> Unit,
     viewModel: NowPlayingViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val currentSong by viewModel.currentSong.collectAsStateWithLifecycle()
     val lyrics by viewModel.lyrics.collectAsStateWithLifecycle()
-    val player by viewModel.player.collectAsStateWithLifecycle()
     val likeState by viewModel.likeState.collectAsStateWithLifecycle()
     val commentInfo by viewModel.commentInfo.collectAsStateWithLifecycle()
     val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
 
+    val mediaMetadata by viewModel.mediaMetadata.collectAsStateWithLifecycle()
+    val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
+    val duration by viewModel.duration.collectAsStateWithLifecycle()
+    val repeatMode by viewModel.repeatMode.collectAsStateWithLifecycle()
+    val shuffleModeEnabled by viewModel.shuffleModeEnabled.collectAsStateWithLifecycle()
+    val isPlayPauseEnabled by viewModel.isPlayPauseEnabled.collectAsStateWithLifecycle()
+    val canShuffleRepeat by viewModel.canShuffleRepeat.collectAsStateWithLifecycle()
+    val isA2dpPlaying by viewModel.isA2dpPlaying.collectAsStateWithLifecycle()
+
+    val currentPositionState = viewModel.currentPosition.collectAsStateWithLifecycle()
+    val bufferedPositionState = viewModel.bufferedPosition.collectAsStateWithLifecycle()
+
     val defaultBgColor = Color(0xFF262626)
     var backgroundColor by remember { mutableStateOf(defaultBgColor) }
-
     var isLyricsMode by remember { mutableStateOf(false) }
-    var songTitle by remember { mutableStateOf<String?>(null) }
-    var songArtist by remember { mutableStateOf<String?>(null) }
-    var isPlaying by remember { mutableStateOf(false) }
-    var currentPosition by remember { mutableLongStateOf(0L) }
-    var bufferedPosition by remember { mutableLongStateOf(0L) }
-    var duration by remember { mutableLongStateOf(0L) }
-    var repeatMode by remember { mutableIntStateOf(Player.REPEAT_MODE_OFF) }
-    var shuffleModeEnabled by remember { mutableStateOf(false) }
 
-    val handler = remember { Handler(Looper.getMainLooper()) }
-    var scrubbing by remember { mutableStateOf(false) }
-    val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
-    var isA2dpPlaying by remember { mutableStateOf(false) }
-
-    DisposableEffect(Unit) {
-        val audioDeviceCallback = object : AudioDeviceCallback() {
-            var audioDevices: List<AudioDeviceInfo> = emptyList()
-            override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>?) {
-                super.onAudioDevicesAdded(addedDevices)
-                if (addedDevices != null) audioDevices += addedDevices
-                isA2dpPlaying = audioDevices.any { it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP }
-            }
-
-            override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>?) {
-                super.onAudioDevicesRemoved(removedDevices)
-                if (removedDevices != null) audioDevices -= removedDevices
-                isA2dpPlaying = audioDevices.any { it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP }
-            }
-        }
-        audioManager.registerAudioDeviceCallback(audioDeviceCallback, handler)
-        onDispose {
-            audioManager.unregisterAudioDeviceCallback(audioDeviceCallback)
-            handler.removeCallbacksAndMessages(null)
-        }
-    }
-    DisposableEffect(player) {
-        val syncState = { p: Player ->
-            isPlaying = p.isPlaying
-            currentPosition = p.contentPosition
-            bufferedPosition = p.contentBufferedPosition
-            repeatMode = p.repeatMode
-            shuffleModeEnabled = p.shuffleModeEnabled
-
-            val timeline =
-                if (p.isCommandAvailable(Player.COMMAND_GET_TIMELINE)) p.currentTimeline else Timeline.EMPTY
-            if (!timeline.isEmpty) {
-                val window = Timeline.Window()
-                timeline.getWindow(p.currentMediaItemIndex, window)
-                duration = Util.usToMs(window.durationUs)
-            } else {
-                val contentDuration = p.contentDuration
-                duration = if (contentDuration != C.TIME_UNSET) contentDuration else 0L
-            }
-        }
-
-        val listener = object : Player.Listener {
-            override fun onEvents(p: Player, events: Player.Events) {
-                syncState(p)
-            }
-
-            override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
-                songTitle = mediaMetadata.title?.toString()
-                songArtist = mediaMetadata.artist?.toString()
-            }
-        }
-        player?.addListener(listener)
-        player?.let { p ->
-            syncState(p)
-            listener.onMediaMetadataChanged(p.mediaMetadata)
-        }
-
-        onDispose { player?.removeListener(listener) }
-    }
-    LaunchedEffect(isPlaying, scrubbing) {
-        if (isPlaying && !scrubbing) {
-            while (true) {
-                player?.let { p ->
-                    currentPosition = p.contentPosition
-                    bufferedPosition = p.contentBufferedPosition
-                }
-                delay(200)
-            }
-        }
-    }
+    val songTitle = mediaMetadata.title?.toString()
+    val songArtist = mediaMetadata.artist?.toString()
 
     Box(
         modifier = Modifier
@@ -228,7 +140,7 @@ fun NowPlayingScreen(
             ) {
                 if (!isLyricsMode) {
                     NowPlayingDisk(
-                        mediaMetadata = player?.mediaMetadata,
+                        mediaMetadata = mediaMetadata,
                         defaultBgColor = defaultBgColor,
                         onBackgroundColorChange = { backgroundColor = it },
                         onClick = { isLyricsMode = true }
@@ -236,10 +148,10 @@ fun NowPlayingScreen(
                 } else {
                     NowPlayingLyrics(
                         lyrics = lyrics,
-                        currentPosition = currentPosition,
+                        currentPositionProvider = { currentPositionState.value },
                         likeState = likeState,
                         isLoggedIn = isLoggedIn,
-                        onLikeClicked = { viewModel.onLikeClicked() },
+                        onLikeClicked = viewModel::onLikeClicked,
                         onClick = { isLyricsMode = false }
                     )
                 }
@@ -255,37 +167,35 @@ fun NowPlayingScreen(
                     likeState = likeState,
                     commentInfo = commentInfo,
                     isLoggedIn = isLoggedIn,
-                    onLikeClicked = { viewModel.onLikeClicked() },
+                    onLikeClicked = viewModel::onLikeClicked,
                     onNavigateToComments = onNavigateToComments
                 )
             }
 
             NowPlayingProgress(
                 modifier = contentModifier,
-                currentPosition = currentPosition,
-                bufferedPosition = bufferedPosition,
+                currentPositionProvider = { currentPositionState.value },
+                bufferedPositionProvider = { bufferedPositionState.value },
                 duration = duration,
-                scrubbing = scrubbing,
-                player = player,
-                onScrubbingChange = { isScrubbing, position ->
-                    scrubbing = isScrubbing
-                    if (position != null) {
-                        currentPosition = position
-                    }
-                }
+                onSeek = viewModel::onSeek
             )
 
             NowPlayingControls(
                 modifier = contentModifier,
-                player = player,
                 isPlaying = isPlaying,
+                isPlayPauseEnabled = isPlayPauseEnabled,
+                canShuffleRepeat = canShuffleRepeat,
                 repeatMode = repeatMode,
                 shuffleModeEnabled = shuffleModeEnabled,
                 isA2dpPlaying = isA2dpPlaying,
                 downloadable = (currentSong as? RemoteSong?)?.isDownloadable == true,
-                audioManager = audioManager,
+                onPlayPauseClick = viewModel::onPlayPauseClick,
+                onPreviousClick = viewModel::onPreviousClick,
+                onNextClick = viewModel::onNextClick,
+                onToggleRepeatShuffleMode = viewModel::onToggleRepeatShuffleMode,
+                onShowVolumeUi = viewModel::onShowVolumeUi,
                 onOpenPlaylist = onOpenPlaylist,
-                onDownloadClick = { viewModel.onDownloadClick() }
+                onDownloadClick = viewModel::onDownloadClick
             )
         }
     }
@@ -401,15 +311,15 @@ private fun NowPlayingDisk(
                     onSuccess = { state ->
                         val image = state.result.image
                         if (image is BitmapImage) {
-                            Palette.from(image.bitmap).generate { palette ->
-                                val dominantColor =
-                                    palette?.getDominantColor(AndroidColor.BLACK)
-                                        ?: AndroidColor.BLACK
-                                val hsl = FloatArray(3)
-                                ColorUtils.colorToHSL(dominantColor, hsl)
-                                hsl[2] = hsl[2].coerceIn(0.15F, 0.45F)
-                                onBackgroundColorChange(Color(AndroidColor.HSVToColor(hsl)))
-                            }
+                            ColorUtils.getDominantColor(
+                                bitmap = image.bitmap,
+                                defaultColor = AndroidColor.BLACK,
+                                minL = 0.15F,
+                                maxL = 0.45F,
+                                onGenerated = { colorInt ->
+                                    onBackgroundColorChange(Color(colorInt))
+                                }
+                            )
                         }
                     },
                     onError = {
@@ -439,13 +349,14 @@ private fun NowPlayingDisk(
 @Composable
 private fun NowPlayingLyrics(
     lyrics: List<LyricsEntry>?,
-    currentPosition: Long,
+    currentPositionProvider: () -> Long,
     likeState: LikeState,
     isLoggedIn: Boolean?,
     onLikeClicked: () -> Unit,
     onClick: () -> Unit
 ) {
     val x8 = dimensionResource(id = R.dimen.x8)
+    val currentPosition = currentPositionProvider()
 
     Column(
         modifier = Modifier
@@ -651,15 +562,16 @@ private fun NowPlayingActions(
 @Composable
 private fun NowPlayingProgress(
     modifier: Modifier = Modifier,
-    currentPosition: Long,
-    bufferedPosition: Long,
+    currentPositionProvider: () -> Long,
+    bufferedPositionProvider: () -> Long,
     duration: Long,
-    scrubbing: Boolean,
-    player: Player?,
-    onScrubbingChange: (isScrubbing: Boolean, position: Long?) -> Unit
+    onSeek: (Long) -> Unit
 ) {
     val formatBuilder = remember { java.lang.StringBuilder() }
     val formatter = remember { Formatter(formatBuilder, Locale.getDefault()) }
+
+    val currentPosition = currentPositionProvider()
+    val bufferedPosition = bufferedPositionProvider()
 
     var scrubPosition by remember { mutableStateOf<Long?>(null) }
     val displayPosition = scrubPosition ?: currentPosition
@@ -688,18 +600,11 @@ private fun NowPlayingProgress(
             Slider(
                 value = if (duration > 0) (displayPosition.toFloat() / duration).coerceIn(0f, 1f) else 0f,
                 onValueChange = { value ->
-                    val newPos = (value * duration).toLong()
-                    scrubPosition = newPos
-                    onScrubbingChange(true, newPos)
+                    scrubPosition = (value * duration).toLong()
                 },
                 onValueChangeFinished = {
-                    scrubPosition?.let { pos ->
-                        if (player?.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM) == true) {
-                            player.seekTo(pos)
-                        }
-                    }
+                    scrubPosition?.let(onSeek)
                     scrubPosition = null
-                    onScrubbingChange(false, null)
                 },
                 interactionSource = interactionSource,
                 thumb = {
@@ -782,22 +687,22 @@ private fun NowPlayingProgress(
 @Composable
 private fun NowPlayingControls(
     modifier: Modifier = Modifier,
-    player: Player?,
     isPlaying: Boolean,
+    isPlayPauseEnabled: Boolean,
+    canShuffleRepeat: Boolean,
     repeatMode: Int,
     shuffleModeEnabled: Boolean,
     isA2dpPlaying: Boolean,
     downloadable: Boolean,
-    audioManager: AudioManager,
+    onPlayPauseClick: () -> Unit,
+    onPreviousClick: () -> Unit,
+    onNextClick: () -> Unit,
+    onToggleRepeatShuffleMode: () -> Unit,
+    onShowVolumeUi: () -> Unit,
     onOpenPlaylist: () -> Unit,
     onDownloadClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val isPlayPauseEnabled = player?.isCommandAvailable(Player.COMMAND_PLAY_PAUSE) == true
-    val canShuffleRepeat =
-        player?.isCommandAvailable(Player.COMMAND_SET_REPEAT_MODE) == true && player.isCommandAvailable(
-            Player.COMMAND_SET_SHUFFLE_MODE
-        )
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -832,17 +737,9 @@ private fun NowPlayingControls(
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                        enabled = canShuffleRepeat
-                    ) {
-                        player?.let {
-                            val nextMode = RepeatShuffleModeUtil.getNextRepeatShuffleMode(
-                                it.repeatMode,
-                                it.shuffleModeEnabled
-                            )
-                            it.repeatMode = nextMode.repeatMode
-                            it.shuffleModeEnabled = nextMode.shuffleModeEnabled
-                        }
-                    },
+                        enabled = canShuffleRepeat,
+                        onClick = onToggleRepeatShuffleMode
+                    ),
                 contentScale = ContentScale.Fit
             )
 
@@ -854,15 +751,9 @@ private fun NowPlayingControls(
                     .alpha(0.7f)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) {
-                        player?.let {
-                            if (it.isCommandAvailable(Player.COMMAND_SEEK_TO_PREVIOUS)) {
-                                it.seekToPreviousMediaItem()
-                                Util.handlePlayButtonAction(it)
-                            }
-                        }
-                    }
+                        indication = null,
+                        onClick = onPreviousClick
+                    )
                     .padding(7.dp),
                 contentScale = ContentScale.Fit
             )
@@ -878,10 +769,9 @@ private fun NowPlayingControls(
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                        enabled = isPlayPauseEnabled
-                    ) {
-                        player?.let { Util.handlePlayPauseButtonAction(it) }
-                    }
+                        enabled = isPlayPauseEnabled,
+                        onClick = onPlayPauseClick
+                    )
                     .padding(14.dp),
                 contentScale = ContentScale.Fit
             )
@@ -894,15 +784,9 @@ private fun NowPlayingControls(
                     .alpha(0.7f)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) {
-                        player?.let {
-                            if (it.isCommandAvailable(Player.COMMAND_SEEK_TO_NEXT)) {
-                                it.seekToNextMediaItem()
-                                Util.handlePlayButtonAction(it)
-                            }
-                        }
-                    }
+                        indication = null,
+                        onClick = onNextClick
+                    )
                     .padding(7.dp),
                 contentScale = ContentScale.Fit
             )
@@ -914,8 +798,9 @@ private fun NowPlayingControls(
                     .size(40.dp)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) { onOpenPlaylist() },
+                        indication = null,
+                        onClick = onOpenPlaylist
+                    ),
                 contentScale = ContentScale.Fit
             )
         }
@@ -938,11 +823,7 @@ private fun NowPlayingControls(
                         indication = null
                     ) {
                         if (!SystemOutputSwitcherDialogController.showDialog(context)) {
-                            audioManager.adjustStreamVolume(
-                                AudioManager.STREAM_MUSIC,
-                                AudioManager.ADJUST_SAME,
-                                AudioManager.FLAG_SHOW_UI
-                            )
+                            onShowVolumeUi()
                         }
                     }
                     .padding(7.dp),

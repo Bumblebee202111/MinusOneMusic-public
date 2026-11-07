@@ -1,12 +1,7 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.nowplaying
 
-import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.Metadata
-import androidx.media3.common.Player
-import androidx.media3.common.Tracks
-import androidx.media3.common.util.UnstableApi
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
@@ -14,14 +9,13 @@ import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginReposi
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.player.AudioOutputMonitor
 import com.github.bumblebee202111.minusonecloudmusic.player.extractEmbeddedLyrics
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
 import com.github.bumblebee202111.minusonecloudmusic.ui.mapper.toUiText
 import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -29,17 +23,27 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 @HiltViewModel
-@OptIn(UnstableApi::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class NowPlayingViewModel @Inject constructor(
     private val songRepository: SongRepository,
     private val loggedInUserDataRepository: LoggedInUserDataRepository,
-    musicServiceConnection: MusicServiceConnection,
+    private val musicServiceConnection: MusicServiceConnection,
+    private val audioOutputMonitor: AudioOutputMonitor,
     loginRepository: LoginRepository,
     private val playlistRepository: PlaylistRepository,
     private val toastManager: ToastManager
 ) : ViewModel() {
 
-    val player = musicServiceConnection.player
+    val mediaMetadata = musicServiceConnection.mediaMetadata
+    val isPlaying = musicServiceConnection.isPlaying
+    val currentPosition = musicServiceConnection.currentPosition
+    val bufferedPosition = musicServiceConnection.bufferedPosition
+    val duration = musicServiceConnection.duration
+    val repeatMode = musicServiceConnection.repeatMode
+    val shuffleModeEnabled = musicServiceConnection.shuffleModeEnabled
+    val isPlayPauseEnabled = musicServiceConnection.isPlayPauseEnabled
+    val canShuffleRepeat = musicServiceConnection.canShuffleRepeat
+    val isA2dpPlaying = audioOutputMonitor.isA2dpPlaying.stateInUi(false)
 
     private val currentMediaId = musicServiceConnection.currentMediaId
 
@@ -50,38 +54,11 @@ class NowPlayingViewModel @Inject constructor(
     private val currentRemoteSongId = currentSong.map { song ->
         (song as? RemoteSong)?.id
     }.stateInUi()
-    private val rawMetadataFlow = player.flatMapLatest { currentPlayer ->
-        if (currentPlayer == null) return@flatMapLatest flowOf(null)
-        callbackFlow<Metadata?> {
-            val listener = object : Player.Listener {
-
-                override fun onTracksChanged(tracks: Tracks) {
-                    val metadata = tracks.groups.firstNotNullOfOrNull { group ->
-                        (0 until group.length).firstNotNullOfOrNull { i ->
-                            group.getTrackFormat(i).metadata
-                        }
-                    }
-                    if (metadata != null) trySend(metadata)
-                }
-
-                override fun onMetadata(metadata: Metadata) {
-                    trySend(metadata)
-                }
-            }
-            currentPlayer.addListener(listener)
-            val initialMetadata = currentPlayer.currentTracks.groups.firstNotNullOfOrNull { group ->
-                (0 until group.length).firstNotNullOfOrNull { i -> group.getTrackFormat(i).metadata }
-            }
-            trySend(initialMetadata)
-
-            awaitClose { currentPlayer.removeListener(listener) }
-        }
-    }
 
     val lyrics = currentSong.flatMapLatest { song ->
         if (song == null) return@flatMapLatest flowOf(null)
 
-        rawMetadataFlow.flatMapLatest { metadata ->
+        musicServiceConnection.rawMetadata.flatMapLatest { metadata ->
             val embeddedLyrics = metadata.extractEmbeddedLyrics()
 
             if (!embeddedLyrics.isNullOrEmpty()) {
@@ -113,6 +90,18 @@ class NowPlayingViewModel @Inject constructor(
     }.stateInUi()
 
     val isLoggedIn = loginRepository.isLoggedIn.stateInUi()
+
+    fun onPlayPauseClick() = musicServiceConnection.togglePlayPause()
+
+    fun onPreviousClick() = musicServiceConnection.seekToPrevious()
+
+    fun onNextClick() = musicServiceConnection.seekToNext()
+
+    fun onToggleRepeatShuffleMode() = musicServiceConnection.toggleRepeatShuffleMode()
+
+    fun onSeek(positionMs: Long) = musicServiceConnection.seekTo(positionMs)
+
+    fun onShowVolumeUi() = audioOutputMonitor.showSystemVolumeUi()
 
     fun onLikeClicked() {
         val songId = currentRemoteSongId.value ?: return

@@ -18,13 +18,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,53 +48,65 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.media3.common.C
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.MediaMetadata
-import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.common.util.Util
 import coil3.compose.AsyncImage
 import com.github.bumblebee202111.minusonecloudmusic.R
+import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
-import kotlinx.coroutines.delay
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 private val PlaceholderColor = Color(0x0D000000)
 private val ProgressBgColor = Color.Gray.copy(alpha = 0.15f)
-@UnstableApi
+
+@HiltViewModel
+class MiniBarViewModel @Inject constructor(
+    private val musicServiceConnection: MusicServiceConnection
+) : ViewModel() {
+    val isPlaying = musicServiceConnection.isPlaying
+    val currentPosition = musicServiceConnection.currentPosition
+    val duration = musicServiceConnection.duration
+    val mediaMetadata = musicServiceConnection.mediaMetadata
+
+    fun togglePlayPause() = musicServiceConnection.togglePlayPause()
+}
 @Composable
 fun MiniBarContainer(
-    player: Player?,
+    onNavigateToNowPlaying: () -> Unit,
+    onShowPlaylist: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: MiniBarViewModel = hiltViewModel()
+) {
+    val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
+    val duration by viewModel.duration.collectAsStateWithLifecycle()
+    val mediaMetadata by viewModel.mediaMetadata.collectAsStateWithLifecycle()
+    val currentPositionState = viewModel.currentPosition.collectAsStateWithLifecycle()
+
+    MiniBarContainer(
+        mediaMetadata = mediaMetadata,
+        isPlaying = isPlaying,
+        progressProvider = {
+            if (duration > 0) (currentPositionState.value.toFloat() / duration).coerceIn(0f, 1f) else 0f
+        },
+        onPlayPauseClick = viewModel::togglePlayPause,
+        onNavigateToNowPlaying = onNavigateToNowPlaying,
+        onShowPlaylist = onShowPlaylist,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun MiniBarContainer(
+    mediaMetadata: MediaMetadata?,
+    isPlaying: Boolean,
+    progressProvider: () -> Float,
+    onPlayPauseClick: () -> Unit,
     onNavigateToNowPlaying: () -> Unit,
     onShowPlaylist: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isPlaying by remember { mutableStateOf(player?.isPlaying == true) }
-    var currentPosition by remember { mutableLongStateOf(player?.contentPosition ?: 0L) }
-    var duration by remember { mutableLongStateOf(player?.duration?.takeIf { it != C.TIME_UNSET } ?: 0L) }
-    var mediaMetadata by remember { mutableStateOf(player?.mediaMetadata) }
-
-    DisposableEffect(player) {
-        val listener = object : Player.Listener {
-            override fun onEvents(p: Player, events: Player.Events) {
-                isPlaying = p.isPlaying
-                currentPosition = p.contentPosition
-                duration = p.duration.takeIf { it != C.TIME_UNSET } ?: 0L
-                mediaMetadata = p.mediaMetadata
-            }
-        }
-        player?.addListener(listener)
-        onDispose { player?.removeListener(listener) }
-    }
-
-    LaunchedEffect(isPlaying) {
-        if (isPlaying) {
-            while (true) {
-                player?.let { currentPosition = it.contentPosition }
-                delay(200)
-            }
-        }
-    }
-
-    val progress = if (duration > 0) (currentPosition.toFloat() / duration).coerceIn(0f, 1f) else 0f
     Box(modifier = modifier.fillMaxWidth()) {
 
         val bgColor = DolphinTheme.colors.backgroundWhite
@@ -138,7 +145,7 @@ fun MiniBarContainer(
                 }
         )
         MiniNewStyleRootView(
-            progress = progress,
+            progressProvider = progressProvider,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(horizontal = 16.dp)
@@ -156,8 +163,8 @@ fun MiniBarContainer(
             MiniPlayerDiscViewFlipper(mediaMetadata)
             MiniPlayPauseButton(
                 isPlaying = isPlaying,
-                progress = progress,
-                onClick = { player?.let { Util.handlePlayPauseButtonAction(it) } }
+                progressProvider = progressProvider,
+                onClick = onPlayPauseClick
             )
 
             MinPlayListBtnContainer(onClick = onShowPlaylist)
@@ -166,7 +173,7 @@ fun MiniBarContainer(
 }
 @Composable
 private fun MiniNewStyleRootView(
-    progress: Float,
+    progressProvider: () -> Float,
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -179,6 +186,7 @@ private fun MiniNewStyleRootView(
                 shape = RoundedCornerShape(22.dp)
             )
             .drawBehind {
+                val progress = progressProvider()
                 val margin = 22.dp.toPx()
                 val lineH = 1.dp.toPx()
                 val y = size.height - (lineH / 2f)
@@ -251,7 +259,7 @@ private fun RowScope.MiniPlayerDiscViewFlipper(
 @Composable
 private fun MiniPlayPauseButton(
     isPlaying: Boolean,
-    progress: Float,
+    progressProvider: () -> Float,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -266,6 +274,7 @@ private fun MiniPlayPauseButton(
             .clip(CircleShape)
             .clickable(onClick = onClick)
     ) {
+        val progress = progressProvider()
         val contentSize = 23.dp.toPx()
         val strokeW = 1.67.dp.toPx()
         val offsetValX = (size.width - contentSize) / 2f + strokeW / 2f
@@ -366,14 +375,16 @@ private fun MinPlayListBtnContainer(
 }
 
 
-@UnstableApi
 @Preview(showBackground = true, backgroundColor = 0xff000000)
 @Composable
 private fun MiniBarContainerPreview() {
     DolphinTheme {
         Box(modifier = Modifier.padding(16.dp)) {
             MiniBarContainer(
-                player = null,
+                mediaMetadata = null,
+                isPlaying = false,
+                progressProvider = { 0.3f },
+                onPlayPauseClick = {},
                 onNavigateToNowPlaying = {},
                 onShowPlaylist = {}
             )
@@ -386,10 +397,10 @@ private fun MiniBarContainerPreview() {
 private fun MiniBarAssembledPreview() {
     DolphinTheme {
         Box(modifier = Modifier.padding(16.dp)) {
-            MiniNewStyleRootView(progress = 0.3f) {
+            MiniNewStyleRootView(progressProvider = { 0.3f }) {
                 MiniDiskContainer(mediaMetadata = null)
                 MiniPlayerDiscViewFlipper(mediaMetadata = null)
-                MiniPlayPauseButton(isPlaying = false, progress = 0.3f, onClick = {})
+                MiniPlayPauseButton(isPlaying = false, progressProvider = { 0.3f }, onClick = {})
                 MinPlayListBtnContainer(onClick = {})
             }
         }
@@ -401,9 +412,9 @@ private fun MiniBarAssembledPreview() {
 private fun MiniPlayPauseButtonPreview() {
     DolphinTheme {
         Row(modifier = Modifier.padding(16.dp)) {
-            MiniPlayPauseButton(isPlaying = true, progress = 0.5f, onClick = {})
+            MiniPlayPauseButton(isPlaying = true, progressProvider = { 0.5f }, onClick = {})
             Box(modifier = Modifier.size(16.dp))
-            MiniPlayPauseButton(isPlaying = false, progress = 0.0f, onClick = {})
+            MiniPlayPauseButton(isPlaying = false, progressProvider = { 0.0f }, onClick = {})
         }
     }
 }

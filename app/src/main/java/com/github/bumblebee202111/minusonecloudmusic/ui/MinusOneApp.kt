@@ -54,7 +54,6 @@ import androidx.core.graphics.toColorInt
 import androidx.core.view.GravityCompat
 import androidx.core.view.forEach
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.media3.common.Player
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import com.github.bumblebee202111.minusonecloudmusic.R
@@ -118,7 +117,6 @@ val LocalMiniPlayerBarHeight = compositionLocalOf { 0.dp }
 
 @Composable
 fun MinusOneApp(
-    player: Player?,
     navigationManager: NavigationManager,
     toastManager: ToastManager,
     initialDeepLinkKey: NavKey?,
@@ -224,7 +222,6 @@ fun MinusOneApp(
                     }
                     if (isMiniBarVisible) {
                         MiniBarContainer(
-                            player = player,
                             onNavigateToNowPlaying = { navigationManager.navigate(NowPlayingRoute) },
                             onShowPlaylist = { showPlayerHistory = true },
                             modifier = Modifier

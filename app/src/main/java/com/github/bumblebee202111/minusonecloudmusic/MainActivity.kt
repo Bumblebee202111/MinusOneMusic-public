@@ -6,8 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation3.runtime.NavKey
 import com.github.bumblebee202111.minusonecloudmusic.data.MusicServiceConnection
@@ -51,11 +49,8 @@ class MainActivity : AppCompatActivity() {
         val initialDeepLinkKey: NavKey? = DeepLinkRegistry.resolve(intent.data?.toString())
 
         setContent {
-            val player by musicServiceConnection.player.collectAsStateWithLifecycle()
-
             DolphinTheme {
                 MinusOneApp(
-                    player = player,
                     navigationManager = navigationManager,
                     toastManager = toastManager,
                     initialDeepLinkKey = initialDeepLinkKey,
