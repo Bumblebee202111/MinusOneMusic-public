@@ -14,7 +14,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-
 class PlayPlaylistUseCase @Inject constructor(
     private val musicServiceConnection: MusicServiceConnection,
     private val playlistRepository: PlaylistRepository,
@@ -24,17 +23,21 @@ class PlayPlaylistUseCase @Inject constructor(
     
     suspend operator fun invoke(
         loadedSongs: List<AbstractSong>,
-        loadRemainingSongs: (suspend () -> List<AbstractSong>)? = null,
+        loadRemainingSongs: (suspend (loadedCount: Int) -> List<AbstractSong>)? = null,
         startIndex: Int = if (loadedSongs.isEmpty()) C.INDEX_UNSET else 0,
     ) {
+        val loadedSnapshot = loadedSongs.toList()
+        if (loadedSnapshot.isEmpty() || (startIndex != C.INDEX_UNSET && startIndex !in loadedSnapshot.indices)) {
+            return
+        }
 
         val player = musicServiceConnection.player.value ?: return
 
         val isSongChanged = startIndex == C.INDEX_UNSET || (
-                musicServiceConnection.currentMediaId.value != loadedSongs[startIndex].mediaId)
+                musicServiceConnection.currentMediaId.value != loadedSnapshot[startIndex].mediaId)
 
         val loadedMediaItems =
-            loadedSongs.map(::mapSongToMediaItem)
+            loadedSnapshot.map(::mapSongToMediaItem)
 
         val startPositionMs =
             if (isSongChanged)
@@ -51,15 +54,17 @@ class PlayPlaylistUseCase @Inject constructor(
         }
 
         playlistRepository.clearPlayerPlaylist()
-        playlistRepository.addSongsToPlayerPlaylist(loadedSongs)
+        playlistRepository.addSongsToPlayerPlaylist(loadedSnapshot)
 
         if (loadRemainingSongs != null) {
-            val remainingSongs = loadRemainingSongs()
-            val mediaItems = remainingSongs.map(::mapSongToMediaItem)
-            withContext(mainDispatcher) {
-                player.addMediaItems(mediaItems)
+            val remainingSongs = loadRemainingSongs(loadedSnapshot.size)
+            if (remainingSongs.isNotEmpty()) {
+                val mediaItems = remainingSongs.map(::mapSongToMediaItem)
+                withContext(mainDispatcher) {
+                    player.addMediaItems(mediaItems)
+                }
+                playlistRepository.addSongsToPlayerPlaylist(remainingSongs)
             }
-            playlistRepository.addSongsToPlayerPlaylist(remainingSongs)
         }
 
     }
@@ -73,5 +78,3 @@ class PlayPlaylistUseCase @Inject constructor(
     }
 
 }
-
-

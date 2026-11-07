@@ -3,7 +3,6 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.playlist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
@@ -25,6 +24,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
+import java.util.concurrent.CopyOnWriteArrayList
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = PlaylistViewModel.Factory::class)
@@ -40,7 +40,14 @@ class PlaylistViewModel @AssistedInject constructor(
     private val getPlaylistSongItemsUseCase: MapSongPagingDataFlowToUiItemsUseCase
 ) : ViewModel() {
 
-    val loadedSongs = mutableListOf<RemoteSong>()
+    private val loadedSongs = CopyOnWriteArrayList<RemoteSong>()
+
+    private val onPageLoaded: (Boolean, List<RemoteSong>) -> Unit = { isInitialPage, items ->
+        if (isInitialPage) {
+            loadedSongs.clear()
+        }
+        loadedSongs.addAll(items)
+    }
 
     private val detailAndPagingFlows = loginRepository.loggedInUserId
         .map { loggedInUserId ->
@@ -50,9 +57,9 @@ class PlaylistViewModel @AssistedInject constructor(
         .map { useV6 ->
             loadedSongs.clear()
             if (useV6) {
-                playlistRepository.getMyPlaylistDetailAndPagingData(playlistId)
+                playlistRepository.getMyPlaylistDetailAndPagingData(playlistId, onPageLoaded)
             } else {
-                playlistRepository.getPlaylistDetailAndPagingData(playlistId)
+                playlistRepository.getPlaylistDetailAndPagingData(playlistId, onPageLoaded)
             }
         }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), replay = 1)
@@ -65,12 +72,7 @@ class PlaylistViewModel @AssistedInject constructor(
 
     private val basePagingDataFlow = detailAndPagingFlows
         .flatMapLatest { (_, pagingDataFlow) ->
-            pagingDataFlow.map { pagingData ->
-                pagingData.map { song ->
-                    loadedSongs += song
-                    song
-                }
-            }
+            pagingDataFlow
         }
         .cachedIn(viewModelScope)
 
@@ -80,11 +82,14 @@ class PlaylistViewModel @AssistedInject constructor(
         playPlaylistUseCase = playPlaylistUseCase,
         scope = viewModelScope,
         getLoadedSongs = { loadedSongs },
-        loadRemainingSongs = {
-            val allSongs = playlistDetail.value?.allSongs
-            if (allSongs != null) {
+        loadRemainingSongs = { loadedCount ->
+            val remainingSongIds = playlistDetail.value?.allSongs
+                ?.drop(loadedCount)
+                ?.map(SimpleRemoteSong::id)
+                .orEmpty()
+            if (remainingSongIds.isNotEmpty()) {
                 val result =
-                    songRepository.getSongDetails(allSongs.map(SimpleRemoteSong::id)).first {
+                    songRepository.getSongDetails(remainingSongIds).first {
                         it !is AppResult.Loading
                     }
 

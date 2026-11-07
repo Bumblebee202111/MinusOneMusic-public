@@ -2,7 +2,6 @@ package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
 import androidx.paging.Pager
 import androidx.paging.PagingData
-import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.data.AppError
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResult
@@ -98,6 +97,7 @@ inline fun <DetailResult : Any, PageResult : Any, reified DetailModel : Any, rei
     noinline getInitialPageItems: suspend DetailResult.() -> List<PageItem>,
     noinline subsequentFetch: suspend (limit: Int, offset: Int, initialResult: DetailResult) -> ApiResult<PageResult>,
     noinline getSubsequentPageItems: suspend (result: PageResult) -> List<PageItem>,
+    noinline onPageLoaded: ((isInitialPage: Boolean, items: List<DomainItem>) -> Unit)? = null,
     crossinline mapToDomainItem: suspend (item: PageItem) -> DomainItem,
 ): Pair<Flow<AppResult<DetailModel>>, Flow<PagingData<DomainItem>>> {
     val deferredInitialFetch = scope.async {
@@ -116,12 +116,15 @@ inline fun <DetailResult : Any, PageResult : Any, reified DetailModel : Any, rei
         ApiLimitOffsetPagingSource(
             deferredInitialFetch = deferredInitialFetch,
             getTotalCount = getTotalCount,
-            getInitialPageItems = getInitialPageItems,
+            getInitialPageItems = { result ->
+                getInitialPageItems(result).map { mapToDomainItem(it) }
+            },
             subsequentFetch = subsequentFetch,
-            getSubsequentPageItems = getSubsequentPageItems
+            getSubsequentPageItems = { result ->
+                getSubsequentPageItems(result).map { mapToDomainItem(it) }
+            },
+            onPageLoaded = onPageLoaded
         )
-    }.flow.map { pagingData -> pagingData.map { mapToDomainItem(it) } }
+    }.flow
     return Pair(appResult, pagingData)
 }
-
-

@@ -12,6 +12,7 @@ class ApiLimitOffsetPagingSource<DetailResult : Any, PageResult, PageItem : Any>
     val getInitialPageItems: suspend (result: DetailResult) -> List<PageItem>,
     val subsequentFetch: suspend (limit: Int, offset: Int, initialResult: DetailResult) -> ApiResult<PageResult>,
     val getSubsequentPageItems: suspend (result: PageResult) -> List<PageItem>,
+    private val onPageLoaded: ((isInitialPage: Boolean, items: List<PageItem>) -> Unit)? = null,
 ) :
     PagingSource<Int, PageItem>() {
     override fun getRefreshKey(state: PagingState<Int, PageItem>): Int? {
@@ -39,8 +40,10 @@ class ApiLimitOffsetPagingSource<DetailResult : Any, PageResult, PageItem : Any>
                 is ApiResult.Success -> {
                     initialFetchData = response.data
                     totalCount = getTotalCount(initialFetchData)
+                    val items = getInitialPageItems(initialFetchData)
+                    onPageLoaded?.invoke(true, items)
                     LoadResult.Page(
-                        data = getInitialPageItems(initialFetchData),
+                        data = items,
                         prevKey = null,
                         nextKey = if (totalCount > params.loadSize) 1 else null
                     )
@@ -69,8 +72,10 @@ class ApiLimitOffsetPagingSource<DetailResult : Any, PageResult, PageItem : Any>
                 subsequentFetch(loadSize, pageIndex * loadSize, initialFetchData)) {
                 is ApiResult.Success -> {
                     val result = response.data
+                    val items = getSubsequentPageItems(result)
+                    onPageLoaded?.invoke(false, items)
                     LoadResult.Page(
-                        data = getSubsequentPageItems(result),
+                        data = items,
                         prevKey = null,
                         nextKey = if (totalCount > (pageIndex + 1) * loadSize) pageIndex + 1 else null
                     )

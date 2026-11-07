@@ -3,7 +3,6 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.clouddisk
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import androidx.paging.map
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.model.RemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUserDataRepository
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,7 +32,16 @@ class MyPrivateCloudViewModel @Inject constructor(
 ) : ViewModel() {
     private val isLoggedIn = loginRepository.isLoggedIn
 
-    private val cloudSongsCountAndPagingData = loggedInUserDataRepository.getCloudSongsPagingData1()
+    private val loadedSongs = CopyOnWriteArrayList<RemoteSong>()
+
+    private val cloudSongsCountAndPagingData = loggedInUserDataRepository.getCloudSongsPagingData1(
+        onPageLoaded = { isInitialPage, items ->
+            if (isInitialPage) {
+                loadedSongs.clear()
+            }
+            loadedSongs.addAll(items)
+        }
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val cloudSongsCount = isLoggedIn.flatMapLatest { isLoggedIn ->
@@ -43,19 +52,14 @@ class MyPrivateCloudViewModel @Inject constructor(
         }
     }.stateInUi(0)
 
-    val loadedSongs: MutableList<RemoteSong> = mutableListOf()
-
     @OptIn(ExperimentalCoroutinesApi::class)
     val songUiItemsPagingData = isLoggedIn.flatMapLatest { isLoggedIn ->
         if (isLoggedIn) {
-            mapSongPagingDataFlowToUiItemsUseCase(cloudSongsCountAndPagingData.second.map {
-                it.map { song ->
-                    loadedSongs += song
-                    song
-                }
-            }.cachedIn(viewModelScope))
-                .cachedIn(viewModelScope)
+            mapSongPagingDataFlowToUiItemsUseCase(
+                cloudSongsCountAndPagingData.second.cachedIn(viewModelScope)
+            )
         } else {
+            loadedSongs.clear()
             emptyFlow()
         }
     }
@@ -64,21 +68,26 @@ class MyPrivateCloudViewModel @Inject constructor(
         playPlaylistUseCase = playPlaylistUseCase,
         scope = viewModelScope,
         getLoadedSongs = { loadedSongs },
-        loadRemainingSongs = {
-            val result = loggedInUserDataRepository.getAllCloudSongs(start = loadedSongs.size)
-                .first { it !is AppResult.Loading }
+        loadRemainingSongs = { loadedCount ->
+            val totalCount = cloudSongsCount.value ?: 0
+            if (loadedCount >= totalCount) {
+                emptyList()
+            } else {
+                val result = loggedInUserDataRepository.getAllCloudSongs(start = loadedCount)
+                    .first { it !is AppResult.Loading }
 
-            when (result) {
-                is AppResult.Success -> {
-                    result.data
+                when (result) {
+                    is AppResult.Success -> {
+                        result.data
+                    }
+
+                    is AppResult.Error -> {
+                        toastManager.showMessage(result.error.toUiText())
+                        emptyList()
+                    }
+
+                    is AppResult.Loading -> emptyList()
                 }
-
-                is AppResult.Error -> {
-                    toastManager.showMessage(result.error.toUiText())
-                    emptyList()
-                }
-
-                is AppResult.Loading -> emptyList()
             }
         }
     )

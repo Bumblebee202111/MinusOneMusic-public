@@ -73,7 +73,10 @@ class PlaylistRepository @Inject constructor(
         }
     )
 
-    fun getPlaylistDetailAndPagingData(playlistId: Long): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
+    fun getPlaylistDetailAndPagingData(
+        playlistId: Long,
+        onPageLoaded: ((isInitialPage: Boolean, items: List<RemoteSong>) -> Unit)? = null
+    ): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
         return apiFlowsOfDetailAndPaging(
             scope = coroutineScope,
             limit = PLAYLIST_PAGE_SIZE,
@@ -97,11 +100,15 @@ class PlaylistRepository @Inject constructor(
                         .map { SongIdAndVersion(it.id, 0) }
                 fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
             },
-            getSubsequentPageItems = { result -> result.songs.zip(result.privileges) }
+            getSubsequentPageItems = { result -> result.songs.zip(result.privileges) },
+            onPageLoaded = onPageLoaded
         ) { item -> item.toRemoteSong() }
     }
 
-    fun getMyPlaylistDetailAndPagingData(playlistId: Long): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
+    fun getMyPlaylistDetailAndPagingData(
+        playlistId: Long,
+        onPageLoaded: ((isInitialPage: Boolean, items: List<RemoteSong>) -> Unit)? = null
+    ): Pair<Flow<AppResult<PlaylistDetail>>, Flow<PagingData<RemoteSong>>> {
         return apiFlowsOfDetailAndPaging(
             scope = coroutineScope,
             limit = PLAYLIST_PAGE_SIZE,
@@ -119,6 +126,7 @@ class PlaylistRepository @Inject constructor(
                 fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
             },
             getSubsequentPageItems = { result -> result.songs.zip(result.privileges) },
+            onPageLoaded = onPageLoaded
         ) { item -> item.toRemoteSong() }
     }
 
