@@ -17,12 +17,7 @@ class ApiLimitOffsetPagingSource<DetailResult : Any, PageResult, PageItem : Any>
     private val onPageLoaded: ((isInitialPage: Boolean, items: List<PageItem>) -> Unit)? = null,
 ) :
     PagingSource<Int, PageItem>() {
-    override fun getRefreshKey(state: PagingState<Int, PageItem>): Int? {
-        return state.anchorPosition?.let { anchorPosition ->
-            val anchorPage = state.closestPageToPosition(anchorPosition)
-            anchorPage?.nextKey?.minus(1)
-        }
-    }
+    override fun getRefreshKey(state: PagingState<Int, PageItem>): Int? = null
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PageItem> {
         val pageIndex = params.key ?: 0
