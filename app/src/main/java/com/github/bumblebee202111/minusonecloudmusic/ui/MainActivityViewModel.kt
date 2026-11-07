@@ -8,38 +8,21 @@ import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoggedInUse
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.LoginRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.PlaylistRepository
 import com.github.bumblebee202111.minusonecloudmusic.data.repository.SongRepository
-import com.github.bumblebee202111.minusonecloudmusic.data.repository.UserRepository
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.ToastManager
-import com.github.bumblebee202111.minusonecloudmusic.utils.stateInUi
 import com.github.bumblebee202111.minusonecloudmusic.ui.mapper.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val userRepository: UserRepository,
     private val loginRepository: LoginRepository,
     private val playlistRepository: PlaylistRepository,
     private val songRepository: SongRepository,
     private val loggedInUserDataRepository: LoggedInUserDataRepository,
     private val toastManager: ToastManager
 ) : ViewModel() {
-
-    val loggedInUserId = loginRepository.loggedInUserId.stateInUi()
-
-    val loggedInUserProfile = loggedInUserId.flatMapLatest { userId ->
-        if (userId != null) {
-            userRepository.getCachedUserProfile(userId)
-        } else {
-            flowOf(null)
-        }
-    }.stateInUi()
 
     init {
         registerAnonymousOrRefreshExisting()

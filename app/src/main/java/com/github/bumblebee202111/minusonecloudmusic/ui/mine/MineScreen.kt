@@ -66,7 +66,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import coil3.compose.AsyncImage
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.ui.MainActivityViewModel
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.LocalMusicRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyCollectionRoute
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.MyFriendRoute
@@ -87,14 +86,13 @@ private val FOSI = FastOutSlowInInterpolator()
 @Composable
 fun MineScreen(
     mineViewModel: MineViewModel = hiltViewModel(),
-    mainViewModel: MainActivityViewModel = hiltViewModel(),
     onOpenDrawer: () -> Unit,
     onNavigate: (NavKey) -> Unit
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     val scope = rememberCoroutineScope()
 
-    val loggedInUserProfile by mainViewModel.loggedInUserProfile.collectAsStateWithLifecycle()
+    val loggedInUserId by mineViewModel.loggedInUserId.collectAsStateWithLifecycle()
     val myProfile by mineViewModel.myProfile.collectAsStateWithLifecycle()
 
     val density = LocalDensity.current
@@ -150,7 +148,7 @@ fun MineScreen(
     }
 
     val onProfileClick: () -> Unit = {
-        if (mainViewModel.loggedInUserId.value == null) {
+        if (loggedInUserId == null) {
             onNavigate(PhoneCaptchaLoginRoute)
         } else {
         }
@@ -163,7 +161,7 @@ fun MineScreen(
             .nestedScroll(nestedScrollConnection)
     ) {
         AsyncImage(
-            model = loggedInUserProfile?.backgroundUrl?.imageUrl(
+            model = myProfile?.backgroundUrl?.imageUrl(
                 thumbnailSize = null,
                 quality = 80
             ),
@@ -224,7 +222,7 @@ fun MineScreen(
                         )
                 ) {
                     AsyncImage(
-                        model = loggedInUserProfile?.avatarUrl?.imageUrl(
+                        model = myProfile?.avatarUrl?.imageUrl(
                             thumbnailSize = 148,
                             quality = 80
                         ),

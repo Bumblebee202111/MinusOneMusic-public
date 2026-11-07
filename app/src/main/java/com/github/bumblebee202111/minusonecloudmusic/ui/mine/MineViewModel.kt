@@ -22,9 +22,9 @@ class MineViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val loggedInUserIdFlow = loginRepository.loggedInUserId
+    val loggedInUserId = loginRepository.loggedInUserId.stateInUi()
 
-    private val myIdAndUserDetailFlow = loggedInUserIdFlow.flatMapLatest { userId ->
+    private val myIdAndUserDetailFlow = loggedInUserId.flatMapLatest { userId ->
         if (userId != null) {
             userRepository.getUserDetail(userId, true).map {
                 Pair(userId, it.data)
@@ -34,15 +34,16 @@ class MineViewModel @Inject constructor(
         }
     }
 
-    val myProfile = loggedInUserIdFlow.flatMapLatest { userId ->
+    val myProfile = loggedInUserId.flatMapLatest { userId ->
         if (userId != null) {
             userRepository.getCachedUserProfile(userId)
         } else {
             flowOf(null)
         }
     }.stateInUi()
+
     private val myPlaylistsFlow =
-        loginRepository.loggedInUserId.flatMapLatest { userId ->
+        loggedInUserId.flatMapLatest { userId ->
             if (userId != null) {
                 userRepository.getUserPlaylists(userId).map {
                     it.data
