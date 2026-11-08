@@ -67,11 +67,10 @@ import kotlin.math.roundToInt
 fun PlaylistScreen(
     playlistId: Long,
     creatorId: Long? = null,
-    isMyPL: Boolean? = null,
-    isV6: Boolean? = null,
+    shouldFetchV6: Boolean? = null,
     onNavigateBack: () -> Unit,
     viewModel: PlaylistViewModel = hiltViewModel<PlaylistViewModel, PlaylistViewModel.Factory>(
-        creationCallback = { factory -> factory.create(playlistId, creatorId, isMyPL, isV6) }
+        creationCallback = { factory -> factory.create(playlistId, creatorId, shouldFetchV6) }
     )
 ) {
     val songs = viewModel.playlistSongs.collectAsLazyPagingItems()

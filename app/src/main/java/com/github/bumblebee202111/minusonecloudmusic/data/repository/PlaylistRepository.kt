@@ -28,13 +28,13 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.ApiResul
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.combine
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.NetworkBillboardGroup
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.SongDetailsApiModel
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.TrackIdApiModel
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toPlaylistDetail
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toMainPageBillboardRowGroup
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toRemoteSong
 import com.github.bumblebee202111.minusonecloudmusic.data.network.requestparam.CParamSongInfo
 import com.github.bumblebee202111.minusonecloudmusic.player.mediaIdToIsLocalAndSongId
 import com.squareup.moshi.JsonAdapter
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -50,27 +50,6 @@ class PlaylistRepository @Inject constructor(
     private val songDao = appDatabase.songDao()
     private val playerDao = appDatabase.playerDao()
 
-
-    fun getPlaylistDetail(id: Long): Flow<AppResult<PlaylistDetail?>> = apiResultFlow(
-        fetch = {
-            ncmEapiService.getPlaylistV4Detail(id).combine {
-                ncmEapiService.getPlaylistPrivilege(id)
-            }
-        },
-        mapSuccess = {
-            Pair(it.first.playlist, it.second).toPlaylistDetail()
-        }
-    )
-
-    fun getMyPlaylistDetail(id: Long): Flow<AppResult<PlaylistDetail?>> = apiResultFlow(
-        fetch = { ncmEapiService.getV6PlaylistDetail(id) },
-        mapSuccess = {
-            with(it) {
-                Pair(playlist, privileges).toPlaylistDetail()
-            }
-        }
-    )
-
     fun getPlaylistDetailAndPagingData(
         playlistId: Long,
         onPageLoaded: ((isInitialPage: Boolean, items: List<RemoteSong>) -> Unit)? = null
@@ -80,22 +59,15 @@ class PlaylistRepository @Inject constructor(
             initialFetch = {
                 ncmEapiService.getPlaylistV4Detail(playlistId).combine {
                     ncmEapiService.getPlaylistPrivilege(playlistId)
-
                 }
             },
             mapToDetailModel = { result ->
-                Pair(
-                    result.first.playlist,
-                    result.second
-                ).toPlaylistDetail()
+                result.first.playlist.toPlaylistDetail(result.second)
             },
             getTotalCount = { result -> result.first.playlist.trackCount + result.first.playlist.cloudTrackCount },
             getInitialPageItems = { first.playlist.tracks.zip(second) },
             subsequentFetch = { limit, offset, initialResult ->
-                val songIdsAndVersions =
-                    initialResult.first.playlist.trackIds.drop(offset).take(limit)
-                        .map { SongIdAndVersion(it.id, 0) }
-                fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
+                fetchSubsequentPlaylistSongs(limit, offset, initialResult.first.playlist.trackIds)
             },
             getSubsequentPageItems = { result -> result.songs.zip(result.privileges) },
             onPageLoaded = onPageLoaded
@@ -117,13 +89,21 @@ class PlaylistRepository @Inject constructor(
                 }
             },
             subsequentFetch = { limit, offset, initialResult ->
-                val songIdsAndVersions = initialResult.playlist.trackIds.drop(offset).take(limit)
-                    .map { SongIdAndVersion(it.id, 0) }
-                fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
+                fetchSubsequentPlaylistSongs(limit, offset, initialResult.playlist.trackIds)
             },
             getSubsequentPageItems = { result -> result.songs.zip(result.privileges) },
             onPageLoaded = onPageLoaded
         ) { item -> item.toRemoteSong() }
+    }
+
+    private suspend fun fetchSubsequentPlaylistSongs(
+        limit: Int,
+        offset: Int,
+        trackIds: List<TrackIdApiModel>
+    ): ApiResult<SongDetailsApiModel> {
+        val songIdsAndVersions = trackIds.drop(offset).take(limit)
+            .map { SongIdAndVersion(it.id, 0) }
+        return fetchPlaylistSongDetailsFromNetwork(songIdsAndVersions)
     }
 
     private suspend fun fetchPlaylistSongDetailsFromNetwork(songIds: List<SongIdAndVersion>): ApiResult<SongDetailsApiModel> {
@@ -220,11 +200,5 @@ class PlaylistRepository @Inject constructor(
     companion object {
         const val TOP_LIST_ID: Long = 3778678
         const val PLAYLIST_PAGE_SIZE: Int = 1000
-        private val REMOTE_PLAYLIST_PAGING_CONFIG = PagingConfig(
-            pageSize = PLAYLIST_PAGE_SIZE,
-            prefetchDistance = PLAYLIST_PAGE_SIZE / 10,
-            initialLoadSize = PLAYLIST_PAGE_SIZE
-        )
     }
 }
-

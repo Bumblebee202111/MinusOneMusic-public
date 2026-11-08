@@ -31,8 +31,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 class PlaylistViewModel @AssistedInject constructor(
     @Assisted val playlistId: Long,
     @Assisted("creatorId") val creatorId: Long?,
-    @Assisted("isMyPL") val isMyPL: Boolean?,
-    @Assisted("isV6") val isV6: Boolean?,
+    @Assisted("shouldFetchV6") val shouldFetchV6: Boolean?,
     private val loginRepository: LoginRepository,
     private val playlistRepository: PlaylistRepository,
     private val songRepository: SongRepository,
@@ -51,7 +50,7 @@ class PlaylistViewModel @AssistedInject constructor(
 
     private val detailAndPagingFlows = loginRepository.loggedInUserId
         .map { loggedInUserId ->
-            isV6 ?: (isMyPL == true || loggedInUserId == creatorId)
+            shouldFetchV6 ?: (loggedInUserId != null && loggedInUserId == creatorId)
         }
         .distinctUntilChanged()
         .map { useV6 ->
@@ -112,8 +111,7 @@ class PlaylistViewModel @AssistedInject constructor(
         fun create(
             playlistId: Long,
             @Assisted("creatorId") creatorId: Long?,
-            @Assisted("isMyPL") isMyPL: Boolean?,
-            @Assisted("isV6") isV6: Boolean?
+            @Assisted("shouldFetchV6") shouldFetchV6: Boolean?
         ): PlaylistViewModel
     }
 }

@@ -123,21 +123,21 @@ fun createAppEntryProvider(navigationManager: NavigationManager) = entryProvider
         PlaylistScreen(
             playlistId = route.playlistId,
             creatorId = route.playlistCreatorId,
-            isMyPL = route.isMyPL,
+            shouldFetchV6 = true.takeIf { route.isMyPL },
             onNavigateBack = { navigationManager.goBack() }
         )
     }
     entry<PlaylistV4Route> { route ->
         PlaylistScreen(
             playlistId = route.id,
-            isV6 = false,
+            shouldFetchV6 = false,
             onNavigateBack = { navigationManager.goBack() }
         )
     }
     entry<V6PlaylistRoute> { route ->
         PlaylistScreen(
             playlistId = route.id,
-            isV6 = true,
+            shouldFetchV6 = true,
             onNavigateBack = { navigationManager.goBack() }
         )
     }
