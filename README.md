@@ -2,11 +2,11 @@
 
 **MinusOne Cloud Music** (减一云音乐, app name: *MinusOne Music*) is a lightweight, third-party NetEase Cloud Music (NCM) client for Android, currently in an inactive (though not abandoned) state of early development.
 
-This project was started as a foundational learning experience, and its current codebase is a candid reflection of the developer's skills and architectural understanding at the time.
+This project was started as a foundational learning experience, and its initial codebase was a candid reflection of the developer's skills and architectural understanding at the time.
 
-To align the project with current best practices and showcase significant skill progression, a full migration to **Jetpack Compose** is planned. This strategic refactor will not only modernize the application with a declarative UI but also serve as a practical demonstration of developer growth.
+To align the project with current best practices and showcase significant skill progression, the application has been migrated to **Jetpack Compose**. This strategic refactor modernizes the application with a declarative UI and serves as a practical demonstration of developer growth.
 
-### Development Progress
+## Development Progress
 
 - Implemented
 
@@ -15,7 +15,8 @@ To align the project with current best practices and showcase significant skill 
   - 播放
     - **迷你播放器**
     - **播放页**
-    - **播放列表（即歌单）**
+    - **播放列表**
+  - **歌单**
   - 发现
     - **每日推荐**
 
@@ -50,7 +51,7 @@ To align the project with current best practices and showcase significant skill 
   - Music playback
   - Tablet/landscape support without special adaptations
 - Direct NCM API integration (utilizing endpoints not publicly documented)
-- View-based system & Single Activity architecture
+- Jetpack Compose & Single Activity architecture
 - **NOT** a modification of the decompiled official app, despite visual similarities
 - Does **NOT** hack music resources
 
@@ -59,11 +60,9 @@ To align the project with current best practices and showcase significant skill 
 - Users are strongly encouraged to use and support the official NCM app. By using this application, you agree to the following:
   - This is a third-party client intended solely for personal learning and educational purposes.
   - **Source Availability:** The project is primarily closed-source, with a public repository for a curated set of non-sensitive files. The expansion of public code is on hold pending a major cleanup, while a full source release is not planned to avoid potential copyright infringement.
-  
-- ### Usage Guidelines
-
-  - For personal learning purposes only.
-  - Do not share without permission.
+  - **Usage Guidelines:**
+    - For personal learning purposes only.
+    - Do not share without permission.
 
 ## Screenshots
 
@@ -81,11 +80,7 @@ To align the project with current best practices and showcase significant skill 
 
 ## To-dos
 
-- Code optimization
-  - Refactoring
-  - Display missing error messages
-- Compose
-  - Migrate
+- Display missing error messages
 - Nav UI
   - NavigationSuiteScaffold
 - Request compressed images
@@ -106,7 +101,6 @@ To align the project with current best practices and showcase significant skill 
     - Fix badge visibility issue
     - Follow
     - Volume control dialog for legacy systems
-    - LinearLayout weight distribution for controls
     - Disk rotation like https://music.163.com/m/song
   - Playlist UI items
     - Actions
@@ -116,7 +110,6 @@ To align the project with current best practices and showcase significant skill 
   - On-boarding
   - Show current audio qualities
 - Player
-  - Continue the work of moving Player to VM
   - Handle fetch error
 - Search
   - Hint
@@ -144,7 +137,7 @@ To align the project with current best practices and showcase significant skill 
 - Download: advanced
 - Firebase Crashlytics
 
-### <span id="intd">Important non-to-dos</span>
+### Important non-to-dos
 
 - Additional search tabs/pagination
 - Custom default audio quality (320 kbps is preferred when making requests)
@@ -162,14 +155,15 @@ To align the project with current best practices and showcase significant skill 
   - [WorkManager][workmanager] (TODO)
   - DataStore & SharedPreferences
 - [UI][ui]
-  - [Animations & Transitions][animation]
-  - [Layout][layout]
-  - Compose
+  - [Jetpack Compose][compose]
+- Dependency Injection
+  - [Hilt][hilt]
 - Behavior
   - [Notifications][notifications]
   - Media3
 - Third party and miscellaneous libraries
   - [Kotlin Coroutines][kotlin-coroutines]
+  - [Kotlinx Serialization][kotlinx-serialization]
   - `javax.crypto`
   - [Retrofit][retrofit]
   - Moshi
@@ -187,11 +181,12 @@ To align the project with current best practices and showcase significant skill 
 [viewmodel]: https://developer.android.com/topic/libraries/architecture/viewmodel
 [workmanager]: https://developer.android.com/topic/libraries/architecture/workmanager
 [ui]: https://developer.android.com/guide/topics/ui
-[animation]: https://developer.android.com/training/animation/
-[layout]: https://developer.android.com/guide/topics/ui/declaring-layout
+[compose]: https://developer.android.com/compose
+[hilt]: https://developer.android.com/training/dependency-injection/hilt-android
 [notifications]: https://developer.android.com/develop/ui/views/notifications
 [retrofit]: https://square.github.io/retrofit/
 [kotlin-coroutines]: https://kotlinlang.org/docs/reference/coroutines-overview.html
+[kotlinx-serialization]: https://github.com/Kotlin/kotlinx.serialization
 
 ## Utilities used
 
