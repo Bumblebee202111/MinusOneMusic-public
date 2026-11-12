@@ -1,12 +1,10 @@
 package com.github.bumblebee202111.minusonecloudmusic.data.repository
 
-import PlayRecordsApiResult
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
-import toPlayRecords
 import com.github.bumblebee202111.minusonecloudmusic.data.AppResult
 import com.github.bumblebee202111.minusonecloudmusic.data.database.AppDatabase
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.AbstractSongEntity
@@ -32,6 +30,8 @@ import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.Tr
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toPlaylistDetail
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toMainPageBillboardRowGroup
 import com.github.bumblebee202111.minusonecloudmusic.data.network.model.music.toRemoteSong
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.PlayRecordsApiResult
+import com.github.bumblebee202111.minusonecloudmusic.data.network.model.mymusic.toPlayRecords
 import com.github.bumblebee202111.minusonecloudmusic.data.network.requestparam.CParamSongInfo
 import com.github.bumblebee202111.minusonecloudmusic.player.mediaIdToIsLocalAndSongId
 import com.squareup.moshi.JsonAdapter
