@@ -96,14 +96,16 @@ class UserRepository @Inject constructor(
             }))
         }
     }, saveSuccess = { pair ->
-        recentPlayDao.deleteAndInsertRecentPlayMusic(
-            pair.first.list.map(
-                MyRecentMusicDataApiModel::toMyRecentMusicDataEntity
+        appDatabase.withTransaction {
+            musicInfoDao.insertRemoteSongs(pair.first.list.zip(pair.second) { a, b ->
+                Pair(a.data, b)
+            }.map(Pair<MusicInfoApiModel, SongPrivilegeApiModel>::toRemoteSongEntity))
+            recentPlayDao.deleteAndInsertRecentPlayMusic(
+                pair.first.list.map(
+                    MyRecentMusicDataApiModel::toMyRecentMusicDataEntity
+                )
             )
-        )
-        musicInfoDao.insertRemoteSongs(pair.first.list.zip(pair.second) { a, b ->
-            Pair(a.data, b)
-        }.map(Pair<MusicInfoApiModel, SongPrivilegeApiModel>::toRemoteSongEntity))
+        }
     })
 
 

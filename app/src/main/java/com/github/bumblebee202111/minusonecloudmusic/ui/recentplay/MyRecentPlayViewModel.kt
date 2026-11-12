@@ -21,12 +21,13 @@ class MyRecentPlayViewModel @Inject constructor(
     userRepository: UserRepository,
     mapSongsFlowToUiItemsUseCase: MapSongsFlowToUiItemsUseCase,
     playPlaylistUseCase: PlayPlaylistUseCase,
+    @Dispatcher(AppDispatchers.IO) ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private val recentPlaySongs = userRepository.getRecentPlayMusic().map {
         it.data?.map(
             MyRecentMusicData::musicInfo
         )
-    }.stateInUi()
+    }.flowOn(ioDispatcher).stateInUi()
 
     val recentPlaySongUiList = mapSongsFlowToUiItemsUseCase(recentPlaySongs)
         .stateInUi()

@@ -2,6 +2,7 @@ package com.github.bumblebee202111.minusonecloudmusic.data.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.MyRecentMusicDataEntity
@@ -12,20 +13,18 @@ import kotlinx.coroutines.flow.Flow
 interface RecentPlayDao {
 
     @Transaction
-    @Query("SELECT * FROM MyRecentMusicDataEntity")
+    @Query("SELECT * FROM MyRecentMusicDataEntity ORDER BY play_time DESC")
     fun observeMyRecentPlayMusic(): Flow<List<PopulatedMyRecentMusicData>>
 
-    @Insert(MyRecentMusicDataEntity::class)
-    fun insertMyRecentPlayMusic(myRecentMusicData: List<MyRecentMusicDataEntity>)
+    @Insert(entity = MyRecentMusicDataEntity::class, onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMyRecentPlayMusic(myRecentMusicData: List<MyRecentMusicDataEntity>)
 
     @Query("DELETE FROM MyRecentMusicDataEntity")
-    fun deleteAllMyRecentPlayMusic()
+    suspend fun deleteAllMyRecentPlayMusic()
 
-    fun deleteAndInsertRecentPlayMusic(myRecentMusicList: List<MyRecentMusicDataEntity>){
+    @Transaction
+    suspend fun deleteAndInsertRecentPlayMusic(myRecentMusicList: List<MyRecentMusicDataEntity>) {
         deleteAllMyRecentPlayMusic()
         insertMyRecentPlayMusic(myRecentMusicList)
     }
-
-
-
 }

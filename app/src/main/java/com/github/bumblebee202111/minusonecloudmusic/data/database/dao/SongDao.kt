@@ -13,10 +13,10 @@ import com.github.bumblebee202111.minusonecloudmusic.data.database.model.entity.
 interface SongDao {
 
     @Insert(entity = RemoteSongEntity::class, onConflict = OnConflictStrategy.REPLACE)
-    fun insertRemoteSongs(songs: List<RemoteSongEntity>)
+    suspend fun insertRemoteSongs(songs: List<RemoteSongEntity>)
 
     @Insert(entity = LocalSongEntity::class, onConflict = OnConflictStrategy.REPLACE)
-    fun insertLocalSongs(songs: List<LocalSongEntity>)
+    suspend fun insertLocalSongs(songs: List<LocalSongEntity>)
 
     @Query("SELECT * FROM LocalSongEntity WHERE id = :id")
     suspend fun localSong(id: Long): LocalSongEntity
