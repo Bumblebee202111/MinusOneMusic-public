@@ -1,3 +1,5 @@
+package com.github.bumblebee202111.minusonecloudmusic.ui.discover
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
