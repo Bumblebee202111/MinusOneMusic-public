@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -36,26 +35,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toDrawable
-import androidx.core.graphics.toColorInt
 import androidx.core.view.GravityCompat
-import androidx.core.view.forEach
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import com.github.bumblebee202111.minusonecloudmusic.R
-import com.github.bumblebee202111.minusonecloudmusic.ui.common.BottomNavigationIconsUtils
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.DolphinToast
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.MainDrawerContent
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.MiniBarContainer
@@ -80,15 +76,8 @@ import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.rememberNavig
 import com.github.bumblebee202111.minusonecloudmusic.ui.navigation.toEntries
 import com.github.bumblebee202111.minusonecloudmusic.ui.playerhistory.PlayerListDialog2
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-
-private val bottomNavMap = mapOf(
-    R.id.nav_main to DiscoverRoute,
-    R.id.nav_track to FriendTracksRoute,
-    R.id.nav_mine to MineRoute
-)
 
 private val nonTopLevelMiniBarRoutes = setOf(
     DailyRecommendRoute::class,
@@ -230,22 +219,10 @@ fun MinusOneApp(
                     }
                 }
                 if (isTopLevel) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        HorizontalDivider(color = DolphinTheme.colors.text7)
-
-                        val useTextOnlyMode = true
-                        if (useTextOnlyMode) {
-                            NavigationTabLayout(
-                                currentKey = currentKey,
-                                onNavigate = { navigator.navigate(it) }
-                            )
-                        } else {
-                            MainBottomNavigation(
-                                currentKey = currentKey,
-                                onNavigate = { navigator.navigate(it) }
-                            )
-                        }
-                    }
+                    NavigationTabLayout(
+                        currentKey = currentKey,
+                        onNavigate = { navigator.navigate(it) }
+                    )
                 }
             }
             if (showPlayerHistory) {
@@ -354,9 +331,10 @@ private fun NavigationTabLayout(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .background(DolphinTheme.colors.backgroundWhite)
             .navigationBarsPadding()
             .height(dimensionResource(R.dimen.bottom_nav_view_height))
-            .background(Color(0xFFFCFDFF)),
+            .padding(bottom = 2.5.dp),
         verticalAlignment = Alignment.Bottom
     ) {
         textOnlyTabs.forEach { tabInfo ->
@@ -391,67 +369,17 @@ private fun NavigationTabItem(
             ),
         contentAlignment = Alignment.BottomCenter
     ) {
-        Row(
-            modifier = Modifier.padding(bottom = 17.dp),
-            verticalAlignment = Alignment.Top
-        ) {
-            Text(
-                text = tabInfo.tabTitle,
-                color = textColor,
+        Text(
+            text = tabInfo.tabTitle,
+            color = textColor,
+            style = TextStyle(
                 fontSize = 16.sp,
-                fontWeight = fontWeight
-            )
-            
-        }
+                fontWeight = fontWeight,
+                lineHeight = TextUnit.Unspecified,
+                letterSpacing = 0.sp,
+                platformStyle = PlatformTextStyle(includeFontPadding = true)
+            ),
+            modifier = Modifier.padding(bottom = 17.dp)
+        )
     }
-}
-
-@Composable
-private fun MainBottomNavigation(
-    currentKey: NavKey?,
-    onNavigate: (NavKey) -> Unit
-) {
-    AndroidView(
-        modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding(),
-        factory = { context ->
-            BottomNavigationView(context).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    MATCH_PARENT,
-                    resources.getDimensionPixelSize(R.dimen.bottom_nav_view_height)
-                )
-                background = "#fcfdff".toColorInt().toDrawable()
-                elevation = 0f
-                inflateMenu(R.menu.menu_bottom_nav)
-                itemIconTintList =
-                    ContextCompat.getColorStateList(context, R.color.bnv_icon_tint)
-                itemTextColor =
-                    ContextCompat.getColorStateList(context, R.color.bnv_title_color)
-
-                val icons = BottomNavigationIconsUtils.getBottomNavigationIcons(context)
-                menu.forEach { item ->
-                    icons[item.itemId]?.let { icon ->
-                        item.icon = icon
-                    }
-                }
-
-                setOnItemSelectedListener { menuItem ->
-                    val route = bottomNavMap[menuItem.itemId]
-                    if (route != null) {
-                        onNavigate(route)
-                        true
-                    } else {
-                        false
-                    }
-                }
-            }
-        },
-        update = { view ->
-            val selectedMenuId = bottomNavMap.entries.find { it.value == currentKey }?.key
-            if (selectedMenuId != null && view.selectedItemId != selectedMenuId) {
-                view.selectedItemId = selectedMenuId
-            }
-        }
-    )
 }
