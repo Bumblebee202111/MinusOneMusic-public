@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,7 +23,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.compose.LazyPagingItems
-import com.github.bumblebee202111.minusonecloudmusic.R
 import com.github.bumblebee202111.minusonecloudmusic.model.SongItemUiModel
 import com.github.bumblebee202111.minusonecloudmusic.ui.common.PlayingMark
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
@@ -44,7 +42,6 @@ fun PagedPlayerSongList(
             if (song != null) {
                 PlayerSongItem(
                     song = song,
-                    position = index + 1,
                     onClick = { onItemClick(song, index) }
                 )
             }
@@ -55,21 +52,21 @@ fun PagedPlayerSongList(
 @Composable
 fun PlayerSongItem(
     song: SongItemUiModel,
-    position: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isCurrent = song.isCurrentSong
-    val primaryColor = colorResource(id = R.color.colorPrimary1)
-    val bgColor = if (isCurrent) DolphinTheme.colors.text7 else Color.White
+    val bgColor = if (isCurrent) DolphinTheme.colors.text7 else Color.Transparent
+    val songNameColor = if (isCurrent) DolphinTheme.colors.primary1 else DolphinTheme.colors.text2
+    val artistColor = if (isCurrent) DolphinTheme.colors.primary1 else DolphinTheme.colors.text4
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp)
             .background(bgColor)
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp),
+            .clickable(onClick = onClick)
+            .padding(start = 19.dp, end = 11.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (isCurrent) {
@@ -82,16 +79,16 @@ fun PlayerSongItem(
             text = buildAnnotatedString {
                 withStyle(
                     SpanStyle(
-                        fontSize = 15.sp,
-                        color = if (isCurrent) primaryColor else Color.Black
+                        fontSize = 16.sp,
+                        color = songNameColor
                     )
                 ) {
                     append(song.name ?: "Unknown")
                 }
                 withStyle(
                     SpanStyle(
-                        fontSize = 11.sp,
-                        color = if (isCurrent) primaryColor else Color(0x7F000000)
+                        fontSize = 13.sp,
+                        color = artistColor
                     )
                 ) {
                     append(" · ")
