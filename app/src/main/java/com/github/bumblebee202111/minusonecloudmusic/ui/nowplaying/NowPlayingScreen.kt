@@ -57,7 +57,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.MediaMetadata
@@ -119,6 +118,14 @@ fun NowPlayingScreen(
             .fillMaxSize()
             .background(backgroundColor)
     ) {
+        if (isLyricsMode) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0x33000000))
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -315,7 +322,7 @@ private fun NowPlayingDisk(
                                 bitmap = image.bitmap,
                                 defaultColor = AndroidColor.BLACK,
                                 minL = 0.15F,
-                                maxL = 0.45F,
+                                maxL = 0.35F,
                                 onGenerated = { colorInt ->
                                     onBackgroundColorChange(Color(colorInt))
                                 }
@@ -345,7 +352,6 @@ private fun NowPlayingDisk(
         }
     }
 }
-
 @Composable
 private fun NowPlayingLyrics(
     lyrics: List<LyricsEntry>?,
@@ -356,38 +362,42 @@ private fun NowPlayingLyrics(
     onClick: () -> Unit
 ) {
     val x8 = dimensionResource(id = R.dimen.x8)
-    val currentPosition = currentPositionProvider()
 
     Column(
         modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .fillMaxHeight()
+            .fillMaxSize()
             .padding(bottom = 12.dp)
     ) {
-        AndroidView(
-            factory = { context ->
-                LyricsView(context).apply {
-                    setOnClickListener { onClick() }
-                }
-            },
-            update = { view ->
-                if (lyrics != null) {
-                    view.setLyrics(lyrics)
-                }
-                view.setPosition(currentPosition)
-            },
+        LyricsView(
+            lyrics = lyrics,
+            currentPositionProvider = currentPositionProvider,
+            onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(bottom = 16.dp)
+                .padding(top = 16.dp, bottom = 20.dp)
         )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 25.dp)
                 .height(x8),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.g71),
+                contentDescription = "Options",
+                colorFilter = ColorFilter.tint(Color(0x66FFFFFF)),
+                modifier = Modifier
+                    .size(x8)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {  }
+                    .padding(4.dp),
+                contentScale = ContentScale.Fit
+            )
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -395,9 +405,8 @@ private fun NowPlayingLyrics(
                     painter = painterResource(id = if (likeState.like == true) R.drawable.h_q else R.drawable.h_o),
                     contentDescription = "Like",
                     modifier = Modifier
-                        .padding(end = 12.dp)
                         .size(x8)
-                        .alpha(0.6f)
+                        .alpha(if (likeState.like == true) 1.0f else 0.4f)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -409,7 +418,7 @@ private fun NowPlayingLyrics(
                     painter = painterResource(id = R.drawable.h_n),
                     contentDescription = "MLog",
                     modifier = Modifier
-                        .padding(end = 12.dp)
+                        .padding(start = 24.dp)
                         .size(x8)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
@@ -419,18 +428,6 @@ private fun NowPlayingLyrics(
                     contentScale = ContentScale.Fit
                 )
             }
-            Image(
-                painter = painterResource(id = R.drawable.g71),
-                contentDescription = "Options",
-                modifier = Modifier
-                    .size(x8)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) {  }
-                    .padding(4.dp),
-                contentScale = ContentScale.Fit
-            )
         }
     }
 }
@@ -682,7 +679,6 @@ private fun NowPlayingProgress(
         }
     }
 }
-
 
 @Composable
 private fun NowPlayingControls(

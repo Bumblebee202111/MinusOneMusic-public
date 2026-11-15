@@ -1,219 +1,248 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.common
 
-import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Paint.ANTI_ALIAS_FLAG
-import android.text.StaticLayout
-import android.text.TextPaint
-import android.util.AttributeSet
-import android.view.View
-import android.view.animation.DecelerateInterpolator
-import android.widget.Scroller
-import androidx.core.graphics.toColorInt
-import androidx.core.graphics.withSave
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.bumblebee202111.minusonecloudmusic.model.LyricsEntry
+import kotlin.math.pow
 import kotlin.math.roundToInt
-class LyricsView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
-
-    private val textColor: Int = Color.WHITE
-    private var normalTextSize: Float = ViewUtils.dpToPx(context, 17)
-    private var highlightedTextSize: Float = ViewUtils.dpToPx(context, 20)
-    private val lineSpacing: Float = ViewUtils.dpToPx(context, 18)
-
-    private var position: Long = 0
-    private var highlightedLine: Int? = null
-    private var scrollDestination: Int? = null
-    private var lyricsLines: List<LyricsLine>? = null
-    private var lyricsEntries: List<LyricsEntry>? = null
-
-    private val normalTextPaint: TextPaint = TextPaint(ANTI_ALIAS_FLAG).apply {
-        color = "#AAFFFFFF".toColorInt()
-        textAlign = Paint.Align.CENTER
-        textSize = normalTextSize
-    }
-
-    private val highlightedTextPaint: TextPaint = TextPaint(ANTI_ALIAS_FLAG).apply {
-        color = "#DDFFFFFF".toColorInt()
-        textAlign = Paint.Align.CENTER
-        textSize = highlightedTextSize
-    }
-
-    private var scroller: Scroller = Scroller(context, DecelerateInterpolator(0.604f))
-    private var isPrepared = false
-    private var isScrolling = false
-    private lateinit var normalLineLayouts: List<StaticLayout>
-    private lateinit var highlightedLineLayouts: List<StaticLayout>
-    private var height: Int = 0
-    private var width: Int = 0
-
-    fun setLyrics(lyrics: List<LyricsEntry>?) {
-        if (this.lyricsEntries == lyrics) return
-        this.lyricsEntries = lyrics
-
-        val pairs =
-            lyrics?.flatMap { entry -> entry.times.map { time -> Pair(time, entry.lyrics) } }
-                ?.sortedBy { it.first }
-
-        lyricsLines = pairs?.mapIndexed { index, pair ->
-            val dur =
-                if (index < pairs.size - 1) {
-                    pairs[index + 1].first - pairs[index].first
-                } else {
-                    Long.MAX_VALUE - pair.first
-                }
-            LyricsLine(index, pair.first, pair.second, dur)
-        }
-
-        isPrepared = false
-        isScrolling = false
-        scrollDestination = null
-        highlightedLine = null
-        update()
-    }
-
-    fun setPosition(position: Long) {
-        if (this.position == position || lyricsLines == null) return
-        this.position = position
-
-        val newLine = findLyricsLineAt(position)
-
-        if (!isPrepared) {
-            highlightedLine = newLine
-            invalidate()
-        } else if (isScrolling) {
-            if (newLine != scrollDestination) {
-                scroller.forceFinished(true)
-                scrollTo(newLine)
-            }
-        } else if (newLine != highlightedLine) {
-            highlightedLine = newLine
-            scrollTo(newLine)
-        }
-    }
-
-    private fun scrollTo(destination: Int?) {
-        this.scrollDestination = destination
-        val destY = getOffsetY(destination ?: 0)
-        val dy = destY - offsetY
-        isScrolling = true
-
-        scroller.startScroll(0, offsetY.roundToInt(), 0, dy.roundToInt(), 300)
-        invalidate()
-    }
-
-    
-    private fun getOffsetY(line: Int): Float {
-        var y = height / 2F - lineSpacing * (line - 1)
-        for (i in 0 until line) {
-            y -= if (highlightedLine == i) {
-                highlightedLineLayouts[i].height
-            } else {
-                normalLineLayouts[i].height
-            }
-        }
-        y -= if (highlightedLine == line) {
-            highlightedLineLayouts[line].height / 2
-        } else {
-            normalLineLayouts[line].height / 2
-        }
-        return y
-    }
-
-    override fun onDraw(canvas: Canvas) {
-        val highlightedLine = highlightedLine
-        val lyricsLines = lyricsLines
-
-        this.height = super.getHeight()
-        this.width = super.getWidth()
-
-        if (lyricsLines.isNullOrEmpty() || height == 0) return
-        if (!isPrepared) {
-            prepareForNewLyrics()
-        }
-
-        if (!isScrolling) {
-            offsetY = getOffsetY(highlightedLine ?: 0)
-        }
-
-        val dx = width / 2F
-        var dy = offsetY
-
-        for (l in lyricsLines.indices) {
-            val line = if (highlightedLine == l) {
-                highlightedLineLayouts[l]
-            } else {
-                normalLineLayouts[l]
-            }
-
-            val lineHeight = line.height
-            if (dy + lineHeight > 0 && dy < height) {
-                canvas.withSave {
-                        translate(dx, dy)
-                        line.draw(this)
-                }
-            }
-
-            dy += lineHeight + lineSpacing
-        }
-    }
-
-    private fun findLyricsLineAt(position: Long): Int? {
-        val lyricsLines = lyricsLines
-            ?: throw RuntimeException("lyricsLines must be set before getLyricsLineAt() is called")
-        return lyricsLines.lastOrNull { it.time <= position }?.lineNumber
-    }
-
-    private fun prepareForNewLyrics() {
-        val lyricsLines = lyricsLines ?: return
-        normalLineLayouts = List(lyricsLines.size) { index ->
-            StaticLayout.Builder.obtain(
-                lyricsLines[index].lyrics,
-                0,
-                lyricsLines[index].lyrics.length,
-                normalTextPaint,
-                width
-            ).build()
-        }
-        highlightedLineLayouts = List(lyricsLines.size) { index ->
-            StaticLayout.Builder.obtain(
-                lyricsLines[index].lyrics,
-                0,
-                lyricsLines[index].lyrics.length,
-                highlightedTextPaint,
-                width
-            ).build()
-        }
-        isPrepared = true
-    }
-
-    private fun update() {
-        invalidate()
-    }
-
-    private var offsetY = 0F
-
-    override fun computeScroll() {
-        if (lyricsLines == null) return
-        if (scroller.computeScrollOffset()) {
-            offsetY = scroller.currY.toFloat()
-            invalidate()
-        } else if (isScrolling) {
-            isScrolling = false
-            highlightedLine = scrollDestination
-            invalidate()
-        }
-    }
-
-    private data class LyricsLine(
-        val lineNumber: Int,
-        val time: Long,
-        val lyrics: String,
-        val dur: Long,
-    )
+private val LyricLineSpacing = 28.dp
+private val LyricPaddingHorizontal = 56.dp
+private val LyricFadingEdgeLength = 50.dp
+private const val LYRIC_TIME_OFFSET_MS = 50L
+private const val DEFAULT_SCROLL_DURATION_MS = 300
+private const val MAX_SCROLL_DURATION_MS = 800L
+private val LyricDecelerateEasing = Easing { fraction ->
+    1f - (1f - fraction).pow(2f * 0.604f)
 }
+private val NormalLyricTextStyle = TextStyle(
+    color = Color(0x66FFFFFF),
+    fontSize = 16.sp,
+    textAlign = TextAlign.Center
+)
+private val HighlightedLyricTextStyle = TextStyle(
+    color = Color.White,
+    fontSize = 18.sp,
+    textAlign = TextAlign.Center
+)
+@Composable
+fun LyricsView(
+    lyrics: List<LyricsEntry>?,
+    currentPositionProvider: () -> Long,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val density = LocalDensity.current
+    val lineSpacingPx = with(density) { LyricLineSpacing.toPx() }
+    val paddingLrPx = with(density) { LyricPaddingHorizontal.toPx() }
+    val fadingEdgePx = with(density) { LyricFadingEdgeLength.toPx() }
+
+    val textMeasurer = rememberTextMeasurer()
+    var canvasSize by remember { mutableStateOf(IntSize.Zero) }
+
+    val lyricsLines = remember(lyrics) {
+        val pairs = lyrics
+            ?.flatMap { entry -> entry.times.map { time -> time to entry.lyrics } }
+            ?.sortedBy { it.first }
+        pairs?.mapIndexed { index, pair ->
+            val dur = if (index < pairs.size - 1) {
+                pairs[index + 1].first - pairs[index].first
+            } else {
+                Long.MAX_VALUE - pair.first
+            }
+            LyricsLine(
+                lineNumber = index,
+                time = pair.first,
+                lyrics = pair.second,
+                dur = dur
+            )
+        }
+    }
+
+    val currentPositionProviderState by rememberUpdatedState(currentPositionProvider)
+    val highlightedLine by remember(lyricsLines) {
+        derivedStateOf {
+            val position = currentPositionProviderState() + LYRIC_TIME_OFFSET_MS
+            lyricsLines?.lastOrNull { it.time <= position }?.lineNumber
+        }
+    }
+
+    val contentWidth = (canvasSize.width - (paddingLrPx * 2).roundToInt()).coerceAtLeast(0)
+    val lineLayouts = remember(lyricsLines, contentWidth, textMeasurer) {
+        if (lyricsLines.isNullOrEmpty() || contentWidth <= 0) {
+            null
+        } else {
+            val constraints = Constraints(minWidth = contentWidth, maxWidth = contentWidth)
+            LyricsLayouts(
+                normal = lyricsLines.map { line ->
+                    textMeasurer.measure(
+                        text = line.lyrics,
+                        style = NormalLyricTextStyle,
+                        constraints = constraints
+                    )
+                },
+                highlighted = lyricsLines.map { line ->
+                    textMeasurer.measure(
+                        text = line.lyrics,
+                        style = HighlightedLyricTextStyle,
+                        constraints = constraints
+                    )
+                }
+            )
+        }
+    }
+
+    val offsetYAnimatable = remember(lyricsLines) { Animatable(0f) }
+    var isInitialized by remember(lyricsLines) { mutableStateOf(false) }
+
+    LaunchedEffect(highlightedLine, lineLayouts, canvasSize.height) {
+        val layouts = lineLayouts ?: return@LaunchedEffect
+        val lines = lyricsLines ?: return@LaunchedEffect
+        if (canvasSize.height == 0 || lines.isEmpty()) return@LaunchedEffect
+
+        val targetIndex = (highlightedLine ?: 0).coerceIn(lines.indices)
+        val targetY = calculateOffsetY(
+            line = targetIndex,
+            layouts = layouts,
+            height = canvasSize.height,
+            lineSpacing = lineSpacingPx
+        )
+
+        if (!isInitialized) {
+            offsetYAnimatable.snapTo(targetY)
+            isInitialized = true
+        } else {
+            val lineDuration = lines.getOrNull(targetIndex)?.dur ?: 0L
+            val durationMillis = if (lineDuration > 0L) {
+                (lineDuration / 2).coerceAtMost(MAX_SCROLL_DURATION_MS).toInt()
+            } else {
+                DEFAULT_SCROLL_DURATION_MS
+            }
+            offsetYAnimatable.animateTo(
+                targetValue = targetY,
+                animationSpec = tween(
+                    durationMillis = durationMillis,
+                    easing = LyricDecelerateEasing
+                )
+            )
+        }
+    }
+
+    Canvas(
+        modifier = modifier
+            .onSizeChanged { canvasSize = it }
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            )
+            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+            .drawWithContent {
+                drawContent()
+                val fadeHeight = fadingEdgePx.coerceAtMost(size.height / 2f)
+                if (fadeHeight > 0f && size.height > 0f) {
+                    val topFraction = fadeHeight / size.height
+                    val bottomFraction = 1f - topFraction
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            topFraction to Color.Black,
+                            bottomFraction to Color.Black,
+                            1f to Color.Transparent
+                        ),
+                        blendMode = BlendMode.DstIn
+                    )
+                }
+            }
+    ) {
+        val layouts = lineLayouts ?: return@Canvas
+        val lines = lyricsLines ?: return@Canvas
+        if (lines.isEmpty() || size.height == 0f) return@Canvas
+
+        val currentHighlighted = highlightedLine
+        var dy = if (isInitialized) {
+            offsetYAnimatable.value
+        } else {
+            calculateOffsetY(
+                line = (currentHighlighted ?: 0).coerceIn(lines.indices),
+                layouts = layouts,
+                height = size.height.roundToInt(),
+                lineSpacing = lineSpacingPx
+            )
+        }
+
+        for (index in lines.indices) {
+            val layoutResult = if (currentHighlighted == index) {
+                layouts.highlighted[index]
+            } else {
+                layouts.normal[index]
+            }
+
+            val lineHeight = layoutResult.size.height
+            if (dy + lineHeight > 0f && dy < size.height) {
+                drawText(
+                    textLayoutResult = layoutResult,
+                    topLeft = Offset(paddingLrPx, dy)
+                )
+            }
+
+            dy += lineHeight + lineSpacingPx
+        }
+    }
+}
+
+private fun calculateOffsetY(
+    line: Int,
+    layouts: LyricsLayouts,
+    height: Int,
+    lineSpacing: Float
+): Float {
+    var y = height / 2f - lineSpacing * line
+    for (i in 0 until line) {
+        y -= layouts.normal[i].size.height
+    }
+    y -= layouts.highlighted[line].size.height / 2f
+    return y
+}
+
+private class LyricsLayouts(
+    val normal: List<TextLayoutResult>,
+    val highlighted: List<TextLayoutResult>
+)
+
+private data class LyricsLine(
+    val lineNumber: Int,
+    val time: Long,
+    val lyrics: String,
+    val dur: Long
+)
