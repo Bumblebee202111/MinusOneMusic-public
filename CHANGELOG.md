@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+## Version 1.0.0-beta07
+
+- **UI & Visual Updates (Work in Progress):** Rebuilt the Mini Player, Lyrics view, and text-only bottom navigation bar in Jetpack Compose, and aligned the Mine screen, playlist items, and dark-themed playback queue dialog with official NCM designs.
+- **Playback & Paging Improvements:** Improved playback state management, media controller lifecycle stability, and lazy loading for large playlists.
+- **Stability & Performance Fixes:** Fixed release build serialization crashes (ProGuard/Moshi) and moved local music queries and recent-play database writes off the main thread.
+
 ## Version 1.0.0-beta06
 
 ### What's New
