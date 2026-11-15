@@ -2,6 +2,7 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -11,6 +12,10 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 
 @Immutable
 @Suppress("PropertyName")
@@ -493,6 +498,12 @@ val LocalDolphinColors = staticCompositionLocalOf {
 
 val LocalDolphinShadows = staticCompositionLocalOf { DolphinShadows() }
 
+private val DolphinDefaultTextStyle = TextStyle(
+    lineHeight = TextUnit.Unspecified,
+    letterSpacing = 0.sp,
+    platformStyle = PlatformTextStyle(includeFontPadding = true)
+)
+
 @Composable
 fun DolphinTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -509,9 +520,13 @@ fun DolphinTheme(
         LocalRippleConfiguration provides null
     ) {
         MaterialTheme(
-            colorScheme = materialColors,
-            content = content
-        )
+            colorScheme = materialColors
+        ) {
+            CompositionLocalProvider(
+                LocalTextStyle provides DolphinDefaultTextStyle,
+                content = content
+            )
+        }
     }
 }
 

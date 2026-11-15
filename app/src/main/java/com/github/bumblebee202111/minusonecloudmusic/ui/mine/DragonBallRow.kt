@@ -15,17 +15,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.bumblebee202111.minusonecloudmusic.R
+import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 @Composable
 fun DragonBallRow(
     dragonBalls: List<MineDragonBall>,
@@ -54,8 +54,8 @@ fun DragonBallItem(
     Box(
         modifier = modifier
             .height(34.dp)
-            .clip(RoundedCornerShape(6.dp))
-            .background(Color(0x26FFFFFF))
+            .clip(RoundedCornerShape(4.dp))
+            .background(Color(0x14FFFFFF))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -66,16 +66,16 @@ fun DragonBallItem(
             Image(
                 painter = painterResource(id = dragonBall.iconResId),
                 contentDescription = null,
-                modifier = Modifier
-                    .size(16.dp)
-                    .alpha(0.8f),
+                colorFilter = ColorFilter.tint(DolphinTheme.colors.textOnimage3_1),
+                modifier = Modifier.size(16.dp),
                 contentScale = ContentScale.Inside
             )
             Text(
                 text = stringResource(id = dragonBall.nameResId),
                 modifier = Modifier.padding(start = 4.dp),
-                color = Color(0xCCFFFFFF),
+                color = DolphinTheme.colors.textOnimage3_1,
                 fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

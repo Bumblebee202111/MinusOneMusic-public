@@ -40,6 +40,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.shadow.Shadow
@@ -50,7 +51,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -157,7 +157,7 @@ fun MineScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.colorBackgroundAndroid))
+            .background(DolphinTheme.colors.backgroundAndroid)
             .nestedScroll(nestedScrollConnection)
     ) {
         AsyncImage(
@@ -249,20 +249,18 @@ fun MineScreen(
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    DragonBallRow(
-                        dragonBalls = MineDragonBall.PINNED_DRAGON_BALLS,
-                        onItemClick = { ball ->
-                            when (ball.code) {
-                                MineDragonBall.TYPE_LOCAL_MUSIC -> onNavigate(LocalMusicRoute)
-                                MineDragonBall.TYPE_CLOUD_DISK -> onNavigate(MyPrivateCloudRoute)
-                                MineDragonBall.TYPE_RECENT_PLAY -> onNavigate(MyRecentPlayRoute)
-                                MineDragonBall.TYPE_FOLLOW -> onNavigate(MyFriendRoute)
-                                MineDragonBall.TYPE_COLLECTION -> onNavigate(MyCollectionRoute)
-                            }
+                DragonBallRow(
+                    dragonBalls = MineDragonBall.PINNED_DRAGON_BALLS,
+                    onItemClick = { ball ->
+                        when (ball.code) {
+                            MineDragonBall.TYPE_LOCAL_MUSIC -> onNavigate(LocalMusicRoute)
+                            MineDragonBall.TYPE_CLOUD_DISK -> onNavigate(MyPrivateCloudRoute)
+                            MineDragonBall.TYPE_RECENT_PLAY -> onNavigate(MyRecentPlayRoute)
+                            MineDragonBall.TYPE_FOLLOW -> onNavigate(MyFriendRoute)
+                            MineDragonBall.TYPE_COLLECTION -> onNavigate(MyCollectionRoute)
                         }
-                    )
-                }
+                    }
+                )
             }
         }
         HorizontalPager(
@@ -279,7 +277,7 @@ fun MineScreen(
                         placeable.place(0, yPosition)
                     }
                 }
-                .background(colorResource(id = R.color.colorBackgroundAndroid))
+                .background(DolphinTheme.colors.backgroundAndroid)
         ) { page ->
             when (page) {
                 0 -> MyMusicTabScreen(
@@ -294,9 +292,8 @@ fun MineScreen(
         val fraction = if (totalScrollRange > 0) min(abs(offsetPx) / totalScrollRange, 1.0f) else 0f
         val interpolation = FOSI.getInterpolation(fraction)
         val isCollapsed = fraction >= 0.4f
-        val maxRadiiDp = 24.dp
-        val minRadiiDp = 0.dp
-        val radiiDp = maxRadiiDp + (minRadiiDp - maxRadiiDp) * fraction * fraction
+        val maxRadiiDp = 12.dp
+        val radiiDp = maxRadiiDp * (1f - fraction)
 
         Box(
             modifier = Modifier
@@ -310,7 +307,7 @@ fun MineScreen(
                 }
                 .height(44.dp)
                 .background(
-                    color = colorResource(id = R.color.colorBackgroundAndroid),
+                    color = DolphinTheme.colors.backgroundAndroid,
                     shape = RoundedCornerShape(topStart = radiiDp, topEnd = radiiDp)
                 ),
             contentAlignment = Alignment.Center
@@ -331,11 +328,17 @@ fun MineScreen(
                     ) {
                         Box(
                             modifier = Modifier
-                                .width(15.dp)
+                                .padding(bottom = 4.dp)
+                                .width(16.dp)
                                 .height(3.dp)
                                 .background(
-                                    color = colorResource(id = R.color.colorPrimary1),
-                                    shape = RoundedCornerShape(3.dp)
+                                    brush = Brush.horizontalGradient(
+                                        colors = listOf(
+                                            DolphinTheme.colors.secondary1_1,
+                                            DolphinTheme.colors.primary1
+                                        )
+                                    ),
+                                    shape = RoundedCornerShape(1.5.dp)
                                 )
                         )
                     }
@@ -354,7 +357,7 @@ fun MineScreen(
                         Text(
                             text = stringResource(id = resId),
                             fontSize = 17.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                             color = if (selected) DolphinTheme.colors.text1 else DolphinTheme.colors.text4
                         )
                     }
@@ -366,7 +369,7 @@ fun MineScreen(
                 .fillMaxWidth()
                 .height(with(density) { toolbarHeightPx.toDp() })
                 .alpha(interpolation)
-                .background(colorResource(id = R.color.colorBackgroundAndroid))
+                .background(DolphinTheme.colors.backgroundAndroid)
         )
         val iconTint = if (isCollapsed) Color.Black else Color.White
         Box(

@@ -3,17 +3,14 @@ package com.github.bumblebee202111.minusonecloudmusic.ui.mine
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,16 +52,16 @@ fun MyMusicTabScreen(
                 .fillMaxWidth()
                 .height(40.dp)
                 .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 4.dp),
+                .padding(start = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             tabs.forEachIndexed { index, userPlaylistTab ->
                 val selected = pagerState.currentPage == index
                 val count = myPlaylistTabs?.get(userPlaylistTab)?.size ?: 0
                 val textColor =
-                    if (selected) DolphinTheme.colors.text1 else DolphinTheme.colors.text4
+                    if (selected) DolphinTheme.colors.text2 else DolphinTheme.colors.text4
 
-                Box(
+                Row(
                     modifier = Modifier
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
@@ -72,25 +69,20 @@ fun MyMusicTabScreen(
                             onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
                         )
                         .padding(horizontal = 12.dp, vertical = 8.dp),
-                    contentAlignment = Alignment.Center
+                    verticalAlignment = Alignment.Top
                 ) {
-                    BadgedBox(
-                        badge = {
-                            if (count > 0) {
-                                Text(
-                                    text = count.toString(),
-                                    color = textColor,
-                                    fontSize = 11.sp,
-                                    modifier = Modifier.offset(x = 10.dp, y = (-2).dp)
-                                )
-                            }
-                        }
-                    ) {
+                    Text(
+                        text = stringResource(id = tabTexts[index]),
+                        color = textColor,
+                        fontSize = 14.sp,
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                    )
+                    if (count > 0) {
                         Text(
-                            text = stringResource(id = tabTexts[index]),
+                            text = "$count ",
                             color = textColor,
-                            fontSize = 15.sp,
-                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }

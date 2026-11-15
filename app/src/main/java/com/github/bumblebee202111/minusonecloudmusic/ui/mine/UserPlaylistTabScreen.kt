@@ -1,8 +1,10 @@
 package com.github.bumblebee202111.minusonecloudmusic.ui.mine
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,9 +27,9 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +38,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.github.bumblebee202111.minusonecloudmusic.R
+import com.github.bumblebee202111.minusonecloudmusic.ui.LocalMiniPlayerBarHeight
 import com.github.bumblebee202111.minusonecloudmusic.ui.theme.DolphinTheme
 import com.github.bumblebee202111.minusonecloudmusic.utils.imageUrl
 
@@ -48,7 +51,10 @@ fun UserPlaylistTabScreen(
     val allTabsData by viewModel.myPlaylistTabs.collectAsStateWithLifecycle(initialValue = null)
     val items = allTabsData?.get(category) ?: emptyList()
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = LocalMiniPlayerBarHeight.current + 28.dp)
+    ) {
         items(
             items = items,
             key = { item ->
@@ -78,7 +84,7 @@ private fun NormalPlaylistItemView(
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
-    val sizePx = remember(density) { with(density) { 58.dp.roundToPx() } }
+    val sizePx = remember(density) { with(density) { 52.dp.roundToPx() } }
     val placeholderPainter = remember(context, sizePx) {
         val drawable = ContextCompat.getDrawable(context, R.drawable.dnl)
         drawable?.toBitmap(width = sizePx, height = sizePx)?.asImageBitmap()
@@ -88,8 +94,9 @@ private fun NormalPlaylistItemView(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .height(68.dp)
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 5.dp),
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
@@ -99,28 +106,30 @@ private fun NormalPlaylistItemView(
             placeholder = placeholderPainter,
             error = placeholderPainter,
             modifier = Modifier
-                .size(58.dp)
-                .clip(RoundedCornerShape(dimensionResource(id = R.dimen.rt)))
+                .size(52.dp)
+                .clip(RoundedCornerShape(3.dp))
+                .background(DolphinTheme.colors.text6_1)
         )
 
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(start = 10.dp)
+                .padding(start = 12.dp)
         ) {
             Text(
                 text = item.playlist.name,
-                color = DolphinTheme.colors.text2,
+                color = DolphinTheme.colors.text1,
                 fontSize = 15.sp,
-                maxLines = 2,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(3.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             Text(
                 text = "${item.playlist.trackCount}首·${item.playlist.playCount}次播放",
-                color = DolphinTheme.colors.text3_1,
+                color = DolphinTheme.colors.text4,
                 fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -137,8 +146,9 @@ private fun UserChartsItemView(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .height(68.dp)
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 5.dp),
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
@@ -146,28 +156,30 @@ private fun UserChartsItemView(
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(58.dp)
-                .clip(RoundedCornerShape(dimensionResource(id = R.dimen.rt)))
+                .size(52.dp)
+                .clip(RoundedCornerShape(3.dp))
+                .background(DolphinTheme.colors.text6_1)
         )
 
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(start = 10.dp)
+                .padding(start = 12.dp)
         ) {
             Text(
                 text = stringResource(id = R.string.charts),
-                color = DolphinTheme.colors.text2,
+                color = DolphinTheme.colors.text1,
                 fontSize = 15.sp,
-                maxLines = 2,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(3.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             Text(
                 text = stringResource(id = R.string.hz2, item.listenSongs),
-                color = DolphinTheme.colors.text3_1,
+                color = DolphinTheme.colors.text4,
                 fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

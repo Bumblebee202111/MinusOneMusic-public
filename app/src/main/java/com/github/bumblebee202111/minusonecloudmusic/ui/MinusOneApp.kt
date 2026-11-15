@@ -40,10 +40,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -372,13 +369,8 @@ private fun NavigationTabItem(
         Text(
             text = tabInfo.tabTitle,
             color = textColor,
-            style = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = fontWeight,
-                lineHeight = TextUnit.Unspecified,
-                letterSpacing = 0.sp,
-                platformStyle = PlatformTextStyle(includeFontPadding = true)
-            ),
+            fontSize = 16.sp,
+            fontWeight = fontWeight,
             modifier = Modifier.padding(bottom = 17.dp)
         )
     }
